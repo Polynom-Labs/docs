@@ -11,6 +11,15 @@
   "navigation": {
     "pages": [
       {
+        "group": "Overview",
+        "pages": [
+          "overview/product-overview",
+          "overview/how-arcane-works",
+          "overview/supported-use-cases",
+          "overview/current-scope"
+        ]
+      },
+      {
         "group": "Architecture",
         "pages": [
           "architecture/overview",
@@ -81,7 +90,7 @@
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg",
-    "href": "/architecture/overview"
+    "href": "/overview/product-overview"
   },
   "navbar": {
     "links": [
@@ -92,8 +101,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "label": "Integration Guide",
+      "href": "/integration/stellar-privacy-pool"
     }
   },
   "contextual": {
@@ -108,11 +117,5 @@
       "vscode"
     ]
   },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
-  }
+  "footer": {}
 }

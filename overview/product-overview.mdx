@@ -1,0 +1,72 @@
+---
+title: "Product Overview"
+description: "What Arcane is, who it is for, and how the privacy-pool and selective-disclosure parts fit together."
+---
+
+Arcane is a compliance and selective-disclosure platform for privacy-preserving asset applications.
+
+It combines two parts:
+
+| Part | What it does | Who uses it |
+| --- | --- | --- |
+| Privacy Pools | Execute private asset movements through an on-chain privacy pool while preserving commitment, nullifier, and proof-verification state | Application teams, integrators, wallet-connected end users |
+| Auditing Portal | Index privacy-pool audit events, interpret registered contract payloads, and expose scoped disclosure workflows | Compliance teams, auditors, application administrators, organization administrators |
+
+The current implementation described in these docs is centered on the Stellar/Soroban privacy-pool path. Applications submit wallet-signed transactions to the Soroban contract. The contract verifies the proof, updates on-chain state, moves tokens where required, and emits an encrypted audit payload. Arcane indexes that payload and makes it available only through scoped portal workflows.
+
+## Why it exists
+
+Privacy-preserving financial applications need two properties that are usually in tension:
+
+| Requirement | Arcane approach |
+| --- | --- |
+| User transaction privacy | Transaction details are represented through commitments, nullifiers, proofs, and encrypted audit payloads instead of public transaction-level disclosure |
+| Compliance review | Authorized organizations and auditors can request, approve, review, and report scoped disclosure data through the Auditing Portal |
+
+Arcane does not make every private transaction public. It creates a controlled path for selective disclosure when an organization or auditor has the right scope.
+
+## Main users
+
+| User | Responsibility |
+| --- | --- |
+| Application team | Integrates the SDK and submits privacy-pool transactions through a Stellar wallet flow |
+| Application administrator | Manages disclosure case approvals, auditor access, reports, and application-level activity |
+| Auditor | Requests disclosure, reviews approved case transactions, and generates reports |
+| Organization administrator | Manages organization-level users, applications, and administration boundaries |
+
+## What Arcane provides
+
+| Capability | Implementation area |
+| --- | --- |
+| Private transaction execution | Soroban privacy-pool contract, Circom circuits, client SDK |
+| Audit event handoff | `AuditEncodedDigest` event emitted by the Soroban contract |
+| Contract indexing | Backend scanner for registered contracts |
+| Interpretation | Backend worker that decrypts and normalizes audit payloads |
+| Access control | Backend auth, permissions, application scope, case assignments, and access windows |
+| Disclosure workflows | Case requests, approvals, case review, reports, downloads, and activity logs |
+
+## What Arcane is not
+
+| Not a | Reason |
+| --- | --- |
+| Custodial wallet | Users sign through their own wallet integration; Arcane does not custody user funds |
+| General block explorer | Arcane indexes registered contracts and audit events for compliance workflows |
+| Generic analytics product | The data model is built around disclosure, case review, reports, and activity logs |
+| Identity provider | The backend integrates identity providers; identity is not the core Arcane protocol |
+
+## Read next
+
+<Columns cols={2}>
+  <Card title="How Arcane Works" icon="route" href="/overview/how-arcane-works">
+    End-to-end path from a private transaction to an approved disclosure workflow.
+  </Card>
+  <Card title="Supported Use Cases" icon="list-check" href="/overview/supported-use-cases">
+    Partner-facing scenarios supported by the current platform model.
+  </Card>
+  <Card title="Current Scope" icon="crosshairs" href="/overview/current-scope">
+    What the current Stellar/Soroban implementation covers and what remains outside this docs set.
+  </Card>
+  <Card title="Architecture Overview" icon="diagram-project" href="/architecture/overview">
+    Technical decomposition of the privacy-pool and Auditing Portal domains.
+  </Card>
+</Columns>

@@ -1,0 +1,61 @@
+---
+title: "How Arcane Works"
+description: "End-to-end flow from a private Soroban transaction to scoped audit review."
+---
+
+Arcane separates transaction execution from disclosure review.
+
+Applications execute private transactions directly against the privacy-pool contract. The Auditing Portal does not sit in the transaction path. It observes registered contract events, interprets encrypted audit payloads, and exposes reviewed data through permissioned workflows.
+
+## End-to-end flow
+
+| Step | Component | Result |
+| --- | --- | --- |
+| 1 | Application | Initializes the privacy-pool SDK and prepares transaction inputs |
+| 2 | Wallet | Signs the Soroban transaction submitted by the application |
+| 3 | Soroban privacy-pool contract | Verifies proof bytes and public signals, updates commitment/nullifier/root state, and performs token movement |
+| 4 | Soroban event stream | Emits `AuditEncodedDigest` with the encrypted audit payload |
+| 5 | Backend scanner | Reads registered contract events from Stellar RPC and writes raw `audit` rows |
+| 6 | Interpretation worker | Decrypts and normalizes audit payloads into `audit_interpretation` rows |
+| 7 | Auditing Portal | Enforces organization, application, case, and permission scope for review and reporting |
+
+## Disclosure model
+
+The platform is built around scoped disclosure rather than global visibility.
+
+| Layer | Visibility model |
+| --- | --- |
+| Public ledger | Contract calls, events, commitments, nullifiers, roots, and public transaction metadata |
+| Encrypted audit payload | Emitted on-chain but readable only with the registered contract decoding key |
+| Backend interpretation | Stored in PostgreSQL after scanner and interpretation workers process registered contracts |
+| Portal access | Restricted by organization, application, case assignment, permissions, and access windows |
+| Reports and logs | Generated and downloaded only through explicit report permissions and logged activity |
+
+## Main boundaries
+
+| Boundary | What crosses it |
+| --- | --- |
+| Application to contract | Proof bytes, public signals, encrypted audit payload, wallet-signed transaction |
+| Contract to ledger | Contract state updates and `AuditEncodedDigest` event |
+| Ledger to backend | Registered contract events read through Stellar RPC |
+| Backend to portal | Scoped API responses for authenticated users |
+| Portal to auditor | Case-scoped review, reports, downloads, and activity-log records |
+
+## Operational split
+
+| Domain | Can be used independently? | Notes |
+| --- | --- | --- |
+| Privacy Pools | Yes | Applications can use the on-chain privacy-pool contract and SDK without the portal being in the transaction path |
+| Auditing Portal | Yes, with registered data sources | The portal consumes indexed and interpreted audit data; it is organized around applications, cases, reports, and user access |
+
+The two domains are connected by the audit event boundary: the privacy pool emits data; the backend indexes and interprets it for scoped disclosure.
+
+## Technical references
+
+| Topic | Page |
+| --- | --- |
+| System-level actors and external systems | [System Context](/architecture/system-context) |
+| Runtime components | [Architecture Map](/architecture/architecture-map) |
+| Privacy-pool implementation | [Privacy Pools overview](/privacy-pools/overview) |
+| Backend indexing path | [Indexing and Interpretation](/auditing-portal/indexing-and-interpretation) |
+| Disclosure workflow | [Disclosure, Cases, and Reports](/auditing-portal/disclosure-cases-and-reports) |

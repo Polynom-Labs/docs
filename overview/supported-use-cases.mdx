@@ -1,0 +1,65 @@
+---
+title: "Supported Use Cases"
+description: "Partner-facing scenarios supported by the current Arcane privacy-pool and auditing model."
+---
+
+Arcane is intended for applications that need private asset movement and a controlled compliance review path.
+
+## Primary use cases
+
+| Use case | What Arcane enables |
+| --- | --- |
+| Regulated private transfers | Applications can submit private deposit, withdrawal, transfer, and mixed transaction shapes through the privacy-pool `transact` entrypoint |
+| Case-based audit review | Auditors review approved case data instead of receiving unrestricted access to all application activity |
+| Disclosure request workflow | Auditors can create disclosure requests, and application administrators can approve, close, or manage access |
+| Report generation | Authorized users can generate and download transaction or case reports from scoped portal data |
+| Activity logging | Disclosure requests, access, decisions, reports, and downloads are written to activity logs |
+| Partner integration | Application teams can integrate the SDK and register contracts so Arcane can index and interpret audit events |
+
+## Auditor use cases
+
+| Use case | Page |
+| --- | --- |
+| Create a disclosure request | [Create Disclosure Request](/use-cases/auditor/create-disclosure-request) |
+| Review approved case transactions | [Review Case Transactions](/use-cases/auditor/review-case-transactions) |
+| Generate reports and activity logs | [Generate Reports and Activity Logs](/use-cases/auditor/generate-reports-and-activity-logs) |
+
+## Application administrator use cases
+
+| Use case | Page |
+| --- | --- |
+| Approve or close disclosure requests | [Approve Disclosure Request](/use-cases/application-administrator/approve-disclosure-request) |
+| Manage case auditors | [Manage Case Auditors](/use-cases/application-administrator/manage-case-auditors) |
+| Review reports and activity logs | [Application Reports and Activity Logs](/use-cases/application-administrator/application-reports-and-activity-logs) |
+
+## Organization administrator use cases
+
+| Use case | Page |
+| --- | --- |
+| Manage organization-level access | [Organization Administrator overview](/use-cases/organization-administrator/overview) |
+| Manage applications and organization boundaries | [Identity and Access](/auditing-portal/identity-and-access) |
+
+## Integration use case
+
+The main integrator path is the Stellar/Soroban privacy-pool integration.
+
+| Integrator task | Page |
+| --- | --- |
+| Connect an application to the privacy-pool contract and Arcane backend | [Stellar Privacy Pool Integration](/integration/stellar-privacy-pool) |
+| Understand SDK responsibilities | [Client SDK](/privacy-pools/client-sdk) |
+| Understand the contract entrypoint and audit event | [Soroban Contract](/privacy-pools/soroban-contract) |
+
+## Fit assessment
+
+Arcane is a good fit when:
+
+- The application needs private asset movement with an on-chain privacy-pool model.
+- The organization needs a permissioned path for audit and disclosure review.
+- Disclosure should be case-based, logged, and scoped to users and applications.
+- The application can register contracts and provide decoding keys for audit interpretation.
+
+Arcane is not a good fit when:
+
+- The application only needs public ledger analytics.
+- The review model requires every transaction detail to be public by default.
+- The organization needs a custodial wallet or identity-provider product rather than a compliance and selective-disclosure layer.
