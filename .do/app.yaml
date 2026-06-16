@@ -1,6 +1,10 @@
 alerts:
   - rule: DEPLOYMENT_FAILED
   - rule: DOMAIN_FAILED
+domains:
+  - domain: docs.arcane.finance
+    type: PRIMARY
+    zone: arcane.finance
 features:
   - buildpack-stack=ubuntu-22
 ingress:
