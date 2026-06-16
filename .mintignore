@@ -7,3 +7,14 @@ drafts/
 *.draft.mdx
 
 .cursor
+
+# Build and deployment artifacts
+.app-build/
+.do/
+.gitignore
+.heroku/
+dist/
+node_modules/
+package-lock.json
+package.json
+scripts/
