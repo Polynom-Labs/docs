@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="760" viewBox="0 0 1320 760" role="img" aria-labelledby="title desc">
+  <title id="title">Auditing Portal components</title>
+  <desc id="desc">Auditing Portal component map split into indexing and interpretation path, and portal access path.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #d9e2f2; stroke-width: 1.5; rx: 24; }
+      .panel-title { fill: #334155; font-family: Helvetica, Arial, sans-serif; font-size: 20px; font-weight: 800; }
+      .box { fill: #ffffff; stroke: #9bb5df; stroke-width: 1.8; rx: 16; }
+      .box-blue { fill: #eaf2ff; stroke: #6ca0dc; }
+      .box-green { fill: #ebf8f0; stroke: #70b88b; }
+      .box-amber { fill: #fff7df; stroke: #d4a72c; }
+      .box-slate { fill: #eef2f7; stroke: #94a3b8; }
+      .text { fill: #0f172a; font-family: Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 700; }
+      .small { fill: #475569; font-family: Helvetica, Arial, sans-serif; font-size: 13px; }
+      .title { fill: #0f172a; font-family: Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 850; }
+      .note { fill: #64748b; font-family: Helvetica, Arial, sans-serif; font-size: 13px; }
+      .label { fill: #334155; font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; }
+      .arrow { fill: none; stroke: #334155; stroke-width: 2.4; marker-end: url(#arrow); }
+      .arrow-soft { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#arrowSoft); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155" />
+    </marker>
+    <marker id="arrowSoft" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1320" height="760" rx="28" />
+  <text x="56" y="64" class="title">Auditing Portal components</text>
+  <text x="56" y="92" class="note">Scanner and interpretation jobs prepare data; API routes enforce access for portal workflows.</text>
+
+  <rect class="panel" x="56" y="132" width="1208" height="260" rx="24" />
+  <text x="88" y="174" class="panel-title">Indexing and interpretation path</text>
+
+  <rect class="box box-slate" x="92" y="206" width="176" height="70" rx="16" />
+  <text x="122" y="236" class="text">Registry</text>
+  <text x="122" y="258" class="small">chain, contracts</text>
+
+  <rect class="box box-amber" x="92" y="300" width="176" height="70" rx="16" />
+  <text x="122" y="330" class="text">Stellar RPC</text>
+  <text x="122" y="352" class="small">events, ledgers</text>
+
+  <rect class="box box-green" x="344" y="252" width="210" height="84" rx="16" />
+  <text x="374" y="284" class="text">ScannerModule</text>
+  <text x="374" y="308" class="small">Stellar scanner service</text>
+
+  <rect class="box box-slate" x="628" y="252" width="198" height="84" rx="16" />
+  <text x="658" y="284" class="text">Raw audit tables</text>
+  <text x="658" y="308" class="small">stellar_scans, audit</text>
+
+  <rect class="box box-green" x="900" y="252" width="236" height="84" rx="16" />
+  <text x="930" y="284" class="text">Interpretation worker</text>
+  <text x="930" y="308" class="small">Decrypts and normalizes</text>
+
+  <rect class="box box-slate" x="930" y="160" width="176" height="58" rx="14" />
+  <text x="956" y="195" class="text">audit_interpretation</text>
+
+  <path class="arrow-soft" d="M 268 241 C 308 241, 308 294, 344 294" />
+  <text x="276" y="226" class="label">registered contracts</text>
+  <path class="arrow" d="M 268 335 C 308 335, 308 294, 344 294" />
+  <path class="arrow" d="M 554 294 H 628" />
+  <path class="arrow" d="M 826 294 H 900" />
+  <path class="arrow" d="M 1018 252 V 218" />
+
+  <rect class="panel" x="56" y="440" width="1208" height="240" rx="24" />
+  <text x="88" y="482" class="panel-title">Portal access path</text>
+
+  <rect class="box box-slate" x="92" y="542" width="176" height="70" rx="16" />
+  <text x="122" y="572" class="text">Identity</text>
+  <text x="122" y="594" class="small">user and org session</text>
+
+  <rect class="box box-blue" x="344" y="542" width="176" height="70" rx="16" />
+  <text x="374" y="572" class="text">Audit UI</text>
+  <text x="374" y="594" class="small">org/app workspaces</text>
+
+  <rect class="box box-green" x="596" y="542" width="210" height="70" rx="16" />
+  <text x="626" y="572" class="text">Backend API</text>
+  <text x="626" y="594" class="small">guards and scoped queries</text>
+
+  <rect class="box box-slate" x="882" y="494" width="176" height="70" rx="16" />
+  <text x="912" y="524" class="text">Access data</text>
+  <text x="912" y="546" class="small">orgs, permissions</text>
+
+  <rect class="box box-slate" x="882" y="598" width="176" height="70" rx="16" />
+  <text x="912" y="628" class="text">Workflow data</text>
+  <text x="912" y="650" class="small">requests, cases, logs</text>
+
+  <rect class="box box-slate" x="1110" y="542" width="112" height="70" rx="16" />
+  <text x="1132" y="572" class="text">Audit data</text>
+  <text x="1132" y="594" class="small">interpreted</text>
+
+  <path class="arrow-soft" d="M 268 577 H 344" />
+  <path class="arrow" d="M 520 577 H 596" />
+  <path class="arrow" d="M 806 577 C 842 577, 842 529, 882 529" />
+  <path class="arrow" d="M 806 577 C 842 577, 842 633, 882 633" />
+  <path class="arrow" d="M 1058 577 H 1110" />
+</svg>

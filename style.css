@@ -1,0 +1,15 @@
+nav-logo img {
+  height: 2.75rem;
+  width: auto;
+  max-height: none;
+}
+
+nav-logo a {
+  display: inline-flex;
+  align-items: center;
+}
+
+#sidebar nav-logo img {
+  height: 2.75rem;
+  width: auto;
+}

@@ -1,0 +1,78 @@
+---
+title: "Client SDK"
+description: "Application-side SDK boundary for Stellar/Soroban privacy-pool integrations."
+---
+
+`PrivacyPoolSDK` is the client-side boundary between an application and the Soroban privacy-pool contract. It prepares the cryptographic inputs for `PrivacyPoolsContract.transact`; it does not manage disclosure cases, reports, or auditor permissions.
+
+## Boundary
+
+| Area | Reference or partner application | PrivacyPoolSDK | Arcane Auditing Portal |
+| --- | --- | --- | --- |
+| End-user UI | Yes | No | No |
+| Stellar wallet connection | Yes | Uses signatures / transaction flow | No |
+| Coin construction | Calls SDK | Yes | No |
+| Merkle witness preparation | Calls SDK | Yes | No |
+| Proof generation | Calls SDK | Yes | No |
+| Soroban argument serialization | Calls SDK | Yes | No |
+| Contract event indexing | No | No | Yes |
+| Audit interpretation | No | No | Yes |
+| Disclosure cases and reports | No | No | Yes |
+
+## SDK responsibilities
+
+| SDK area | Function examples |
+| --- | --- |
+| Stealth address derivation | `buildStealthAddressSignMessage`, `generateStealthAddressFromStellarSignature` |
+| Coin creation | `generateCoin`, `generateCoinWithSharedSecret`, `generateCoinForDepositWithSharedHex` |
+| Witness preparation | `buildWithdrawMerkleWitness` |
+| Proof generation | `proveWithdrawal`, `proveTransaction` |
+| Soroban serialization | `proofToHex`, `publicToHex` |
+| Nullifier helper | `calculateNullifierHash` |
+| ECDH helpers | `ecdhEphemeralPublicKeyFromScalarHex`, `ecdhSharedKey`, shared-secret helpers |
+
+## Application flow
+
+```mermaid
+sequenceDiagram
+  participant App as Application
+  participant SDK as PrivacyPoolSDK
+  participant Wallet as Stellar wallet
+  participant Contract as PrivacyPoolsContract
+
+  App->>SDK: Initialize SDK with WASM/circuit assets
+  App->>SDK: Build or recover private coin data
+  App->>SDK: Read pool state and build witness
+  App->>SDK: Generate proof bytes and public signal bytes
+  App->>SDK: Prepare encoded audit bytes
+  App->>Wallet: Request transaction signing
+  Wallet->>Contract: transact(from, proof_bytes, pub_signals_bytes, encoded)
+```
+
+## Install
+
+```bash
+npm install @auditable/privacy-pool-zk-sdk
+```
+
+Runtime requirements:
+
+- Node.js `>=19.0.0`, or
+- A browser with Web Crypto (`crypto.subtle`)
+
+## Soroban call shape
+
+The application submits:
+
+```text
+transact(from, proof_bytes, pub_signals_bytes, encoded)
+```
+
+| Argument | Produced by |
+| --- | --- |
+| `from` | Wallet-authenticated Stellar address |
+| `proof_bytes` | SDK proof serialization |
+| `pub_signals_bytes` | SDK public-signal serialization |
+| `encoded` | Encrypted audit payload prepared by the application/SDK flow |
+
+After a successful transaction, the contract emits `AuditEncodedDigest`; the backend scanner reads it later through Stellar RPC.

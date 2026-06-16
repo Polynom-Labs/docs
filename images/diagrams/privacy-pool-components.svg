@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1320" height="760" viewBox="0 0 1320 760" role="img" aria-labelledby="title desc">
+  <title id="title">Privacy Pool components</title>
+  <desc id="desc">Privacy Pool component diagram showing the application, PrivacyPoolSDK, wallet, transact entrypoint, proof verification, on-chain state updates, token transfers, and audit event emission.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #d9e2f2; stroke-width: 1.4; rx: 22; }
+      .box { fill: #ffffff; stroke: #9bb5df; stroke-width: 1.7; rx: 16; }
+      .box-blue { fill: #eaf2ff; stroke: #6ca0dc; }
+      .box-green { fill: #ebf8f0; stroke: #70b88b; }
+      .box-amber { fill: #fff7df; stroke: #d4a72c; }
+      .text { fill: #0f172a; font-family: Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 700; }
+      .small { fill: #475569; font-family: Helvetica, Arial, sans-serif; font-size: 13px; }
+      .title { fill: #0f172a; font-family: Helvetica, Arial, sans-serif; font-size: 26px; font-weight: 850; }
+      .panel-title { fill: #475569; font-family: Helvetica, Arial, sans-serif; font-size: 17px; font-weight: 800; }
+      .arrow { fill: none; stroke: #334155; stroke-width: 2.4; marker-end: url(#arrow); }
+      .arrow-soft { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#arrowSoft); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155" />
+    </marker>
+    <marker id="arrowSoft" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1320" height="760" rx="28" />
+  <text x="56" y="64" class="title">Privacy Pool components</text>
+  <text x="56" y="92" class="small">The SDK prepares private transaction inputs; the contract verifies and commits state.</text>
+
+  <rect class="panel" x="56" y="140" width="320" height="500" rx="22" />
+  <text x="86" y="178" class="panel-title">Application side</text>
+  <rect class="box box-blue" x="92" y="220" width="248" height="76" rx="16" />
+  <text x="122" y="252" class="text">Partner application</text>
+  <text x="122" y="276" class="small">End-user transaction UI</text>
+  <rect class="box" x="92" y="338" width="248" height="76" rx="16" />
+  <text x="122" y="370" class="text">PrivacyPoolSDK</text>
+  <text x="122" y="394" class="small">Coins, witness, proof, signals</text>
+  <rect class="box" x="92" y="456" width="248" height="76" rx="16" />
+  <text x="122" y="488" class="text">Stellar wallet</text>
+  <text x="122" y="512" class="small">Signs Soroban invocation</text>
+
+  <rect class="panel" x="430" y="140" width="834" height="500" rx="22" />
+  <text x="460" y="178" class="panel-title">Soroban contract</text>
+  <rect class="box box-green" x="474" y="230" width="252" height="96" rx="16" />
+  <text x="504" y="266" class="text">transact(...)</text>
+  <text x="504" y="292" class="small">Single public entrypoint</text>
+
+  <rect class="box" x="786" y="190" width="188" height="70" rx="16" />
+  <text x="816" y="232" class="text">Auth check</text>
+  <rect class="box" x="1014" y="190" width="188" height="70" rx="16" />
+  <text x="1044" y="222" class="text">Root check</text>
+  <text x="1044" y="244" class="small">Recent root history</text>
+
+  <rect class="box" x="786" y="310" width="188" height="78" rx="16" />
+  <text x="816" y="340" class="text">Nullifier check</text>
+  <text x="816" y="362" class="small">Reject reused hashes</text>
+  <rect class="box" x="1014" y="310" width="188" height="78" rx="16" />
+  <text x="1044" y="340" class="text">Proof verify</text>
+  <text x="1044" y="362" class="small">Groth16 verifier</text>
+
+  <rect class="box box-amber" x="786" y="446" width="188" height="92" rx="16" />
+  <text x="816" y="478" class="text">State update</text>
+  <text x="816" y="502" class="small">commitments, roots,</text>
+  <text x="816" y="520" class="small">ephemeral keys</text>
+  <rect class="box box-amber" x="1014" y="446" width="188" height="92" rx="16" />
+  <text x="1044" y="478" class="text">Token legs</text>
+  <text x="1044" y="502" class="small">public deposits and</text>
+  <text x="1044" y="520" class="small">withdrawals</text>
+
+  <rect class="box box-green" x="905" y="574" width="206" height="70" rx="16" />
+  <text x="936" y="604" class="text">AuditEncodedDigest</text>
+  <text x="936" y="626" class="small">encrypted audit payload</text>
+
+  <path class="arrow" d="M 216 296 V 338" />
+  <path class="arrow-soft" d="M 216 414 V 456" />
+  <path class="arrow" d="M 340 494 C 412 494, 414 278, 474 278" />
+  <path class="arrow" d="M 340 376 C 414 376, 414 278, 474 278" />
+  <path class="arrow" d="M 726 278 C 764 278, 756 225, 786 225" />
+  <path class="arrow" d="M 974 225 H 1014" />
+  <path class="arrow" d="M 880 260 V 310" />
+  <path class="arrow" d="M 974 349 H 1014" />
+  <path class="arrow" d="M 1108 388 V 446" />
+  <path class="arrow" d="M 974 492 H 1014" />
+  <path class="arrow" d="M 1108 538 C 1108 564, 1082 574, 1040 574" />
+</svg>

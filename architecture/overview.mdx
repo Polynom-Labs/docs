@@ -1,0 +1,58 @@
+---
+title: "Architecture overview"
+description: "Top-level technical architecture for Arcane privacy pools and the compliance auditing portal."
+---
+
+Arcane has two technical domains that can be understood separately:
+
+| Domain | Main implementation | Responsibility |
+| --- | --- | --- |
+| Privacy Pools | Soroban contract, Circom circuits, client SDK | Execute private asset movements on-chain, maintain commitment/nullifier state, verify proofs, and emit encrypted audit payloads |
+| Auditing Portal | NestJS backend, PostgreSQL, scanner, interpretation worker, React Audit UI | Index registered contracts, interpret audit payloads, enforce organization/application/case access, manage disclosure workflows, reports, and activity logs |
+
+The Stellar/Soroban path is the current privacy-pool implementation covered by these pages. The backend also contains Solana confidential-token scanner and interpretation modules; those are separate chain adapters after the indexing boundary.
+
+## Documentation map
+
+<Columns cols={2}>
+  <Card title="System Context" icon="diagram-project" href="/architecture/system-context">
+    Users, external systems, the privacy pool, and the auditing portal.
+  </Card>
+  <Card title="Architecture Map" icon="network-wired" href="/architecture/architecture-map">
+    Runtime components and the event path between them.
+  </Card>
+  <Card title="Privacy Pools" icon="lock" href="/privacy-pools/overview">
+    Soroban contract, SDK, cryptography, on-chain state, and audit event boundary.
+  </Card>
+  <Card title="Auditing Portal" icon="server" href="/auditing-portal/overview">
+    Backend modules, data model, indexing, interpretation, identity, cases, reports, and UI.
+  </Card>
+</Columns>
+
+## Runtime summary
+
+| Path | Sequence |
+| --- | --- |
+| Private transaction execution | Application -> SDK -> wallet -> `PrivacyPoolsContract.transact` |
+| Audit event handoff | `PrivacyPoolsContract.transact` -> `AuditEncodedDigest` -> Stellar RPC |
+| Indexing and interpretation | Stellar RPC -> scanner -> `audit` -> interpretation worker -> `audit_interpretation` |
+| Portal review | Audit UI -> backend API -> scoped cases, reports, and `auditors_log` |
+
+## Boundaries
+
+| Boundary | Implementation | Responsibility |
+| --- | --- | --- |
+| External application | Reference app or partner integration | End-user wallet flow, SDK initialization, proof generation, transaction submission |
+| SDK and wallet | `@auditable/privacy-pool-zk-sdk` plus Stellar wallet | Coin construction, witness preparation, proof generation, Soroban serialization, signing |
+| Soroban privacy-pool contract | `PrivacyPoolsContract` | Proof verification, root/nullifier checks, commitment insertion, token movement, audit event emission |
+| Backend scanner and interpreter | `ScannerModule`, `StellarLedgerScannerService`, `AuditInterpretationRunnerService` | Registered-contract scanning, raw audit upsert, decryption, normalized interpretation rows |
+| Audit API and UI | NestJS controllers/guards plus React/Vite UI | Authenticated access, disclosure cases, transaction review, reports, activity logs |
+| PostgreSQL | TypeORM entities and migrations | Registry, audit, interpretation, access, workflow, report, and log storage |
+
+## Implementation repositories
+
+| Area | Repository |
+| --- | --- |
+| Backend, scanner, API, PostgreSQL entities | `stellar-privacy-layer-backend` |
+| Audit UI | `stellar-audit-ui` |
+| Soroban contract, circuits, SDK | `stellar-privacy-layer-contracts` |

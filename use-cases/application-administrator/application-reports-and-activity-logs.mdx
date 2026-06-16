@@ -1,0 +1,41 @@
+---
+title: "Application Reports and Activity Logs"
+description: "How application administrators view application reports and activity logs."
+---
+
+Application administrators can review reports and activity at application scope when the relevant permission bucket is granted.
+
+## Permissions
+
+| Action | Permission |
+| --- | --- |
+| List application reports | `reports:list` |
+| Download application reports | `reports:download` |
+| View application activity log | `logs:view_activity` |
+| Generate case report from a case workspace | `reports:create` |
+
+## View application reports
+
+1. Open the application workspace.
+2. Click **Reports**.
+3. Review report rows by boundary, period, creator, format, and created date.
+4. Download available reports when `reports:download` is granted.
+
+Report generation for transaction summaries happens inside the case **Reports** tab. The application **Reports** page lists generated reports.
+
+## View application activity log
+
+1. Open the application workspace.
+2. Click **Audit Log**.
+3. Filter by date, actor, event type, or target object.
+
+Application activity is read from `auditors_log` with `application_foreign_id` scope.
+
+## Backend boundaries
+
+| Route family | Data |
+| --- | --- |
+| `/api/applications/:foreignId/reports` | Application report list |
+| `/api/applications/:foreignId/reports/:reportId/download` | Application report download |
+| `/api/applications/:foreignId/auditors-log` | Application activity log |
+| `/api/applications/:foreignId/auditors-log/reports` | Activity log report generation |

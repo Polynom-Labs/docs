@@ -1,0 +1,46 @@
+---
+title: "Manage Case Auditors"
+description: "How application administrators add and remove auditors on an active investigation case."
+---
+
+Application administrators manage case-level auditor access after a case is approved. Case auditor assignments control who appears in the worklist and who can open the case workspace.
+
+## Prerequisites
+
+- Access to an application workspace.
+- An approved case.
+- `cases:edit` for add/remove controls.
+- `reports:view_transactions` to view the case workspace and **Case Auditors** tab.
+
+## Workflow
+
+<Steps>
+  <Step title="Open the case workspace">
+    From **Case Review**, open an approved case visible to the administrator.
+  </Step>
+  <Step title="Open Case Auditors">
+    Click the **Case Auditors** tab.
+  </Step>
+  <Step title="Add an auditor">
+    Click **Add auditor**, select a team member, and confirm.
+  </Step>
+  <Step title="Remove an auditor">
+    Remove an existing auditor assignment and confirm if prompted.
+  </Step>
+</Steps>
+
+## Storage behavior
+
+| Table | Usage |
+| --- | --- |
+| `case_auditor_assignments` | Active case access assignments |
+| `case_auditor_assignments.deleted_at` | Soft-delete history for removed assignments |
+| `auditors_log` | Add/remove assignment activity |
+
+Removed assignments remain in history while active case access filters exclude soft-deleted rows.
+
+## Relationship to team access
+
+Organization team settings grant application-level permission buckets. Case auditor assignments further restrict which approved cases a user can open.
+
+A user may have `reports:view_transactions` on an application and still see only cases they are assigned to.

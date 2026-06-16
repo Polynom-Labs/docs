@@ -1,0 +1,36 @@
+---
+title: "Architecture Map"
+description: "Runtime components and data paths for the Stellar/Soroban privacy-pool and auditing-portal implementation."
+---
+
+This page shows runtime components and their main data paths.
+
+## Runtime components
+
+![Arcane architecture map](/images/diagrams/architecture-map.svg)
+
+The diagram shows the primary runtime path only. Internal backend module responsibilities and table groups are listed below instead of adding every dependency as another arrow.
+
+## Runtime responsibilities
+
+| Component | Implementation | Responsibility |
+| --- | --- | --- |
+| Reference or partner application | Integrator application | End-user UI, wallet connection, SDK calls, Soroban transaction submission |
+| `PrivacyPoolSDK` | `stellar-privacy-layer-contracts/client-sdk` | Coin construction, stealth address helpers, witness construction, proof generation, Soroban serialization |
+| Stellar wallet | Wallet integration | Message signing and Soroban transaction signing |
+| Soroban contract | `stellar-privacy-layer-contracts/contract/src/lib.rs` | `transact`, proof verification, nullifier checks, commitment state, token transfers, audit event emission |
+| Stellar RPC | Configured `chain.rpc_url` | Ledger and event source for registered contract scanning |
+| Backend API | NestJS controllers and guards | Authenticated API routes for applications, audit rows, cases, reports, logs, team/admin actions |
+| Scanner | `ScannerModule`, `StellarLedgerScannerService` | Ledger range scanning, Soroban event parsing, raw `audit` upsert, `stellar_scans` checkpoint update |
+| Interpretation worker | `AuditInterpretationRunnerService` | Decrypt raw audit rows and write normalized `audit_interpretation` records |
+| PostgreSQL | TypeORM entities and migrations | Registry, audit, interpretation, access, workflow, report, and activity-log data |
+| Audit UI | React/Vite application | Organization and application workspaces backed by `GET /auth/me` and scoped API routes |
+
+## Primary paths
+
+| Path | Sequence |
+| --- | --- |
+| Private transaction execution | Application -> SDK -> wallet -> `PrivacyPoolsContract.transact` -> contract state + `AuditEncodedDigest` |
+| Indexing and interpretation | `AuditEncodedDigest` -> Stellar RPC -> scanner -> `audit` -> interpretation worker -> `audit_interpretation` |
+| Portal access | Audit UI -> identity flow -> `GET /auth/me` -> permission buckets -> guarded API routes |
+| Disclosure workflow | Case request -> administrator decision -> approved case -> assigned auditor review -> report/activity log |

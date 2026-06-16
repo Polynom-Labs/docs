@@ -1,0 +1,41 @@
+---
+title: "System Context"
+description: "Arcane users, external systems, privacy pools, and the auditing portal."
+---
+
+This page shows the systems and actors around Arcane. It deliberately does not show backend modules or database tables; those appear in the architecture map and component pages.
+
+## System context
+
+![Arcane system context](/images/diagrams/system-context.svg)
+
+## Actors
+
+| Actor | Uses | Main actions |
+| --- | --- | --- |
+| End user | Reference or partner application, Stellar wallet | Signs private-pool transactions |
+| Privacy-pool integrator | SDK and Soroban contract | Builds the user-facing application flow around `PrivacyPoolSDK` and `transact` |
+| Auditor | Audit UI | Requests disclosure cases, reviews assigned case transactions, creates reports |
+| Application administrator | Audit UI | Reviews disclosure requests, approves or closes requests, manages case auditors |
+| Organization administrator | Audit UI | Manages applications, team members, permissions, organization reports, and organization activity |
+
+## Systems
+
+| System | Owner | Boundary |
+| --- | --- | --- |
+| Reference or partner application | Integrator | Outside Arcane; submits Soroban transactions through user wallets |
+| Stellar wallet | Wallet provider / user | Signs transactions and messages |
+| Soroban privacy-pool contract | Arcane deployment | On-chain execution and audit event emission |
+| Stellar ledger and events | Stellar network | Source of committed transaction state and emitted events |
+| Arcane Auditing Portal | Arcane | Backend API, scanner, interpretation worker, PostgreSQL, and Audit UI |
+| Identity provider | Third-party service configured by Arcane | Authenticates portal users and organization context |
+
+## Domain split
+
+Privacy Pools and the Auditing Portal meet at the on-chain event boundary:
+
+```text
+PrivacyPoolsContract.transact -> AuditEncodedDigest -> scanner -> audit -> audit_interpretation
+```
+
+The privacy pool can execute on-chain transactions without the Audit UI being open. The Auditing Portal can index and manage disclosure workflows for registered contracts without being part of the end-user wallet flow.

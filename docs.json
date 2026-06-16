@@ -1,47 +1,93 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "Arcane Compliant Privacy Layer",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0065F4",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "pages": [
       {
-        "group": "Getting Started",
+        "group": "Architecture",
         "pages": [
-          "index",
-          "quickstart"
+          "architecture/overview",
+          "architecture/system-context",
+          "architecture/architecture-map",
+          {
+            "group": "Privacy Pools",
+            "pages": [
+              "privacy-pools/overview",
+              "privacy-pools/soroban-contract",
+              "privacy-pools/cryptography",
+              "privacy-pools/client-sdk",
+              "privacy-pools/on-chain-state",
+              "privacy-pools/audit-events"
+            ]
+          },
+          {
+            "group": "Auditing Portal",
+            "pages": [
+              "auditing-portal/overview",
+              "auditing-portal/backend-architecture",
+              "auditing-portal/data-model",
+              "auditing-portal/indexing-and-interpretation",
+              "auditing-portal/identity-and-access",
+              "auditing-portal/disclosure-cases-and-reports",
+              "auditing-portal/audit-ui"
+            ]
+          }
+        ]
+      },
+      {
+        "group": "Integration",
+        "pages": [
+          "integration/stellar-privacy-pool"
+        ]
+      },
+      {
+        "group": "Use Cases",
+        "pages": [
+          {
+            "group": "Auditor",
+            "pages": [
+              "use-cases/auditor/overview",
+              "use-cases/auditor/create-disclosure-request",
+              "use-cases/auditor/review-case-transactions",
+              "use-cases/auditor/generate-reports-and-activity-logs"
+            ]
+          },
+          {
+            "group": "Application Administrator",
+            "pages": [
+              "use-cases/application-administrator/overview",
+              "use-cases/application-administrator/approve-disclosure-request",
+              "use-cases/application-administrator/manage-case-auditors",
+              "use-cases/application-administrator/application-reports-and-activity-logs"
+            ]
+          },
+          {
+            "group": "Organization Administrator",
+            "pages": [
+              "use-cases/organization-administrator/overview"
+            ]
+          }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
+    ]
   },
   "logo": {
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.svg",
+    "href": "/architecture/overview"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:support@polynomlabs.com"
       }
     ],
     "primary": {

@@ -1,0 +1,51 @@
+---
+title: "Generate Reports and Activity Logs"
+description: "How auditors generate case reports, download exports, and review case activity."
+---
+
+Auditors generate case transaction reports and review case activity from approved case workspaces.
+
+## Permissions
+
+| Action | Permission |
+| --- | --- |
+| Generate case report | `reports:create` |
+| List application reports | `reports:list` |
+| Download application reports | `reports:download` |
+| View case activity | `reports:view_transactions` |
+
+## Generate a case report
+
+<Steps>
+  <Step title="Open the case">
+    From **Case Review**, open an approved assigned case.
+  </Step>
+  <Step title="Open Reports">
+    Click the **Reports** tab in the case workspace.
+  </Step>
+  <Step title="Generate report">
+    Click **Generate report**, select the report type, and confirm the case scope.
+  </Step>
+  <Step title="Download">
+    After generation completes, use **Download** on the report row.
+  </Step>
+</Steps>
+
+Case report generation creates a transaction summary from transactions filtered to the approved case boundary and period.
+
+## Review case activity
+
+1. Open an approved case workspace.
+2. Click the **Activity** tab.
+3. Review case-scoped `auditors_log` entries.
+
+The **Activity** tab requires `reports:view_transactions`.
+
+## Backend writes and reads
+
+| Action | Backend data |
+| --- | --- |
+| Generate report | Reads scoped `audit_interpretation`; writes `reports` |
+| Download report | Reads scoped `reports` |
+| View case activity | Reads `auditors_log` filtered by application and case |
+| Successful sensitive action | Writes `auditors_log` |
