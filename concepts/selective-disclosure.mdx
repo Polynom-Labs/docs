@@ -1,0 +1,41 @@
+---
+title: "Selective Disclosure"
+description: "Understand how Arcane supports privacy with scoped review."
+---
+
+Selective disclosure lets authorized parties review private transaction information without making all private activity public by default.
+
+## Privacy by default
+
+Arcane private transactions should not expose product-level details to public observers.
+
+Examples of product-level details include:
+
+- Customer identity.
+- Card-load purpose.
+- Payroll recipient.
+- Employer payroll cycle.
+- Internal treasury reason.
+- Support or dispute context.
+
+## Disclosure by scope
+
+When review is needed, disclosure should be scoped by:
+
+- Organization.
+- Application.
+- Case.
+- Role.
+- Time window.
+- Asset.
+- Resource id.
+
+## Workflow
+
+1. An authorized user creates a disclosure request.
+2. An application administrator approves or denies the request.
+3. The auditor reviews only the approved records.
+4. Reports and downloads are logged.
+5. Access expires when the case window ends.
+
+See [Controlled Disclosure](/integration-guides/controlled-disclosure) for the integration guide.

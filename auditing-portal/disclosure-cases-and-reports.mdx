@@ -81,8 +81,8 @@ flowchart LR
 | `POST /api/applications/:foreignId/case-requests/:id/approve` | Approve request | `cases:approve_creation` |
 | `POST /api/applications/:foreignId/case-requests/:id/close` | Close request | `cases:approve_creation` |
 | `POST /api/applications/:foreignId/case-reports` | Generate transaction summary report | `reports:create` |
-| `GET /api/applications/:foreignId/reports` | List application reports | `reports:list` |
-| `GET /api/applications/:foreignId/reports/:reportId/download` | Download application report | `reports:download` |
+| `GET /api/applications/:foreignId/case-reports` | List application case reports | `reports:list` |
+| `GET /api/applications/:foreignId/case-reports/:reportId/download` | Download application case report | `reports:download` |
 | `GET /api/applications/:foreignId/auditors-log` | Application activity log | `logs:view_activity` |
 | `GET /api/applications/:foreignId/cases/:caseId/auditors-log` | Case activity log | `reports:view_transactions` |
 
@@ -122,12 +122,11 @@ Report boundaries:
 
 | Boundary | Endpoint |
 | --- | --- |
-| Organization | `GET /api/reports`, `GET /api/reports/:reportId/download` |
-| Application | `GET /api/applications/:foreignId/reports`, `GET /api/applications/:foreignId/reports/:reportId/download` |
+| Application case reports | `GET /api/applications/:foreignId/case-reports`, `GET /api/applications/:foreignId/case-reports/:reportId/download` |
 | Case transaction summary | `POST /api/applications/:foreignId/case-reports` |
-| Activity log report | `POST /api/auditors-log/reports`, `POST /api/applications/:foreignId/auditors-log/reports`, `POST /api/applications/:foreignId/cases/:caseId/auditors-log/reports` |
+| Activity log CSV exports | `GET /api/auditors-log/export.csv`, `GET /api/applications/:foreignId/auditors-log/export.csv`, `GET /api/applications/:foreignId/cases/:caseId/auditors-log/export.csv` |
 
-Generation and download are separate permission checks and separate activity-log events.
+Report generation, report download, and activity-log export are separate permission checks and separate activity-log events where the backend records them.
 
 ## Activity log
 

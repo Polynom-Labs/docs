@@ -1,6 +1,6 @@
 ---
 title: "Organization Administrator Use Cases"
-description: "Organization administrator workflows for applications, team access, organization reports, and activity logs."
+description: "Organization administrator workflows for applications, team access, and organization activity logs."
 ---
 
 Organization administrators work in the organization owner workspace. Their actions are organization-scoped, not case-scoped.
@@ -13,9 +13,6 @@ Organization administrators work in the organization owner workspace. Their acti
 | Read applications | `applications:read` |
 | Manage application administrators | `admins:manage_application_administrators` |
 | View organization activity log | `logs:view_activity` |
-| Create organization reports | `reports:create` |
-| List organization reports | `reports:list` |
-| Download organization reports | `reports:download` |
 
 ## Primary route family
 
@@ -24,7 +21,6 @@ Organization administrators work in the organization owner workspace. Their acti
 /workspace/organization-owner/applications
 /workspace/organization-owner/team
 /workspace/organization-owner/activity
-/workspace/organization-owner/reports
 ```
 
 ## Manage applications
@@ -52,11 +48,10 @@ Organization administrators manage team members and application permission bucke
 
 Application-level permissions control which application workspaces appear under `auth/me.applications[foreignId]`.
 
-## Organization reports and activity
+## Organization activity
 
 | Route | Backend data |
 | --- | --- |
-| `/workspace/organization-owner/reports` | Organization-scoped `reports` |
 | `/workspace/organization-owner/activity` | Organization-scoped `auditors_log` |
 
 Organization activity includes team, application, request, report, and access events that are persisted after successful backend actions.

@@ -1,0 +1,174 @@
+---
+title: "Solana SDK"
+description: "Use the Arcane Solana SDK for backend-managed deposits, private transfers, withdrawals, and UTXO scanning."
+---
+
+The Solana SDK provides reusable protocol client code for private payments on Solana. Use it when your backend needs to create private balances, scan UTXOs, generate proofs, submit relayed transactions, and withdraw to public Solana addresses.
+
+## Package
+
+<Warning>
+The Solana SDK package is not published on npm yet. Arcane currently provides SDK access during onboarding through a private package, tarball, or source repository. Do not use `yarn add @arcane-labs/privacy-layer-sdk` until Arcane confirms the package is published or private registry access is configured.
+</Warning>
+
+Source access is available in the private GitHub repository: [Polynom-Labs/privacy-layer-sdk](https://github.com/Polynom-Labs/privacy-layer-sdk). Arcane must grant repository access before partners can clone it.
+
+For private beta access, install the package artifact provided by Arcane:
+
+```bash
+yarn add <path-or-registry-spec-for-arcane-solana-sdk>
+```
+
+Replace the placeholder with the private registry package name, tarball path, or workspace alias Arcane provides during onboarding.
+
+If Arcane provides source access instead of a package artifact, build and pack it locally before adding it to your backend:
+
+```bash
+yarn install --frozen-lockfile
+yarn build
+yarn pack --filename arcane-solana-sdk.tgz
+```
+
+After installation, the SDK package exposes TypeScript helpers for:
+
+- Program and provider setup.
+- UTXO keypairs, commitments, and nullifiers.
+- Private SOL and token deposits.
+- Private transfers.
+- Withdrawals to public Solana addresses.
+- UTXO scanning and balance calculation.
+- Relayer, indexer, Light RPC, Merkle, and prover utilities.
+
+## Program
+
+The current deployed Arcane Solana program id is:
+
+```text
+2EyitVDBV38LSeGDKQuZWHMCmebMdGeVFgHC5LYxepLG
+```
+
+Confirm the target program id with Arcane before production deployment.
+
+## Direct SDK runtime configuration
+
+Most partners should not need to think about these values in the first product flow. They matter when your backend runs the Solana SDK, proof generation, indexer access, and relayer submission directly.
+
+Keep this configuration server-side. Do not expose backend signing material, proof authority, decoded UTXOs, or encrypted output caches in frontend code.
+
+| Variable | Purpose | Default in the SDK |
+| --- | --- | --- |
+| `ARCANE_INDEXER_URL` | Indexer API used for Merkle roots, proofs, UTXO history, and compliance checks | `https://yona.cash/api` |
+| `ARCANE_RELAYER_URL` | Relayer API used for `/relayer/info`, `/relayer/submit-signed-transaction`, `/relayer/withdraw`, and job status polling | Same as indexer URL |
+| `ARCANE_LIGHT_RPC_URL` | Light Protocol RPC endpoint used for compressed account state | Empty; withdrawal falls back to the Solana connection RPC when needed |
+| `ARCANE_CIRCUIT_PATH` | Advanced prover setting: base path or URL for the Groth16 artifacts used as `<path>.wasm` and `<path>.zkey` | `/transaction2` |
+| `SOLANA_RPC_URL` | Solana RPC endpoint used by your backend to create the SDK `Connection` | Not read directly by the SDK |
+| `COMPLIANCE_REQUIRE_SENDER` | Optional sender signature enforcement for compliant withdrawals | `false` |
+
+Local and Vite-style aliases may exist for demos. Production backends should use server-side environment variables.
+
+If Arcane provides a managed prover or a preconfigured backend package, the circuit artifact path may be hidden from your application. Treat `ARCANE_CIRCUIT_PATH` as an advanced self-hosted SDK/prover setting, not as a product-level integration object.
+
+## Common imports
+
+```ts
+import {
+  createProvider,
+  createProgram,
+  getMyUtxos,
+  getBalanceFromUtxos,
+  depositWithRelayer,
+  transactTransfer,
+  withdrawWithRelayer,
+} from "<arcane-solana-sdk-package>";
+```
+
+## Deposit and shield
+
+Use a deposit flow after your backend detects public funding.
+
+```ts
+const result = await depositWithRelayer(
+  amountInUiUnits,
+  signedWallet,
+  connection,
+  lightRpc,
+  program,
+  mintAddress,
+  signTransaction,
+  setStatus,
+  lightWasm
+);
+```
+
+The first argument is a UI amount. For native SOL, `0.5` means 0.5 SOL. For tokens, the SDK converts the UI amount using the selected mint decimals.
+
+The SDK prepares private output state, creates the proof, builds the transaction, signs where required, and submits through the relayer.
+
+For product flows, map this operation to a `FundingIntent`.
+
+## Scan private balance
+
+Scan and decode private state before showing available balance or spending.
+
+```ts
+const utxos = await getMyUtxos(
+  signedWallet,
+  connection,
+  setStatus,
+  lightWasm
+);
+
+const balance = getBalanceFromUtxos(utxos);
+```
+
+Persist scan state and decoded UTXOs on the backend. Do not store decoded private state in browser local storage.
+
+## Private transfer
+
+Use private transfers for account-to-account movement inside the privacy layer.
+
+```ts
+const result = await transactTransfer(
+  amountInUiUnits,
+  recipientUtxoPubkey,
+  recipientX25519Pubkey,
+  signedWallet,
+  connection,
+  lightRpc,
+  program,
+  mintAddress,
+  signTransaction,
+  setStatus,
+  lightWasm
+);
+```
+
+For product flows, map this operation to a `PrivateTransfer`.
+
+## Withdrawal
+
+Use withdrawals to move private balance back to a public Solana address.
+
+```ts
+const result = await withdrawWithRelayer(
+  recipientAddress,
+  amountInLamports,
+  signedWallet,
+  connection,
+  mintAddress,
+  setStatus,
+  lightWasm,
+  referralCode,
+  signMessage
+);
+```
+
+For product flows, map this operation to a `Withdrawal`.
+
+## Production guidance
+
+- Use [Backend-Managed Wallets](/sdks/backend-managed-wallets) for card funding, payroll, and treasury flows.
+- Store private keys in KMS, HSM, or an equivalent managed signing service.
+- Treat proof generation, relayer submission, chain confirmation, and indexer state as separate failure domains.
+- Persist status history and operation ids for reconciliation.
+- Do not expose UTXOs, nullifiers, proof inputs, or backend signing keys to the browser.

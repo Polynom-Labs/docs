@@ -1,0 +1,62 @@
+---
+title: "Shielding and Unshielding"
+description: "Understand public-to-private and private-to-public movement in Arcane."
+---
+
+Shielding moves value from public chain state into Arcane private state. Unshielding moves value from private state back to a public destination.
+
+## Shielding
+
+Shielding is used for:
+
+- Card funding.
+- Payroll treasury deposits.
+- User wallet deposits.
+- Application treasury funding.
+
+The product-level resource is usually a `FundingIntent`.
+
+```mermaid
+flowchart LR
+  public["Public funds"]
+  detect["Funding detected"]
+  shield["Shield"]
+  private["Private balance"]
+
+  public --> detect
+  detect --> shield
+  shield --> private
+```
+
+## Unshielding
+
+Unshielding is used for:
+
+- User withdrawals.
+- Treasury settlement.
+- Payroll payout to a public address.
+- Liquidity movement between public and private systems.
+
+The product-level resource is usually a `Withdrawal`.
+
+```mermaid
+flowchart LR
+  private["Private balance"]
+  withdraw["Withdrawal"]
+  public["Public destination"]
+
+  private --> withdraw
+  withdraw --> public
+```
+
+## Status distinction
+
+Do not treat chain confirmation and Arcane indexing as the same event.
+
+| Event | Meaning |
+| --- | --- |
+| Chain confirmed | The public chain accepted the transaction |
+| Arcane indexed | Arcane processed the private state |
+| Product complete | Your ledger or product state has been updated |
+
+Keep those states separate in your backend.

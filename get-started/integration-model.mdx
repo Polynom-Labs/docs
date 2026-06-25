@@ -1,0 +1,85 @@
+---
+title: "Integration Model"
+description: "How a partner application integrates Arcane without exposing privacy-layer internals to end users."
+---
+
+Arcane gives your application a private transaction layer with controlled disclosure. Your users keep a normal product flow. Your backend coordinates private accounts, funding intents, SDK calls, status tracking, reconciliation, and audit access.
+
+## Core model
+
+Most integrations follow the same lifecycle:
+
+```mermaid
+flowchart LR
+  intent["Create intent"]
+  fund["Fund or authorize"]
+  shield["Shield funds"]
+  transact["Transact privately"]
+  track["Track status"]
+  disclose["Reconcile or disclose"]
+
+  intent --> fund
+  fund --> shield
+  shield --> transact
+  transact --> track
+  track --> disclose
+```
+
+The partner application owns the product experience. Arcane owns the privacy-layer transaction machinery.
+
+| Layer | Responsibility |
+| --- | --- |
+| Partner frontend | Shows the user action, payment address, transaction status, and product result |
+| Partner backend | Creates intents, stores partner references, calls Arcane API or SDK, and reconciles outcomes |
+| Arcane SDK | Prepares private transaction inputs, proofs, encrypted outputs, and relayer submissions |
+| Arcane infrastructure | Indexes transactions, tracks private state, and supports disclosure workflows |
+| Chain RPC | Confirms public funding, private pool execution, withdrawals, and settlement transactions |
+
+## Resource model
+
+Arcane integrations should be built around product-level resources instead of protocol details.
+
+| Resource | Purpose |
+| --- | --- |
+| `PrivateAccount` | The privacy-layer account or wallet scope for a partner user, customer, employee, or treasury entity |
+| `FundingIntent` | A request to fund a private balance from a public chain transfer |
+| `PrivateTransfer` | A private movement between Arcane private accounts or private recipients |
+| `Withdrawal` | A movement from private balance back to a public chain address |
+| `Balance` | The current private balance view after scanning and indexing |
+| `AuditRecord` | The permissioned record used for reconciliation, support, disputes, and compliance review |
+
+Your backend should store your own product references, such as customer ids, card-load ids, payroll-cycle ids, invoice ids, or treasury batch ids. Arcane stores privacy-layer state and returns stable ids that you can reconcile later.
+
+## Integration styles
+
+| Style | Use when | Where secrets live |
+| --- | --- | --- |
+| Backend-managed wallet | You need a server-owned flow, card funding, payroll orchestration, or custodial treasury operations | Partner backend, KMS, HSM, or managed signing service |
+| Client-side wallet flow | You want end users to sign transactions with their own wallet | End-user wallet and browser session |
+| Hybrid flow | You need a wallet-authenticated user action plus backend execution and reconciliation | Wallet signs user authorization; backend executes privacy-layer operations |
+
+Start with the backend-managed model when you need card funding, payroll funding, treasury settlement, or a reliable server-side reconciliation path.
+
+## What users see
+
+Users should not see commitments, nullifiers, Merkle roots, proof files, or relayer jobs. They should see product language:
+
+- "Add funds"
+- "Private transfer"
+- "Withdraw"
+- "Processing"
+- "Confirmed"
+- "Available"
+
+The integration should feel like a normal transaction flow. Arcane-specific details stay in your backend, logs, and developer tools.
+
+## Read next
+
+<Columns cols={2}>
+  <Card title="Build your first private transaction" icon="route" href="/get-started/first-private-transaction">
+    Create a first end-to-end transaction from intent creation to reconciliation.
+  </Card>
+  <Card title="Backend-managed wallets" icon="server" href="/sdks/backend-managed-wallets">
+    Use the server-side pattern for card, payroll, and treasury flows.
+  </Card>
+</Columns>

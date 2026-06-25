@@ -1,0 +1,74 @@
+---
+title: "Controlled Disclosure"
+description: "Expose private transaction data only through scoped, authorized review workflows."
+---
+
+Arcane is designed for privacy-preserving applications that still need a controlled path for compliance review, dispute resolution, and reporting.
+
+Controlled disclosure means private transaction data is not broadly visible by default. Authorized users request, approve, review, and report only the scoped data they are allowed to see.
+
+## Disclosure flow
+
+```mermaid
+sequenceDiagram
+  participant Auditor
+  participant Admin as Application admin
+  participant Portal as Arcane Auditing Portal
+  participant Records as Audit records
+
+  Auditor->>Portal: Create disclosure request
+  Portal->>Admin: Notify for approval
+  Admin->>Portal: Approve scope and access window
+  Auditor->>Portal: Review approved case
+  Portal->>Records: Read scoped audit records
+  Portal-->>Auditor: Show permitted fields
+```
+
+## Scope dimensions
+
+Disclosure should be limited by scope.
+
+| Dimension | Examples |
+| --- | --- |
+| Organization | Which partner or customer organization owns the data |
+| Application | Which app, card program, payroll product, or treasury product |
+| Time window | Start and end time for permitted review |
+| Asset | USDC, SOL, native token, or supported private asset |
+| Resource ids | Funding intent, private transfer, withdrawal, audit record |
+| Role | Auditor, application administrator, organization administrator |
+| Case | Specific investigation, dispute, report, or legal request |
+
+## What disclosure is for
+
+Use controlled disclosure for:
+
+- Support investigations.
+- Card disputes and chargeback research.
+- Payroll disputes.
+- Fraud review.
+- Regulatory requests.
+- Internal compliance reports.
+- External audits.
+
+Do not use controlled disclosure as a general analytics export. Build product analytics from partner-side product events and aggregate Arcane status data.
+
+## Integration requirements
+
+Your backend should:
+
+- Store the audit record id for each relevant product action.
+- Keep product references stable and searchable.
+- Preserve status history.
+- Route sensitive review through the Auditing Portal or an equivalent scoped workflow.
+- Log access, report generation, and downloads.
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Reconciliation and audit records" icon="file-search" href="/integration-guides/reconciliation-and-audit-records">
+    Link product objects to Arcane records for operations and review.
+  </Card>
+  <Card title="Identity and access" icon="lock-keyhole" href="/auditing-portal/identity-and-access">
+    Understand how portal access is scoped and enforced.
+  </Card>
+</Columns>

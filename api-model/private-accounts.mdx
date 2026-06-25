@@ -1,0 +1,64 @@
+---
+title: "Private Accounts"
+description: "Create and manage privacy-layer account scopes for users, treasuries, and applications."
+---
+
+A `PrivateAccount` is the privacy-layer scope that owns or receives private balance.
+
+Use private accounts for cardholders, employees, treasury entities, application wallets, and payroll programs.
+
+<Warning>
+These endpoint examples describe the intended hosted API model. If you are integrating through the SDK today, implement equivalent resources in your backend and confirm hosted API availability with Arcane before coding against these routes.
+</Warning>
+
+## Object
+
+```json
+{
+  "id": "pa_...",
+  "status": "active",
+  "chain": "solana",
+  "default_asset": "USDC",
+  "external_reference": "customer_123",
+  "created_at": "2026-06-25T10:00:00Z"
+}
+```
+
+## Create a private account
+
+```http
+POST /private-accounts
+```
+
+```json
+{
+  "chain": "solana",
+  "external_reference": "customer_123",
+  "metadata": {
+    "product": "card_funding"
+  }
+}
+```
+
+## Retrieve a private account
+
+```http
+GET /private-accounts/{id}
+```
+
+Use this when restoring a user session, reconciling product state, or preparing a funding intent.
+
+## Design guidance
+
+| Question | Recommendation |
+| --- | --- |
+| One account per user or per product? | Start with one account per product-level balance scope |
+| Can accounts be shared? | Avoid sharing between unrelated product contexts |
+| Where does the mapping live? | Store partner user, card, employee, or treasury ids in your backend |
+| Can the frontend see the id? | Yes, if it is not used as a secret |
+
+## Related guides
+
+- [Integration Model](/get-started/integration-model)
+- [Private Card Funding](/integration-guides/private-card-funding)
+- [Private Payroll Flows](/integration-guides/private-payroll-flows)

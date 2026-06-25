@@ -1,0 +1,69 @@
+---
+title: "Reconciliation and Audit Records"
+description: "Link Arcane private activity to partner product state without making all activity public."
+---
+
+Arcane integrations need two views of the same activity:
+
+- A simple product view for users and operations.
+- A permissioned audit view for compliance, support, disputes, and reporting.
+
+Reconciliation connects those views without leaking private transaction details publicly.
+
+## Reconciliation keys
+
+Store stable references on both sides of the integration.
+
+| Key | Owner | Purpose |
+| --- | --- | --- |
+| `external_reference` | Partner | Links Arcane activity to your product object |
+| `private_account_id` | Arcane and partner | Identifies private balance scope |
+| `funding_intent_id` | Arcane and partner | Tracks public funding into private state |
+| `private_transaction_id` | Arcane and partner | Tracks private movement |
+| `audit_record_id` | Arcane and partner | Enables scoped disclosure |
+| Public transaction hash | Chain | Confirms funding, withdrawal, or settlement |
+
+## What to record
+
+For each user-visible money movement, record:
+
+- Product object id.
+- Arcane resource id.
+- Amount, asset, and chain.
+- Status history.
+- Public transaction hash if one exists.
+- Audit record id.
+- Webhook delivery ids.
+- Retry attempts and error codes.
+
+## Audit record access
+
+An audit record should not automatically expose all private details. It should be accessed through a controlled workflow.
+
+| Actor | Typical access |
+| --- | --- |
+| Customer support | Limited status and product reference |
+| Application administrator | Approve or deny scoped disclosure |
+| Auditor | Review approved transaction fields in an active case |
+| Organization administrator | Manage users, applications, and access boundaries |
+
+See [Controlled Disclosure](/integration-guides/controlled-disclosure) for the approval path.
+
+## Operational reports
+
+Common reports include:
+
+- Funding intents by status.
+- Private transfers by product reference.
+- Withdrawals by destination chain.
+- Failed or delayed shielding operations.
+- Audit cases and approved disclosures.
+- Card-load or payroll-cycle reconciliation.
+
+## Design guidance
+
+- Treat Arcane ids as durable references.
+- Keep product ids private to your backend and audit metadata.
+- Do not put personally identifiable information in public chain data.
+- Make status updates append-only when possible.
+- Use idempotency for all product ledger updates.

@@ -1,22 +1,22 @@
 ---
 title: "How Arcane Works"
-description: "End-to-end flow from a private Soroban transaction to scoped audit review."
+description: "End-to-end flow from private transaction execution to scoped audit review."
 ---
 
 Arcane separates transaction execution from disclosure review.
 
-Applications execute private transactions directly against the privacy-pool contract. The Auditing Portal does not sit in the transaction path. It observes registered contract events, interprets encrypted audit payloads, and exposes reviewed data through permissioned workflows.
+Applications execute private transactions through Arcane APIs, SDKs, or supported privacy-pool contracts. The Auditing Portal does not sit in the user transaction path. It observes registered private transaction records, interprets encrypted audit payloads, and exposes reviewed data through permissioned workflows.
 
 ## End-to-end flow
 
 | Step | Component | Result |
 | --- | --- | --- |
-| 1 | Application | Initializes the privacy-pool SDK and prepares transaction inputs |
-| 2 | Wallet | Signs the Soroban transaction submitted by the application |
-| 3 | Soroban privacy-pool contract | Verifies proof bytes and public signals, updates commitment/nullifier/root state, and performs token movement |
-| 4 | Soroban event stream | Emits `AuditEncodedDigest` with the encrypted audit payload |
-| 5 | Backend scanner | Reads registered contract events from Stellar RPC and writes raw `audit` rows |
-| 6 | Interpretation worker | Decrypts and normalizes audit payloads into `audit_interpretation` rows |
+| 1 | Partner application | Creates a product intent such as funding, transfer, payroll allocation, or withdrawal |
+| 2 | Arcane API or SDK | Prepares private transaction inputs, proof data, encrypted outputs, and submission payloads |
+| 3 | Privacy rail | Verifies proof data, updates private state, and performs public token legs when needed |
+| 4 | Event or index boundary | Emits or exposes encrypted audit and transaction state |
+| 5 | Arcane indexer or scanner | Reads registered activity and writes raw audit rows |
+| 6 | Interpretation worker | Decrypts and normalizes audit payloads into interpreted records |
 | 7 | Auditing Portal | Enforces organization, application, case, and permission scope for review and reporting |
 
 ## Disclosure model
@@ -25,7 +25,7 @@ The platform is built around scoped disclosure rather than global visibility.
 
 | Layer | Visibility model |
 | --- | --- |
-| Public ledger | Contract calls, events, commitments, nullifiers, roots, and public transaction metadata |
+| Public ledger | Contract calls, events, commitments, nullifiers, roots, and public transaction metadata when applicable |
 | Encrypted audit payload | Emitted on-chain but readable only with the registered contract decoding key |
 | Backend interpretation | Stored in PostgreSQL after scanner and interpretation workers process registered contracts |
 | Portal access | Restricted by organization, application, case assignment, permissions, and access windows |
@@ -35,9 +35,10 @@ The platform is built around scoped disclosure rather than global visibility.
 
 | Boundary | What crosses it |
 | --- | --- |
-| Application to contract | Proof bytes, public signals, encrypted audit payload, wallet-signed transaction |
-| Contract to ledger | Contract state updates and `AuditEncodedDigest` event |
-| Ledger to backend | Registered contract events read through Stellar RPC |
+| Application to Arcane | Product intent, private account, amount, asset, destination, and external reference |
+| Arcane to privacy rail | Proof bytes, public signals, encrypted audit payload, relayer job, or wallet-signed transaction |
+| Privacy rail to ledger | State updates, public token legs, and audit events |
+| Ledger to backend | Registered events and indexed transaction state |
 | Backend to portal | Scoped API responses for authenticated users |
 | Portal to auditor | Case-scoped review, reports, downloads, and activity-log records |
 
@@ -45,15 +46,16 @@ The platform is built around scoped disclosure rather than global visibility.
 
 | Domain | Can be used independently? | Notes |
 | --- | --- | --- |
-| Privacy Pools | Yes | Applications can use the on-chain privacy-pool contract and SDK without the portal being in the transaction path |
+| Privacy execution | Yes | Applications can use Arcane transaction APIs or SDKs without the portal being in the user transaction path |
 | Auditing Portal | Yes, with registered data sources | The portal consumes indexed and interpreted audit data; it is organized around applications, cases, reports, and user access |
 
-The two domains are connected by the audit event boundary: the privacy pool emits data; the backend indexes and interprets it for scoped disclosure.
+The two domains are connected by the audit boundary: private execution emits or exposes encrypted records; the backend indexes and interprets them for scoped disclosure.
 
 ## Technical references
 
 | Topic | Page |
 | --- | --- |
+| First private transaction | [Build Your First Private Transaction](/get-started/first-private-transaction) |
 | System-level actors and external systems | [System Context](/architecture/system-context) |
 | Runtime components | [Architecture Map](/architecture/architecture-map) |
 | Privacy-pool implementation | [Privacy Pools overview](/privacy-pools/overview) |

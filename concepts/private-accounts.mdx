@@ -1,0 +1,34 @@
+---
+title: "Private Accounts"
+description: "Understand the privacy-layer balance scope used across Arcane integrations."
+---
+
+A private account is the application-level scope for private balance. It lets your product refer to a user, employee, customer, card program, payroll treasury, or application wallet without exposing low-level protocol state.
+
+## What it represents
+
+| Product context | Private account meaning |
+| --- | --- |
+| Card funding | Cardholder, card funding profile, or program treasury |
+| Payroll | Employee, employer treasury, payroll program, or contractor |
+| Treasury | Internal operating wallet or settlement pool |
+| Wallet app | User-controlled private balance |
+
+## What it hides
+
+The private account abstraction keeps these details out of product code where possible:
+
+- UTXO selection.
+- Commitments.
+- Nullifiers.
+- Merkle witnesses.
+- Proof inputs.
+- Encrypted outputs.
+
+Your backend or Arcane SDK still needs those details internally. Your product should not make them user-facing concepts.
+
+## Design choice
+
+Start with one private account per product balance scope. Avoid sharing a private account across unrelated products or legal entities.
+
+For example, a card product and a payroll product can use separate private accounts even when they belong to the same end user.

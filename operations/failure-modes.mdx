@@ -1,0 +1,46 @@
+---
+title: "Failure Modes"
+description: "Handle failures across funding, proof generation, relayer submission, indexing, and product reconciliation."
+---
+
+Arcane integrations cross several systems. Design your product state machine so each failure is isolated and recoverable.
+
+## Common failures
+
+| Failure | What happened | Recommended handling |
+| --- | --- | --- |
+| Funding not received | User did not send funds or sent to the wrong address | Keep intent open until expiration, then show expired |
+| Amount mismatch | Funding amount differs from expected amount | Hold for review or apply product-specific partial funding rules |
+| Prover failure | Proof generation failed or timed out | Retry with the same product reference |
+| Relayer failure | Transaction was not submitted or job failed | Retry submission after checking job status |
+| Chain RPC failure | Confirmation read failed | Retry or use another RPC provider |
+| Chain confirmation delay | Transaction is submitted but not finalized | Show processing and keep polling |
+| Indexer lag | Chain confirmed but Arcane has not indexed state | Wait before marking balance spendable |
+| Product ledger failure | Arcane succeeded but partner ledger update failed | Retry product ledger update idempotently |
+
+## Do not collapse statuses
+
+Avoid a single `processing` state in your backend. Track enough detail to recover.
+
+Minimum recommended backend states:
+
+- Product resource state.
+- Arcane resource state.
+- Chain transaction state.
+- Product ledger update state.
+- Retry count and last error.
+
+## Manual review states
+
+Use review states for:
+
+- Late funds.
+- Overpayment or underpayment.
+- Suspicious withdrawal destination.
+- Repeated relayer or proof failures.
+- Customer support disputes.
+- Compliance escalation.
+
+## Recovery rule
+
+When retrying, keep the same external reference and idempotency key unless you intentionally create a new product action.

@@ -1,27 +1,27 @@
 ---
-title: "Application Reports and Activity Logs"
-description: "How application administrators view application reports and activity logs."
+title: "Application Case Reports and Activity Logs"
+description: "How application administrators view application case reports and activity logs."
 ---
 
-Application administrators can review reports and activity at application scope when the relevant permission bucket is granted.
+Application administrators can review case reports and activity at application scope when the relevant permission bucket is granted.
 
 ## Permissions
 
 | Action | Permission |
 | --- | --- |
-| List application reports | `reports:list` |
-| Download application reports | `reports:download` |
+| List application case reports | `reports:list` |
+| Download application case reports | `reports:download` |
 | View application activity log | `logs:view_activity` |
 | Generate case report from a case workspace | `reports:create` |
 
-## View application reports
+## View application case reports
 
 1. Open the application workspace.
 2. Click **Reports**.
 3. Review report rows by boundary, period, creator, format, and created date.
-4. Download available reports when `reports:download` is granted.
+4. Download available case reports when `reports:download` is granted.
 
-Report generation for transaction summaries happens inside the case **Reports** tab. The application **Reports** page lists generated reports.
+Report generation for transaction summaries happens inside the case **Reports** tab. The application **Reports** page lists generated case reports.
 
 ## View application activity log
 
@@ -35,7 +35,7 @@ Application activity is read from `auditors_log` with `application_foreign_id` s
 
 | Route family | Data |
 | --- | --- |
-| `/api/applications/:foreignId/reports` | Application report list |
-| `/api/applications/:foreignId/reports/:reportId/download` | Application report download |
+| `/api/applications/:foreignId/case-reports` | Application case report list |
+| `/api/applications/:foreignId/case-reports/:reportId/download` | Application case report download |
 | `/api/applications/:foreignId/auditors-log` | Application activity log |
-| `/api/applications/:foreignId/auditors-log/reports` | Activity log report generation |
+| `/api/applications/:foreignId/auditors-log/export.csv` | Application activity log CSV export |

@@ -1,0 +1,82 @@
+---
+title: "Withdrawals and Payouts"
+description: "Move private balance back to a public address or payout destination."
+---
+
+Withdrawals move value from Arcane private state to a public destination. Use them for user withdrawals, treasury settlement, payroll payouts, and liquidity movements.
+
+## Withdrawal flow
+
+```mermaid
+flowchart LR
+  balance["Private balance"]
+  request["Withdrawal request"]
+  proof["Proof and transaction"]
+  public["Public destination"]
+  audit["Audit record"]
+
+  balance --> request
+  request --> proof
+  proof --> public
+  proof --> audit
+```
+
+## Create a withdrawal
+
+Your backend should validate the destination before creating the withdrawal.
+
+```json
+{
+  "private_account_id": "pa_...",
+  "amount": "50.00",
+  "asset": "USDC",
+  "chain": "solana",
+  "destination_address": "...",
+  "external_reference": "withdrawal_123"
+}
+```
+
+## Backend checks
+
+Before submission:
+
+- Confirm the user or product action is authorized.
+- Validate the destination address format.
+- Confirm available private balance.
+- Apply compliance, velocity, and product controls.
+- Create the withdrawal idempotently.
+
+## Status lifecycle
+
+| Status | Meaning |
+| --- | --- |
+| `requires_balance` | Private balance is insufficient |
+| `requires_review` | Product or compliance policy requires review |
+| `preparing` | Arcane is preparing proof and transaction data |
+| `submitted` | Transaction was submitted |
+| `confirmed` | Public chain confirmed the withdrawal |
+| `indexed` | Arcane indexed the spend and audit record |
+| `paid_out` | Your product has marked the payout complete |
+| `failed` | Retry or review is required |
+
+## Reconciliation
+
+Store:
+
+- Withdrawal id.
+- Destination address.
+- Public transaction signature or hash.
+- Private transaction id.
+- Audit record id.
+- Product reference.
+- Status history.
+
+For payroll and card products, keep the product ledger update separate from the Arcane withdrawal status. This prevents double accounting when a chain transaction succeeds but a downstream ledger update needs retry.
+
+## Production notes
+
+- Never let the browser provide unrestricted withdrawal parameters.
+- Use idempotency keys for withdrawal creation and retries.
+- Treat relayer, chain RPC, and indexer failures as independent retry domains.
+- Keep audit access scoped and logged.
+- Consider manual review for large, unusual, or compliance-sensitive withdrawals.

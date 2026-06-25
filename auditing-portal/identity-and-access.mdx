@@ -81,9 +81,6 @@ Granted at organization scope.
 | Read applications | `applications:read` |
 | Manage application administrators | `admins:manage_application_administrators` |
 | View organization activity log | `logs:view_activity` |
-| Create organization reports | `reports:create` |
-| List organization reports | `reports:list` |
-| Download organization reports | `reports:download` |
 
 ## Application permission buckets
 
@@ -109,9 +106,9 @@ Application permissions are stored as three arrays on `team_member_application_p
 | Create cases | `cases:create` |
 | Withdraw pending case requests | `cases:withdraw_pending_request` |
 | View transactions | `reports:view_transactions` |
-| Create application reports | `reports:create` |
-| List application reports | `reports:list` |
-| Download application reports | `reports:download` |
+| Create application case reports | `reports:create` |
+| List application case reports | `reports:list` |
+| Download application case reports | `reports:download` |
 
 Default role buckets are defined in `permissions.constants.ts`. Organization owners can adjust access through team-management flows.
 

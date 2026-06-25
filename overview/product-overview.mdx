@@ -1,16 +1,16 @@
 ---
 title: "Product Overview"
-description: "What Arcane is, who it is for, and how the privacy-pool and selective-disclosure parts fit together."
+description: "What Arcane is, who it is for, and how private transaction execution and selective disclosure fit together."
 ---
 
-Arcane is a compliance and selective-disclosure platform for privacy-preserving asset applications.
+Arcane is a privacy layer for financial applications that need private asset movement, partner-friendly integration primitives, and controlled disclosure.
 
 It combines two parts:
 
 | Part | What it does | Who uses it |
 | --- | --- | --- |
-| Privacy Pools | Execute private asset movements through an on-chain privacy pool while preserving commitment, nullifier, and proof-verification state | Application teams, integrators, wallet-connected end users |
-| Auditing Portal | Index privacy-pool audit events, interpret registered contract payloads, and expose scoped disclosure workflows | Compliance teams, auditors, application administrators, organization administrators |
+| Privacy execution | Execute private funding, transfer, and withdrawal flows through supported privacy rails | Application teams, integrators, wallet-connected end users |
+| Auditing Portal | Index private transaction records, interpret registered payloads, and expose scoped disclosure workflows | Compliance teams, auditors, application administrators, organization administrators |
 
 ## Why it exists
 
@@ -27,7 +27,7 @@ Arcane does not make every private transaction public. It creates a controlled p
 
 | User | Responsibility |
 | --- | --- |
-| Application team | Integrates the SDK and submits privacy-pool transactions through a Stellar wallet flow |
+| Application team | Integrates Arcane APIs or SDKs and builds the product flow around private accounts, funding intents, transfers, and withdrawals |
 | Application administrator | Manages disclosure case approvals, auditor access, reports, and application-level activity |
 | Auditor | Requests disclosure, reviews approved case transactions, and generates reports |
 | Organization administrator | Manages organization-level users, applications, and administration boundaries |
@@ -36,9 +36,10 @@ Arcane does not make every private transaction public. It creates a controlled p
 
 | Capability | Implementation area |
 | --- | --- |
-| Private transaction execution | Soroban privacy-pool contract, Circom circuits, client SDK |
-| Audit event handoff | `AuditEncodedDigest` event emitted by the Soroban contract |
-| Contract indexing | Backend scanner for registered contracts |
+| Private transaction execution | Solana SDK, Stellar/Soroban privacy-pool contract, circuits, and partner API resources |
+| Integration resources | Private accounts, funding intents, private transfers, withdrawals, balances, webhooks, and audit records |
+| Audit event handoff | Encrypted audit payloads and chain events emitted by supported privacy rails |
+| Indexing | Backend scanners and indexers for registered private transaction sources |
 | Interpretation | Backend worker that decrypts and normalizes audit payloads |
 | Access control | Backend auth, permissions, application scope, case assignments, and access windows |
 | Disclosure workflows | Case requests, approvals, case review, reports, downloads, and activity logs |
@@ -49,10 +50,10 @@ Arcane does not make every private transaction public. It creates a controlled p
   <Card title="How Arcane Works" icon="route" href="/overview/how-arcane-works">
     End-to-end path from a private transaction to an approved disclosure workflow.
   </Card>
-  <Card title="Supported Use Cases" icon="list-check" href="/overview/supported-use-cases">
-    Partner-facing scenarios supported by the current platform model.
+  <Card title="Build Your First Private Transaction" icon="play" href="/get-started/first-private-transaction">
+    Create the first partner integration from intent to reconciliation.
   </Card>
-  <Card title="Architecture Overview" icon="diagram-project" href="/architecture/overview">
-    Technical decomposition of the privacy-pool and Auditing Portal domains.
+  <Card title="Private Card Funding" icon="credit-card" href="/integration-guides/private-card-funding">
+    Build a private card-funding flow without partner-specific naming.
   </Card>
 </Columns>

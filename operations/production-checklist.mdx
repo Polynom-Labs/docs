@@ -1,0 +1,48 @@
+---
+title: "Production Checklist"
+description: "Prepare an Arcane integration for production launch."
+---
+
+Use this checklist before launching an Arcane integration with real funds.
+
+## Integration readiness
+
+- First private transaction succeeds in sandbox.
+- Funding, shielding, private transfer, withdrawal, and reconciliation paths are tested.
+- Product state distinguishes submitted, confirmed, indexed, and product-complete states.
+- Webhook or internal event processing is idempotent.
+- Polling fallback exists for critical status reads.
+- Product references are stable and searchable.
+
+## Security readiness
+
+- API keys or SDK service credentials are stored server-side.
+- Backend signing uses KMS, HSM, or managed signing.
+- Secrets are not present in logs or analytics.
+- Frontend never receives backend keys, decoded private state, or proof authority.
+- Withdrawal destinations and high-risk actions are validated.
+
+## Operations readiness
+
+- Support can find a product action by Arcane resource id.
+- Operations can find an Arcane resource by product reference.
+- Retry paths exist for prover, relayer, RPC, indexer, and product ledger failures.
+- Manual review states are defined.
+- Alerts exist for failed or delayed money movement.
+
+## Compliance readiness
+
+- Disclosure workflow has an owner.
+- Auditor and administrator permissions are configured.
+- Report generation and downloads are logged.
+- Data retention and export policy are defined.
+- Production audit access is tested with sample records.
+
+## Go-live sequence
+
+1. Run a production dry run with minimal value.
+2. Confirm funding, shielding, indexing, and reconciliation.
+3. Confirm webhook delivery if hosted events are enabled; otherwise confirm internal event and polling behavior.
+4. Confirm audit record creation.
+5. Confirm scoped disclosure access.
+6. Enable wider traffic gradually.

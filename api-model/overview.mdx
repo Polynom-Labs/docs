@@ -1,0 +1,34 @@
+---
+title: "API Model"
+description: "Resource model for hosted Arcane API integrations and partner backend implementations."
+---
+
+The pages in this section describe the intended partner-facing resource model for Arcane integrations.
+
+<Warning>
+These pages are not a generated OpenAPI reference yet. If you are integrating through the SDK today, implement equivalent resources in your backend and confirm hosted API availability with Arcane before coding against these HTTP routes.
+</Warning>
+
+## Why this model exists
+
+Arcane integrations should be designed around product-level resources instead of protocol internals.
+
+| Resource | Purpose |
+| --- | --- |
+| `PrivateAccount` | Private balance scope for a user, cardholder, employee, treasury, or application |
+| `FundingIntent` | Public-to-private funding action |
+| `PrivateTransfer` | Private movement between private accounts or recipients |
+| `Withdrawal` | Private-to-public movement |
+| `Balance` | Indexed private balance view |
+| `AuditRecord` | Permissioned record for reconciliation and disclosure |
+| Webhook event | Asynchronous status update |
+
+## Current integration guidance
+
+Use this section as the API design contract for partner backends. Use the SDK pages for current chain-specific implementation details:
+
+- [Solana SDK](/sdks/solana-sdk)
+- [Stellar SDK](/sdks/stellar-sdk)
+- [Backend-Managed Wallets](/sdks/backend-managed-wallets)
+
+When hosted Arcane API endpoints are available, this section should be replaced or backed by a generated OpenAPI reference.

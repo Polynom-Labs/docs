@@ -1,0 +1,59 @@
+---
+title: "Authentication"
+description: "Authenticate partner backend calls to Arcane API resources."
+---
+
+Arcane API calls should come from your backend. Do not call partner API endpoints directly from an untrusted browser with secret credentials.
+
+<Warning>
+These endpoint examples describe the intended hosted API model. If you are integrating through the SDK today, implement equivalent resources in your backend and confirm hosted API availability with Arcane before coding against these routes.
+</Warning>
+
+## Server-side API keys
+
+Use server-side credentials for Arcane API calls.
+
+```bash
+Authorization: Bearer arcane_sk_...
+```
+
+Store API keys in your secret manager. Do not store them in frontend code, mobile apps, public repositories, or analytics tools.
+
+## Environments
+
+Use separate credentials for each environment.
+
+| Environment | Purpose |
+| --- | --- |
+| Sandbox | Development and testnet integration |
+| Staging | Pre-production integration testing |
+| Production | Real funds and production audit records |
+
+## Idempotency
+
+Send an idempotency key when creating resources that move money or trigger private state changes.
+
+```bash
+Idempotency-Key: card_load_123:create_funding_intent
+```
+
+Use stable product references for retries. Do not generate a new idempotency key after a timeout unless you intentionally want a new operation.
+
+## Webhook signatures
+
+Verify webhook signatures before processing status events.
+
+```bash
+Arcane-Signature: t=...,v1=...
+```
+
+Keep webhook processing idempotent. See [Webhooks](/api-model/webhooks) and [Webhooks and Retries](/operations/webhooks-and-retries).
+
+## Security checklist
+
+- Use server-side credentials only.
+- Rotate keys when people leave the project or access scope changes.
+- Use least-privilege keys when multiple scopes are available.
+- Verify webhook signatures.
+- Log administrative key changes.
+- Keep sandbox and production data separated.

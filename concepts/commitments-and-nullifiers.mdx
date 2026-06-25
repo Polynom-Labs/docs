@@ -1,0 +1,37 @@
+---
+title: "Commitments and Nullifiers"
+description: "Understand the low-level privacy-pool concepts behind Arcane transactions."
+---
+
+Commitments and nullifiers are protocol-level concepts. Most product integrations should not expose them to users.
+
+## Commitments
+
+A commitment represents private value that was created inside the privacy layer. Observers can see that a commitment exists, but they should not learn the owner, amount, or product context from the commitment alone.
+
+## Nullifiers
+
+A nullifier prevents double spending. When private value is spent, the protocol reveals a nullifier derived from private data. Observers can check that the same private value is not spent twice without learning the original private details.
+
+## Why product code should abstract them
+
+Your product should work with:
+
+- Private accounts.
+- Funding intents.
+- Private transfers.
+- Withdrawals.
+- Balances.
+- Audit records.
+
+The SDK and protocol handle:
+
+- Commitment creation.
+- Nullifier generation.
+- Merkle proof construction.
+- Proof generation.
+- State updates.
+
+## When you need to care
+
+You may need commitment and nullifier details when debugging low-level SDK behavior, auditing protocol state, or building custom chain adapters. Most partner integrations should use higher-level SDK or API resources.

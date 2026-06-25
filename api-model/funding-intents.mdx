@@ -1,0 +1,73 @@
+---
+title: "Funding Intents"
+description: "Track public funding into Arcane private balance."
+---
+
+A `FundingIntent` represents a planned movement from public funds into private balance.
+
+Use it when a user or partner system starts a deposit, card load, payroll funding, or treasury funding action.
+
+<Warning>
+These endpoint examples describe the intended hosted API model. If you are integrating through the SDK today, implement equivalent resources in your backend and confirm hosted API availability with Arcane before coding against these routes.
+</Warning>
+
+## Object
+
+```json
+{
+  "id": "fi_...",
+  "status": "requires_funding",
+  "private_account_id": "pa_...",
+  "amount": "100.00",
+  "asset": "USDC",
+  "chain": "solana",
+  "funding_address": "...",
+  "external_reference": "card_load_123",
+  "created_at": "2026-06-25T10:00:00Z",
+  "expires_at": "2026-06-25T10:30:00Z"
+}
+```
+
+## Create a funding intent
+
+```http
+POST /funding-intents
+```
+
+```json
+{
+  "private_account_id": "pa_...",
+  "amount": "100.00",
+  "asset": "USDC",
+  "chain": "solana",
+  "external_reference": "card_load_123"
+}
+```
+
+## Retrieve a funding intent
+
+```http
+GET /funding-intents/{id}
+```
+
+Use retrieval for page refresh, polling fallback, and reconciliation.
+
+## Statuses
+
+| Status | Meaning |
+| --- | --- |
+| `requires_funding` | Waiting for public funds |
+| `funding_detected` | Public funds were observed |
+| `shielding` | Arcane is creating private state |
+| `submitted` | Transaction was submitted |
+| `confirmed` | Chain confirmed the transaction |
+| `indexed` | Arcane indexed private state |
+| `available` | Funds are ready for product use |
+| `failed` | Retry or review is required |
+| `expired` | Funding window closed |
+
+## Related guides
+
+- [Build Your First Private Transaction](/get-started/first-private-transaction)
+- [Private Card Funding](/integration-guides/private-card-funding)
+- [Status Lifecycle](/operations/status-lifecycle)

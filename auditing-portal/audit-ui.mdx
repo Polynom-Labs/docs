@@ -9,7 +9,7 @@ The Audit UI is a React/Vite application. It does not execute end-user privacy-p
 
 | Workspace | Routes | Backing scope |
 | --- | --- | --- |
-| Organization owner | `/workspace/organization-owner/overview`, `/applications`, `/team`, `/activity`, `/reports` | `auth/me.owner` permissions |
+| Organization owner | `/workspace/organization-owner/overview`, `/applications`, `/team`, `/activity` | `auth/me.owner` permissions |
 | Application | `/workspace/application/:foreignId/overview`, `/cases`, `/cases/new`, `/cases/:caseId`, `/disclosure`, `/reports`, `/log`, `/settings` | `auth/me.applications[foreignId]` permission buckets |
 
 Legacy routes under `/workspace/application-auditor/:foreignId/*` and `/workspace/application-administrator/:foreignId/*` redirect to the unified application workspace.
@@ -61,7 +61,6 @@ UI checks hide unavailable navigation. Backend guards still enforce access for e
 | `/workspace/organization-owner/applications` | Application list and creation |
 | `/workspace/organization-owner/team` | Team members and permissions |
 | `/workspace/organization-owner/activity` | Organization activity log |
-| `/workspace/organization-owner/reports` | Organization report list and downloads |
 
 ## Application workspace
 
@@ -72,6 +71,6 @@ UI checks hide unavailable navigation. Backend guards still enforce access for e
 | `/workspace/application/:foreignId/cases/new` | Disclosure case request form |
 | `/workspace/application/:foreignId/cases/:caseId` | Approved case workspace |
 | `/workspace/application/:foreignId/disclosure` | Disclosure request registry for application administrators |
-| `/workspace/application/:foreignId/reports` | Application report list |
+| `/workspace/application/:foreignId/reports` | Application case report list |
 | `/workspace/application/:foreignId/log` | Application activity log |
 | `/workspace/application/:foreignId/settings` | Application settings |

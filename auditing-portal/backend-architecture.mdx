@@ -77,7 +77,7 @@ Representative API groups:
 | Audit rows | `GET /api/audit/contract/:contractId` | `reports:view_transactions` |
 | Cases | `/api/applications/:foreignId/cases/...` | Application scope, case permissions, assignments |
 | Admin case decisions | `/api/applications/:foreignId/case-requests/:id/approve` | `cases:approve_creation` |
-| Reports | `/api/reports`, `/api/applications/:foreignId/reports`, `/api/applications/:foreignId/case-reports` | `reports:create`, `reports:list`, `reports:download` |
+| Reports | `/api/applications/:foreignId/case-reports`, `/api/applications/:foreignId/case-reports/:reportId/download` | `reports:create`, `reports:list`, `reports:download` |
 | Activity log | `/api/auditors-log`, `/api/applications/:foreignId/auditors-log`, `/api/applications/:foreignId/cases/:caseId/auditors-log` | `logs:view_activity` or `reports:view_transactions` |
 | Team/admin | `/api/admin/team/...` | Organization owner and team-management checks |
 

@@ -1,0 +1,80 @@
+---
+title: "Sandbox / Testnet Setup"
+description: "Prepare a safe environment for your first Arcane integration."
+---
+
+Use a sandbox or testnet environment before moving real value through Arcane.
+
+## Environment checklist
+
+| Requirement | Purpose |
+| --- | --- |
+| Arcane SDK access | Build and submit privacy-layer operations from your backend |
+| Hosted API credentials, if enabled | Authenticate hosted Arcane API calls when your environment supports them |
+| Test chain RPC | Read funding transactions and submit test transactions |
+| Test asset | Exercise deposit, transfer, and withdrawal flows |
+| Partner backend environment | Store private account ids, intent ids, and operation history |
+| Webhook endpoint, if enabled | Receive hosted API status changes and audit events |
+| Secure signing setup | Keep backend-managed keys out of frontend code |
+
+## Suggested environments
+
+| Rail | Use for |
+| --- | --- |
+| Solana devnet or test deployment | Backend-managed card funding and relayer flows |
+| Stellar testnet or Futurenet | Stellar/Soroban privacy-pool flows |
+| Local integration environment | Backend orchestration, state machine, and webhook testing |
+
+## Direct Solana SDK configuration
+
+Keep Arcane, chain, and signing configuration server-side. For the current Solana SDK path, the backend needs indexer, relayer, Light RPC, prover, and Solana RPC configuration.
+
+```bash
+ARCANE_INDEXER_URL=<arcane-sandbox-indexer-url>
+ARCANE_RELAYER_URL=<arcane-sandbox-relayer-url>
+ARCANE_LIGHT_RPC_URL=<light-rpc-url>
+ARCANE_CIRCUIT_PATH=<circuit-base-path-or-url>
+SOLANA_RPC_URL=<solana-devnet-rpc-url>
+```
+
+`ARCANE_CIRCUIT_PATH` is an advanced prover setting. The SDK default is `/transaction2`, and the value is used as the base path for the `.wasm` and `.zkey` proof artifacts. See [Solana SDK](/sdks/solana-sdk).
+
+If Arcane enables hosted API or webhook access for your environment, add the hosted API values separately:
+
+```bash
+ARCANE_API_URL=<arcane-hosted-api-url>
+ARCANE_WEBHOOK_SECRET=<webhook-signing-secret>
+STELLAR_RPC_URL=<stellar-testnet-rpc-url>
+```
+
+## Test sequence
+
+1. Create a private account.
+2. Create a funding intent.
+3. Fund the returned address with test assets.
+4. Shield the funds.
+5. Read the private balance.
+6. Submit a private transfer.
+7. Withdraw a small amount to a public address.
+8. Confirm webhooks and audit records, when hosted API events are enabled.
+
+## Sandbox data
+
+Use realistic product identifiers without using production customer data.
+
+| Field | Example |
+| --- | --- |
+| `external_reference` | `card_load_test_001` |
+| `customer_reference` | `test_customer_001` |
+| `payroll_cycle_reference` | `test_payroll_2026_06` |
+| `metadata.environment` | `sandbox` |
+
+## Go-live gate
+
+Move to production only after:
+
+- Webhooks and retries are idempotent.
+- Funding, shielding, transfer, withdrawal, and reconciliation paths pass.
+- Secrets are stored in KMS, HSM, or an equivalent managed signing layer.
+- Your team can explain every status in [Status Lifecycle](/operations/status-lifecycle).
+- Your compliance owner has reviewed [Controlled Disclosure](/integration-guides/controlled-disclosure).
