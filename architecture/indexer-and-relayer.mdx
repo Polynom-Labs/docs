@@ -1,0 +1,35 @@
+---
+title: "Indexer and Relayer"
+description: "Infrastructure APIs used by the Solana SDK for private payment execution."
+---
+
+The Solana SDK uses Arcane API endpoints for indexer and relayer operations.
+
+The default SDK indexer URL is:
+
+```text
+https://yona.cash/api
+```
+
+## Indexer
+
+The indexer is used for:
+
+- Merkle roots.
+- Merkle proofs.
+- UTXO history.
+- Private state scanning.
+- Compliance checks where configured.
+
+## Relayer
+
+The relayer submits signed private transactions.
+
+When your backend uses a local relayer endpoint, `ARCANE_RELAYER_URL` must expose:
+
+```http
+POST /relayer/submit-signed-transaction
+GET /relayer/info
+```
+
+Treat relayer submission separately from Solana chain confirmation. A relayer call can succeed before your product action is complete.

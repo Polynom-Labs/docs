@@ -1,0 +1,49 @@
+---
+title: "Reconciliation and Support"
+description: "Store enough product and transaction state to support private payment operations."
+---
+
+Your backend is the system of record for product state. Arcane SDK operations should be attached to your product records through stable references and transaction signatures.
+
+## What to store
+
+For each user-visible money movement, store:
+
+- Product record id.
+- Owner wallet public key.
+- Managed wallet reference.
+- Amount and asset.
+- Funding address when applicable.
+- Public funding or withdrawal signature when applicable.
+- Shield, spend, or withdrawal signature.
+- Scan state.
+- Status history.
+- Retry attempts and error messages.
+
+## Support view
+
+Support teams should see product language, not protocol internals.
+
+| Support question | Data to use |
+| --- | --- |
+| Did the user send funds? | Funding address and public funding signature |
+| Did shielding start? | `shield_deposit_submitted` history event |
+| Is private balance available? | Scan state and decoded UTXO balance |
+| Did a withdrawal submit? | Withdrawal signature and chain confirmation |
+| Why is the product still processing? | Last status, retry count, and last error |
+
+## Reconciliation rule
+
+Do not mark the product action complete only because an SDK call returned.
+
+Wait for:
+
+1. Chain confirmation.
+2. Indexed private state when the operation changes private balance.
+3. Successful product ledger update.
+
+## Review and disclosure
+
+Use [Controlled Disclosure](/integration-guides/controlled-disclosure) when a support, compliance, or audit workflow needs scoped access to private transaction data.
+
+Do not use disclosure workflows as a general analytics export.

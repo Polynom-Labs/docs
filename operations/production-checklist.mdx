@@ -1,48 +1,47 @@
 ---
 title: "Production Checklist"
-description: "Prepare an Arcane integration for production launch."
+description: "Prepare an Arcane private payments integration for production launch."
 ---
 
-Use this checklist before launching an Arcane integration with real funds.
+Use this checklist before launching with real value.
 
 ## Integration readiness
 
-- First private transaction succeeds in sandbox.
-- Funding, shielding, private transfer, withdrawal, and reconciliation paths are tested.
-- Product state distinguishes submitted, confirmed, indexed, and product-complete states.
-- Operation retries are idempotent.
-- Polling fallback exists for critical status reads.
-- Product references are stable and searchable.
+- The first private transaction succeeds in a test environment.
+- Login or session restore creates the correct wallet row.
+- Scan state starts from the correct indexer position for new users.
+- Deposit checks, shielding, private spend, withdrawal, and balance refresh paths are tested.
+- Status history is append-only or otherwise auditable.
+- Product ledger updates are idempotent.
 
 ## Security readiness
 
-- SDK service credentials, RPC credentials, and relayer configuration are stored server-side.
-- Backend signing uses KMS, HSM, or managed signing.
-- Secrets are not present in logs or analytics.
-- Frontend never receives backend keys, decoded private state, or proof authority.
-- Withdrawal destinations and high-risk actions are validated.
+- Backend signing uses KMS, HSM, or an equivalent managed signing service.
+- SDK, Solana RPC, indexer, relayer, Light RPC, and circuit configuration are server-side.
+- Frontend never receives backend keys, proof signatures, decoded UTXOs, or encrypted output caches.
+- Sessions are authenticated before using `owner_wallet_public_key` as wallet scope.
+- Deposit checks, private spend, withdrawal, and relayer endpoints are rate limited.
 
-## Operations readiness
+## Operational readiness
 
-- Support can find SDK and chain operations by product reference.
-- Operations can find product records by transaction signature.
-- Retry paths exist for prover, relayer, RPC, indexer, and product ledger failures.
-- Manual review states are defined.
-- Alerts exist for failed or delayed money movement.
+- Support can find product records by transaction signature.
+- Support can find SDK operation history by product record id.
+- Retry behavior uses the same product reference unless a new product action is intentionally created.
+- Arcane API, Solana RPC, proof generation, relayer submission, and product ledger updates are tracked as separate failure domains.
+- Manual review states are defined for late funds, amount mismatch, suspicious destination, repeated failures, and disputes.
 
-## Compliance readiness
+## Disclosure readiness
 
 - Disclosure workflow has an owner.
 - Auditor and administrator permissions are configured.
 - Report generation and downloads are logged.
-- Data retention and export policy are defined.
 - Production audit access is tested with sample records.
 
 ## Go-live sequence
 
 1. Run a production dry run with minimal value.
-2. Confirm funding, shielding, indexing, and reconciliation.
-3. Confirm status tracking and polling behavior.
-4. Confirm operation history and disclosure case linkage when the audit portal is used.
-5. Confirm scoped disclosure access.
-6. Enable wider traffic gradually.
+2. Confirm deposit, shielding, scanning, and reconciliation.
+3. Confirm private spend or withdrawal behavior if your product uses it.
+4. Confirm status tracking and retry behavior.
+5. Confirm support and disclosure access.
+6. Increase traffic gradually.

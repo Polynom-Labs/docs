@@ -1,144 +1,117 @@
 ---
 title: "Private Card Funding"
-description: "Build a private funding flow for card programs and embedded finance products."
+description: "Apply the private payments integration pattern to a card funding flow."
 ---
 
-Private card funding lets a user or partner system add funds to a card program while reducing public transaction visibility. Your application keeps the internal mapping between the customer, card-load record, funding address, chain transaction, and treasury operation.
+Private card funding is a product recipe on top of [Private Payments Integration Guide](/integration-guides/private-payments-integration-guide).
 
-## When to use this guide
+Your backend keeps the card funding session, customer reference, funding amount, transaction signatures, scan state, and card ledger status. Arcane provides the SDK and infrastructure for private transaction execution.
 
-Use this pattern when you operate:
-
-- Consumer or business card programs.
-- Stablecoin-backed card funding.
-- Embedded finance accounts with card spend.
-- Contractor or employee cards connected to payroll or treasury balances.
-- White-label card programs where you need partner-level reconciliation.
-
-## High-level flow
+## Flow
 
 ```mermaid
 sequenceDiagram
   participant User
   participant App as Partner app
   participant Backend as Partner backend
-  participant SDK as Arcane SDK
-  participant Chain
+  participant SDK as Privacy Layer SDK
+  participant RPC as Solana RPC
   participant Card as Card ledger
 
   User->>App: Starts card funding
-  App->>Backend: Create card funding session
-  Backend->>Backend: Load managed wallet and deposit address
+  App->>Backend: Create or restore card funding session
+  Backend->>Backend: Load wallet row and stealth deposit address
   Backend-->>App: Show funding instructions
-  User->>Chain: Sends funds
-  Backend->>Chain: Detects public funding
+  User->>RPC: Sends funds
+  Backend->>RPC: Checks deposit address balance
   Backend->>SDK: depositWithRelayer(...)
   SDK-->>Backend: Shield transaction signature
-  Backend->>Backend: Scan private state
+  Backend->>SDK: getMyUtxos(...)
   Backend->>Card: Mark card load ready
 ```
 
-## Partner responsibilities
+## Partner-owned record
 
-Your backend owns the product state.
-
-| Data | Owner |
-| --- | --- |
-| Customer id | Partner |
-| Card id or card-load id | Partner |
-| Funding amount and asset | Partner |
-| Funding address shown to user | Partner backend, derived from managed wallet state |
-| Public funding transaction | Chain and partner |
-| Shield transaction signature | Chain, relayer, and partner |
-| Card ledger update | Partner |
-
-Keep partner ids in your backend. Do not put customer personal data in public chain metadata or low-level transaction fields.
-
-## Step 1: Create a card funding session
-
-When the customer chooses to fund a card, create a card funding session in your backend.
+Create a card funding session in your backend.
 
 ```json
 {
   "card_load_id": "card_load_123",
   "customer_reference": "customer_456",
   "amount": "100.00",
-  "asset": "USDC",
+  "asset": "SOL",
   "chain": "solana",
   "status": "awaiting_public_funds"
 }
 ```
 
-The card funding session should be idempotent. If the user refreshes the page, return the same open session instead of creating duplicate funding instructions.
+This record is your product state. It is not an Arcane SDK object.
 
-## Step 2: Show funding instructions
+## Step 1: Create or restore wallet state
 
-Load or create the backend-managed wallet context for the customer or funding profile. Return only user-safe information to the frontend:
+Use the same wallet row and scan state described in [Private Payments Integration Guide](/integration-guides/private-payments-integration-guide).
+
+Return only user-safe information to the frontend:
 
 - Amount.
 - Asset.
-- Funding address or wallet action.
-- Expiration time.
+- Funding address.
+- Expiration time if your product uses one.
 - Current product status.
 
 Do not expose managed private keys, proof signatures, decoded UTXOs, or encrypted output caches.
 
-## Step 3: Detect funds and shield
+## Step 2: Detect funds and shield
 
-After public funds arrive, shield them into private state.
+After funds arrive at the stealth deposit address:
 
-In a backend-managed Solana integration, this maps to:
+1. Confirm the public balance through Solana RPC.
+2. Call `depositWithRelayer`.
+3. Store the returned signature and operation timing metadata.
+4. Scan private state with `getMyUtxos`.
+5. Mark private balance available only after chain confirmation and indexed state.
 
-- Confirm the public funding transaction through Solana RPC.
-- Call the SDK deposit path, usually `depositWithRelayer`.
-- Submit through the relayer.
-- Store the returned signature and operation history.
-- Scan private state until the balance is available.
+## Step 3: Complete card funding
 
-See [Backend-Managed Wallets](/sdks/backend-managed-wallets) and [Solana SDK](/sdks/solana-sdk).
-
-## Step 4: Complete the card load
-
-After the shield transaction is confirmed and indexed, update your card ledger or treasury operation.
+Update your card ledger only after private state is available.
 
 | State | Product action |
 | --- | --- |
-| `available` | Mark card load ready or initiate card ledger funding |
-| `failed` | Retry shielding or route to operations review |
-| `expired` | Close the funding session and ask the user to start again |
-| `requires_review` | Hold the card load until support or compliance review finishes |
+| `awaiting_public_funds` | Show funding instructions |
+| `shielding` | Funds were detected and SDK shielding is in progress |
+| `available` | Private state is indexed and the card ledger can be updated |
+| `failed` | Retry or route to review |
+| `expired` | Close the session or ask the user to start again |
 
-Do not mark the card load as complete before you have both chain confirmation and indexed private state.
-
-## Step 5: Reconcile
+## Reconciliation data
 
 Store enough data to answer support, dispute, fraud, and compliance questions.
 
 | Record | Why it matters |
 | --- | --- |
-| Card-load id | Links the product action to funding and shield operations |
-| Funding address | Explains where the user sent public funds |
-| Public funding signature | Confirms the public deposit |
+| Card funding session id | Links the product action to funding and shielding |
+| Funding address | Shows where the user sent funds |
+| Public funding signature | Confirms public deposit when available |
 | Shield signature | Links the SDK operation to chain execution |
-| Scan state and status history | Explains delays, retries, and operational events |
-
-The customer-facing UI can stay simple. Internal operations can use the product record and transaction signatures to investigate issues.
+| Scan state and status history | Explains delays, retries, and available balance |
 
 ## Failure handling
 
 | Failure | Recommended handling |
 | --- | --- |
-| Funds arrived after expiration | Resume the existing session or create a new one through support tooling |
-| Amount mismatch | Hold the session and show manual review status |
-| Shielding failed | Retry with the same card-load reference after confirming prior transaction state |
-| Indexer lag | Keep the user in processing status and poll the indexer |
-| Card ledger update failed | Keep private state available and retry the product ledger update |
+| Funds arrived after expiration | Resume the existing session or route to review |
+| Amount mismatch | Hold the session for review |
+| Shielding failed | Retry with the same card funding session id after checking prior transaction state |
+| Indexer lag | Keep the user in processing status and poll before marking funds available |
+| Card ledger update failed | Keep private state available and retry the ledger update idempotently |
 
-## Go-live checklist
+## Related pages
 
-- Funding sessions are idempotent.
-- Public funding detection handles partial and late transfers.
-- Card loads are not completed before private state is indexed.
-- Customer ids are not leaked into public chain metadata.
-- Operations can find public and shield signatures from the card-load id.
-- Compliance and support review is scoped to the relevant product records.
+<Columns cols={2}>
+  <Card title="Reconciliation and support" icon="file-search" href="/integration-guides/reconciliation-and-support">
+    Decide what to store for operations and support.
+  </Card>
+  <Card title="Production checklist" icon="list-checks" href="/operations/production-checklist">
+    Review readiness before launch.
+  </Card>
+</Columns>

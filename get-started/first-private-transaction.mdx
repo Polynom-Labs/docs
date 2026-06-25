@@ -1,140 +1,90 @@
 ---
 title: "Build Your First Private Transaction"
-description: "Create a first end-to-end Arcane transaction using the current SDK-backed integration path."
+description: "Run the first backend-managed private payment flow with the Solana SDK."
 ---
 
-This guide walks through the first successful backend-managed Solana flow: create or restore a managed wallet, show a funding address, detect public funds, shield them with the SDK, scan private state, and reconcile the product result.
+This guide shows the shortest source-backed path to a first successful private transaction.
 
-It uses a card-funding style example, but the same mechanics apply to payroll, treasury, wallet, and embedded finance integrations.
+Use it to confirm that your backend can create or restore a managed wallet, scan private state, shield funds, and reconcile the result with your product state.
 
 ## Before you begin
 
 You need:
 
-- Arcane SDK source or package access for the selected rail.
-- A partner backend that can store product records, managed wallet state, scan state, and operation history.
-- A Solana RPC endpoint for the environment you are testing.
-- Arcane indexer, relayer, Light RPC, and prover configuration for direct SDK use.
-- A test asset such as native SOL or test USDC.
+- Arcane Solana SDK source or private package access.
+- A backend that can store wallet rows, scan progress, decoded UTXOs, encrypted outputs, and operation history.
+- A Solana RPC endpoint.
+- Arcane indexer, relayer, Light RPC, and circuit configuration.
+- A test amount of SOL or a supported test asset.
 
-For local testing, see [Sandbox / Testnet Setup](/get-started/sandbox-testnet-setup).
+See [Testnet Setup](/get-started/sandbox-testnet-setup) for environment setup.
 
-## Step 1: Create or restore the managed wallet
+## Step 1: Start a backend session
 
-When the user opens the funding flow, your frontend identifies the user or product actor and calls your backend.
+The frontend connects the user's external Solana wallet and sends `owner_wallet_public_key` to your backend.
 
-For wallet-authenticated products, the frontend sends the user's external Solana wallet public key. Your backend uses that value as the owner scope.
+Your backend uses that value as the owner scope. It should not restore a "latest wallet" in a multi-user production flow.
 
-Your backend should create or load a wallet row with:
+## Step 2: Create or restore the wallet row
+
+If the owner has no wallet row, your backend creates one.
 
 | Field | Purpose |
 | --- | --- |
-| `owner_wallet_public_key` | External wallet or product identity used to find the row |
-| `managed_public_key` | Backend-managed public key used by the SDK |
-| Signing key reference | KMS, HSM, or encrypted key reference for the managed signer |
-| `proof_signature_base58` | Stable proof authority signature used for private key derivation |
-| `stealth_deposit_index` | Current deposit address offset |
+| `owner_wallet_public_key` | External Solana wallet identity |
+| `managed_public_key` | Backend-managed public key, usually the active stealth deposit public key |
+| `private_key_base58` | Backend-managed Solana private key; use KMS or HSM in production |
+| `proof_signature_base58` | Stable proof authority signature used for UTXO derivation |
+| `stealth_deposit_index` | Deposit address offset |
 
-Return only public context to the frontend, such as the funding address, asset, amount, and current product status.
+Return only public context to the frontend.
 
-## Step 2: Create your product funding session
+## Step 3: Initialize scan state
 
-Create a partner-owned product record for the user action. For card funding, this might be a `card_load` or `card_funding_session` row.
+Create `arcane_utxo_scan_state` for the owner wallet.
 
-```json
-{
-  "card_load_id": "card_load_123",
-  "customer_reference": "customer_456",
-  "amount": "100.00",
-  "asset": "USDC",
-  "chain": "solana",
-  "status": "awaiting_public_funds"
-}
-```
+For a new user, initialize from the current Arcane API total and set `start_at_current=true`. This avoids scanning unrelated historical commitments.
 
-This is your object, not an Arcane SDK object. Keep it idempotent: if the user refreshes, return the same open funding session.
+## Step 4: Display the deposit address
 
-## Step 3: Show the funding action
+Show the active stealth SOL deposit address to the user. Your product can attach its own product reference, such as a card funding session id, but that reference stays in your backend.
 
-Your frontend shows normal product instructions:
+## Step 5: Check public funding and shield
 
-- Amount and asset.
-- Funding address or wallet action.
-- Current status.
-- Expiration or cancellation state if your product supports it.
+After the user sends funds, your backend checks the stealth deposit address through Solana RPC.
 
-The frontend should not call low-level privacy-layer functions in a backend-managed integration.
+When funds are available, call `depositWithRelayer`. The SDK creates private output UTXOs, generates the proof, builds the Arcane transaction, and submits through the relayer.
 
-## Step 4: Detect public funding
+Record a `shield_deposit_submitted` history event with the returned signature and timing metadata.
 
-Your backend watches the funding address through chain RPC. After the expected transfer is visible, mark your product session as `public_funds_detected`.
+## Step 6: Scan private balance
 
-```mermaid
-sequenceDiagram
-  participant User
-  participant App as Partner frontend
-  participant Backend as Partner backend
-  participant RPC as Solana RPC
-  participant SDK as Arcane SDK
-  participant Relayer as Arcane relayer
+After shielding, call `getMyUtxos` with server-side storage scoped by `owner_wallet_public_key`.
 
-  User->>App: Starts funding
-  App->>Backend: Create or restore card funding session
-  Backend->>Backend: Load managed wallet and deposit address
-  Backend-->>App: Funding instructions
-  User->>RPC: Sends public funds
-  Backend->>RPC: Watches funding address
-  Backend->>SDK: depositWithRelayer(...)
-  SDK->>Relayer: Submit signed transaction
-  Relayer-->>SDK: Transaction signature
-  SDK-->>Backend: Shield result
-  Backend->>Backend: Save operation history
-```
+Persist:
 
-## Step 5: Shield funds into private state
-
-After public funding is detected, your backend calls the SDK deposit flow.
-
-For Solana, this maps to `depositWithRelayer` in [Solana SDK](/sdks/solana-sdk).
-
-The shielding operation should:
-
-- Create private output state.
-- Generate the required proof.
-- Submit through the relayer.
-- Store the transaction signature and SDK timing details.
-- Continue only after chain confirmation and indexer visibility.
-
-## Step 6: Scan private state
-
-After shielding, scan private state before showing spendable balance or using the funds.
-
-For Solana, this maps to `getMyUtxos` and backend-side UTXO persistence. The current SDK helper uses browser-style `localStorage`, so backend-managed integrations need a server-side storage shim.
+- Decoded UTXOs.
+- Encrypted outputs.
+- Scan progress.
+- User-visible history.
 
 ## Step 7: Reconcile the product result
 
-When the private balance is confirmed and indexed, update your product ledger.
+Mark the product action ready only after the chain transaction is confirmed and the private state is indexed.
 
-For card funding, this usually means:
+For card funding, link the card funding session to:
 
-- Link the card-load row to the public funding transaction and private shield transaction.
-- Mark the card load ready only after chain confirmation and indexed private state.
-- Keep customer-facing history simple.
-- Keep support and compliance history permissioned.
-
-For payroll, this usually means:
-
-- Link the private operation to payroll cycle, employee, employer, and accrual records.
-- Preserve enough transaction and scan history to explain failures or retries.
-- Keep external chain activity decoupled from employee-facing payroll history.
+- The public funding transaction.
+- The shield transaction signature.
+- The scan state that made the private balance available.
 
 ## Next guides
 
 <Columns cols={2}>
-  <Card title="Private card funding" icon="credit-card" href="/integration-guides/private-card-funding">
-    Build a private card-load or card-funding flow.
+  <Card title="Private payments integration guide" icon="route" href="/integration-guides/private-payments-integration-guide">
+    Implement the full backend-managed wallet pattern.
   </Card>
-  <Card title="Private payroll flows" icon="timer" href="/integration-guides/private-payroll-flows">
-    Apply the same model to payroll, streaming, and employee payouts.
+  <Card title="Private card funding" icon="credit-card" href="/integration-guides/private-card-funding">
+    Apply the pattern to a card funding product flow.
   </Card>
 </Columns>

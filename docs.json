@@ -15,49 +15,19 @@
         "pages": [
           "overview/product-overview",
           "overview/how-arcane-works",
-          "get-started/integration-model",
           "get-started/first-private-transaction",
           "get-started/sandbox-testnet-setup"
         ]
       },
       {
-        "group": "Integration Guides",
+        "group": "Integration Guide",
         "pages": [
+          "integration-guides/sdk-guide",
+          "integration-guides/private-payments-integration-guide",
           "integration-guides/private-card-funding",
-          "integration-guides/private-payroll-flows",
-          "integration-guides/private-transfers",
-          "integration-guides/withdrawals-and-payouts",
-          "integration-guides/reconciliation-and-audit-records",
-          "integration-guides/controlled-disclosure"
-        ]
-      },
-      {
-        "group": "SDKs",
-        "pages": [
+          "integration-guides/reconciliation-and-support",
           "sdks/solana-sdk",
-          "sdks/stellar-sdk",
-          "sdks/backend-managed-wallets",
-          "sdks/client-side-wallet-flows",
-          "sdks/relayer-indexer-prover"
-        ]
-      },
-      {
-        "group": "Concepts",
-        "pages": [
-          "concepts/managed-wallets",
-          "concepts/commitments-and-nullifiers",
-          "concepts/shielding-and-unshielding",
-          "concepts/selective-disclosure",
-          "concepts/compliance-model",
-          "overview/supported-use-cases"
-        ]
-      },
-      {
-        "group": "Operations",
-        "pages": [
-          "operations/status-lifecycle",
-          "operations/failure-modes",
-          "operations/security-checklist",
+          "integration-guides/controlled-disclosure",
           "operations/production-checklist"
         ]
       },
@@ -68,47 +38,17 @@
           "use-cases/auditor/create-disclosure-request",
           "use-cases/auditor/review-case-transactions",
           "use-cases/auditor/generate-reports-and-activity-logs",
-          "auditing-portal/identity-and-access",
-          "auditing-portal/disclosure-cases-and-reports",
-          {
-            "group": "Administrator workflows",
-            "pages": [
-              "use-cases/auditor/overview",
-              "use-cases/application-administrator/overview",
-              "use-cases/application-administrator/approve-disclosure-request",
-              "use-cases/application-administrator/manage-case-auditors",
-              "use-cases/application-administrator/application-reports-and-activity-logs",
-              "use-cases/organization-administrator/overview"
-            ]
-          }
+          "auditing-portal/identity-and-access"
         ]
       },
       {
         "group": "Architecture",
         "pages": [
           "architecture/system-context",
-          "privacy-pools/overview",
-          "auditing-portal/backend-architecture",
-          "auditing-portal/data-model",
-          "architecture/overview",
-          "architecture/architecture-map",
-          {
-            "group": "Privacy pool internals",
-            "pages": [
-              "privacy-pools/soroban-contract",
-              "privacy-pools/cryptography",
-              "privacy-pools/client-sdk",
-              "privacy-pools/on-chain-state",
-              "privacy-pools/audit-events"
-            ]
-          },
-          {
-            "group": "Auditing internals",
-            "pages": [
-              "auditing-portal/indexing-and-interpretation",
-              "auditing-portal/audit-ui"
-            ]
-          }
+          "architecture/solana-program",
+          "architecture/indexer-and-relayer",
+          "architecture/prover-and-circuits",
+          "auditing-portal/backend-architecture"
         ]
       }
     ]
@@ -128,7 +68,7 @@
     "primary": {
       "type": "button",
       "label": "Start integrating",
-      "href": "/get-started/first-private-transaction"
+      "href": "/integration-guides/sdk-guide"
     }
   },
   "contextual": {

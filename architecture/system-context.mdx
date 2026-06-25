@@ -1,41 +1,45 @@
 ---
 title: "System Context"
-description: "Arcane users, external systems, privacy pools, and the auditing portal."
+description: "Arcane partner applications, SDK infrastructure, Solana RPC, and the auditing portal."
 ---
 
-This page shows the systems and actors around Arcane. It deliberately does not show backend modules or database tables; those appear in the architecture map and component pages.
-
-## System context
-
-![Arcane system context](/images/diagrams/system-context.svg)
+This page shows the main systems around an Arcane integration.
 
 ## Actors
 
 | Actor | Uses | Main actions |
 | --- | --- | --- |
-| End user | Reference or partner application, Stellar wallet | Signs private-pool transactions |
-| Privacy-pool integrator | SDK and Soroban contract | Builds the user-facing application flow around `PrivacyPoolSDK` and `transact` |
-| Auditor | Audit UI | Requests disclosure cases, reviews assigned case transactions, creates reports |
-| Application administrator | Audit UI | Reviews disclosure requests, approves or closes requests, manages case auditors |
-| Organization administrator | Audit UI | Manages applications, team members, permissions, and organization activity |
+| End user | Partner application | Connects an external Solana wallet and starts product actions |
+| Partner application team | Backend, database, and Solana SDK | Builds private payment flows and stores product state |
+| Support or operations team | Partner backend records | Tracks transaction signatures, status history, and reconciliation state |
+| Auditor | Auditing Portal | Requests disclosure cases, reviews approved case transactions, and creates reports |
+| Application administrator | Auditing Portal | Reviews disclosure requests, approves or closes requests, and manages case auditors |
+| Organization administrator | Auditing Portal | Manages organization users, applications, and administration boundaries |
 
 ## Systems
 
 | System | Owner | Boundary |
 | --- | --- | --- |
-| Reference or partner application | Integrator | Outside Arcane; submits Soroban transactions through user wallets |
-| Stellar wallet | Wallet provider / user | Signs transactions and messages |
-| Soroban privacy-pool contract | Arcane deployment | On-chain execution and audit event emission |
-| Stellar ledger and events | Stellar network | Source of committed transaction state and emitted events |
-| Arcane Auditing Portal | Arcane | Backend API, scanner, interpretation worker, PostgreSQL, and Audit UI |
-| Identity provider | Third-party service configured by Arcane | Authenticates portal users and organization context |
+| Partner frontend | Partner | Connects wallet, shows funding instructions, and calls backend APIs |
+| Partner backend | Partner | Owns sessions, wallet state, scan state, SDK calls, and product reconciliation |
+| Partner database | Partner | Persists wallet rows, UTXOs, encrypted outputs, scan state, and operation history |
+| Solana SDK | Arcane package used by partner backend | Builds instructions, scans private state, generates proofs, and submits through relayer |
+| Arcane API | Arcane | Provides indexer and relayer APIs used by the SDK |
+| Solana RPC | RPC provider | Reads public balances and confirms transactions |
+| Auditing Portal | Arcane | Supports scoped disclosure, case review, reports, and access control |
 
-## Domain split
-
-Privacy Pools and the Auditing Portal meet at the on-chain event boundary:
+## Execution boundary
 
 ```text
-PrivacyPoolsContract.transact -> AuditEncodedDigest -> scanner -> audit -> audit_interpretation
+Partner frontend -> Partner backend -> Solana SDK -> Arcane API / Solana RPC
 ```
 
-The privacy pool can execute on-chain transactions without the Audit UI being open. The Auditing Portal can index and manage disclosure workflows for registered contracts without being part of the end-user wallet flow.
+The SDK does not own the partner product model. The partner backend remains the system of record for product state and reconciliation.
+
+## Disclosure boundary
+
+```text
+Product and transaction evidence -> scoped disclosure workflow -> approved review
+```
+
+The Auditing Portal is separate from the user transaction path.

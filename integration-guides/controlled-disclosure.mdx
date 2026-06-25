@@ -3,9 +3,9 @@ title: "Controlled Disclosure"
 description: "Expose private transaction data only through scoped, authorized review workflows."
 ---
 
-Arcane is designed for privacy-preserving applications that still need a controlled path for compliance review, dispute resolution, and reporting.
+Controlled disclosure means private transaction data is not broadly visible by default.
 
-Controlled disclosure means private transaction data is not broadly visible by default. Authorized users request, approve, review, and report only the scoped data they are allowed to see.
+Authorized users request, approve, review, and report only the scoped data they are allowed to see.
 
 ## Disclosure flow
 
@@ -26,31 +26,15 @@ sequenceDiagram
 
 ## Scope dimensions
 
-Disclosure should be limited by scope.
-
 | Dimension | Examples |
 | --- | --- |
 | Organization | Which partner or customer organization owns the data |
-| Application | Which app, card program, payroll product, or treasury product |
+| Application | Which application owns the product flow |
 | Time window | Start and end time for permitted review |
-| Asset | USDC, SOL, native token, or supported private asset |
+| Asset | SOL or supported private asset |
 | Operation references | Product object ids, transaction signatures, disclosure cases, and reports |
 | Role | Auditor, application administrator, organization administrator |
 | Case | Specific investigation, dispute, report, or legal request |
-
-## What disclosure is for
-
-Use controlled disclosure for:
-
-- Support investigations.
-- Card disputes and chargeback research.
-- Payroll disputes.
-- Fraud review.
-- Regulatory requests.
-- Internal compliance reports.
-- External audits.
-
-Do not use controlled disclosure as a general analytics export. Build product analytics from partner-side product events and aggregate Arcane status data.
 
 ## Integration requirements
 
@@ -65,8 +49,8 @@ Your backend should:
 ## Related pages
 
 <Columns cols={2}>
-  <Card title="Reconciliation and audit records" icon="file-search" href="/integration-guides/reconciliation-and-audit-records">
-    Link product objects to Arcane records for operations and review.
+  <Card title="Reconciliation and support" icon="file-search" href="/integration-guides/reconciliation-and-support">
+    Link product records to SDK and chain evidence.
   </Card>
   <Card title="Identity and access" icon="lock-keyhole" href="/auditing-portal/identity-and-access">
     Understand how portal access is scoped and enforced.

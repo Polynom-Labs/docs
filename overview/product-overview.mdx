@@ -1,59 +1,47 @@
 ---
-title: "Product Overview"
-description: "What Arcane is, who it is for, and how private transaction execution and selective disclosure fit together."
+title: "Overview"
+description: "What Arcane provides for private transaction execution and controlled disclosure."
 ---
 
-Arcane is a privacy layer for financial applications that need private asset movement, partner-friendly integration primitives, and controlled disclosure.
+Arcane helps financial applications execute private transactions while preserving a controlled path for compliance review.
 
-It combines two parts:
-
-| Part | What it does | Who uses it |
-| --- | --- | --- |
-| Privacy execution | Execute private funding, transfer, and withdrawal flows through supported privacy rails | Application teams, integrators, wallet-connected end users |
-| Auditing Portal | Index private transaction records, interpret registered payloads, and expose scoped disclosure workflows | Compliance teams, auditors, application administrators, organization administrators |
-
-## Why it exists
-
-Privacy-preserving financial applications need two properties that are usually in tension:
-
-| Requirement | Arcane approach |
-| --- | --- |
-| User transaction privacy | Transaction details are represented through commitments, nullifiers, proofs, and encrypted audit payloads instead of public transaction-level disclosure |
-| Compliance review | Authorized organizations and auditors can request, approve, review, and report scoped disclosure data through the Auditing Portal |
-
-Arcane does not make every private transaction public. It creates a controlled path for selective disclosure when an organization or auditor has the right scope.
-
-## Main users
-
-| User | Responsibility |
-| --- | --- |
-| Application team | Integrates Arcane SDKs and infrastructure into product flows such as card funding, payroll, transfers, and withdrawals |
-| Application administrator | Manages disclosure case approvals, auditor access, reports, and application-level activity |
-| Auditor | Requests disclosure, reviews approved case transactions, and generates reports |
-| Organization administrator | Manages organization-level users, applications, and administration boundaries |
+Today, the supported partner integration path is the Solana Privacy Layer SDK. Your backend uses the SDK to manage private balances, scan UTXOs, generate proofs, submit relayed transactions, and reconcile the result with your product state.
 
 ## What Arcane provides
 
-| Capability | Implementation area |
+| Area | What it does |
 | --- | --- |
-| Private transaction execution | Solana SDK, Stellar/Soroban privacy-pool contract, circuits, indexer, relayer, and prover utilities |
-| Integration model | Backend-managed wallets, partner-owned product records, SDK operations, private state scanning, and reconciliation |
-| Audit event handoff | Encrypted audit payloads and chain events emitted by supported privacy rails |
-| Indexing | Backend scanners and indexers for registered private transaction sources |
-| Interpretation | Backend worker that decrypts and normalizes audit payloads |
-| Access control | Backend auth, permissions, application scope, case assignments, and access windows |
-| Disclosure workflows | Case requests, approvals, case review, reports, downloads, and activity logs |
+| Solana Privacy Layer SDK | Builds private payment operations, scans private state, generates proofs, and submits transactions through the relayer |
+| Private payments integration pattern | Shows how your backend stores wallet state, scan progress, UTXOs, encrypted outputs, and operation history |
+| Auditing Portal | Supports scoped disclosure workflows for approved review, reporting, and access control |
+| Infrastructure | Provides indexer, relayer, prover, and chain integration surfaces used by the SDK |
+
+## Current integration path
+
+The current live integration path is the Solana SDK. Future SDKs will be documented only when they are ready for partner use.
+
+## Who uses Arcane
+
+| User | Responsibility |
+| --- | --- |
+| Partner application team | Integrates the SDK into backend transaction flows |
+| Support or operations team | Tracks product status, transaction signatures, and reconciliation state |
+| Application administrator | Approves scoped disclosure requests and manages access |
+| Auditor | Reviews approved cases and generates reports |
 
 ## Read next
 
 <Columns cols={2}>
-  <Card title="How Arcane Works" icon="route" href="/overview/how-arcane-works">
-    End-to-end path from a private transaction to an approved disclosure workflow.
+  <Card title="Build your first private transaction" icon="play" href="/get-started/first-private-transaction">
+    Walk through the first backend-managed private payment flow.
   </Card>
-  <Card title="Build Your First Private Transaction" icon="play" href="/get-started/first-private-transaction">
-    Create the first partner integration from managed wallet setup to reconciliation.
+  <Card title="SDK guide" icon="code" href="/integration-guides/sdk-guide">
+    See which SDKs are available and where to start.
   </Card>
-  <Card title="Private Card Funding" icon="credit-card" href="/integration-guides/private-card-funding">
-    Build a private card-funding flow without partner-specific naming.
+  <Card title="Private payments integration guide" icon="route" href="/integration-guides/private-payments-integration-guide">
+    Implement the source-backed backend-managed wallet pattern.
+  </Card>
+  <Card title="Private card funding" icon="credit-card" href="/integration-guides/private-card-funding">
+    Apply the private payments flow to card funding.
   </Card>
 </Columns>

@@ -1,47 +1,48 @@
 ---
-title: "Auditing Portal overview"
-description: "Technical overview of the Arcane backend, PostgreSQL storage, scanner, interpretation worker, API, and Audit UI."
+title: "Auditing Portal Overview"
+description: "Scoped disclosure, case review, reporting, and access control for approved review workflows."
 ---
 
-The Auditing Portal is the off-chain part of Arcane. It indexes registered contracts, stores raw and interpreted audit data, enforces access, manages disclosure cases, generates reports, and records activity logs.
+The Auditing Portal is separate from the user transaction path.
 
-## Auditing Portal components
+Use it when an approved support, compliance, or audit workflow needs scoped access to private transaction records.
 
-![Auditing Portal components](/images/diagrams/auditing-portal-components.svg)
+## What the portal supports
 
-## Runtime responsibilities
+| Area | Purpose |
+| --- | --- |
+| Disclosure requests | Auditors request scoped access for a specific review need |
+| Case approval | Application administrators approve, close, or limit access |
+| Case review | Assigned auditors review approved transaction records |
+| Reports | Approved users generate and download case reports |
+| Permissions | Organization and application permissions enforce access boundaries |
 
-| Area | Implementation | Responsibility |
-| --- | --- | --- |
-| Backend runtime | NestJS, TypeORM, scheduled jobs | Module graph, API routes, scanner ticks, interpretation batches |
-| Registry | `chain`, `contracts`, `assets`, `applications` | Defines which contracts are scanned and how contracts map to organizations/applications |
-| Scanner | `ScannerModule`, `StellarLedgerScannerService` | Reads Stellar RPC, parses Soroban events, writes raw `audit` rows and `stellar_scans` checkpoints |
-| Interpretation | `AuditInterpretationRunnerService` | Decrypts raw audit rows and writes normalized `audit_interpretation` rows |
-| Identity/access | `AuthModule`, `WorkosAuthModule`, `MagicAuthModule`, guards | Maps authenticated users to organizations, applications, permission buckets, and route scope |
-| Disclosure workflow | `CasesModule`, `DisclosureRequestModule` | Request creation, approval/close decisions, approved cases, assignments, access windows |
-| Reports | `ReportsModule` | Report generation, listing, download, and report metadata |
-| Activity log | `AuditorsLogModule` | Activity staging, persistence, list, export |
-| UI | React/Vite | Organization owner and application workspaces |
+## Access model
 
-## Documentation
+The portal is organized around:
+
+- Organizations.
+- Applications.
+- Cases.
+- Assignments.
+- Permission buckets.
+- Access windows.
+
+Portal access does not make every private transaction broadly visible.
+
+## Read next
 
 <Columns cols={2}>
-  <Card title="Backend Architecture" icon="server" href="/auditing-portal/backend-architecture">
-    Backend modules, API groups, scanner and worker runtime.
+  <Card title="Disclosure requests" icon="file-plus" href="/use-cases/auditor/create-disclosure-request">
+    Request scoped access for a review case.
   </Card>
-  <Card title="Data Model" icon="database" href="/auditing-portal/data-model">
-    Core PostgreSQL tables and relationships.
+  <Card title="Case review" icon="file-search" href="/use-cases/auditor/review-case-transactions">
+    Review approved case transactions.
   </Card>
-  <Card title="Indexing and Interpretation" icon="timeline" href="/auditing-portal/indexing-and-interpretation">
-    Stellar RPC scanning, raw audit upsert, interpretation batches, and error states.
+  <Card title="Reports" icon="file-lines" href="/use-cases/auditor/generate-reports-and-activity-logs">
+    Generate reports and review activity logs.
   </Card>
-  <Card title="Identity and Access" icon="shield" href="/auditing-portal/identity-and-access">
-    `GET /auth/me`, permission buckets, workspace resolution, and API enforcement.
-  </Card>
-  <Card title="Disclosure, Cases, and Reports" icon="file-lines" href="/auditing-portal/disclosure-cases-and-reports">
-    Request lifecycle, approved cases, assignments, reports, and activity logs.
-  </Card>
-  <Card title="Audit UI" icon="desktop" href="/auditing-portal/audit-ui">
-    Organization and application workspace routes.
+  <Card title="Permissions and access" icon="shield" href="/auditing-portal/identity-and-access">
+    Understand portal identity and route enforcement.
   </Card>
 </Columns>

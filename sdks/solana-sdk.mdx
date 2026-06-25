@@ -1,47 +1,36 @@
 ---
-title: "Solana SDK"
-description: "Use the Arcane Solana SDK for backend-managed deposits, private transfers, withdrawals, and UTXO scanning."
+title: "Solana SDK Reference"
+description: "Use the Arcane Solana SDK package, exports, configuration, and core transaction helpers."
 ---
 
-The Solana SDK provides reusable protocol client code for private payments on Solana. Use it when your backend needs to create private balances, scan UTXOs, generate proofs, submit relayed transactions, and withdraw to public Solana addresses.
+The Solana SDK is the current live SDK path for Arcane private payments.
 
-## Package
+It is a standalone TypeScript SDK for the Arcane privacy layer on Solana. It provides reusable protocol client code for private balances, UTXO scanning, proof generation, relayed transaction submission, private spend, and withdrawal to Solana.
+
+## Package status
 
 <Warning>
-The Solana SDK package is not published on npm yet. Arcane currently provides SDK access during onboarding through a private package, tarball, or source repository. Do not use `yarn add @arcane-labs/privacy-layer-sdk` until Arcane confirms the package is published or private registry access is configured.
+The package name is `@arcane-labs/privacy-layer-sdk`, but the package is not publicly published yet. Do not use `yarn add @arcane-labs/privacy-layer-sdk` unless Arcane confirms private registry access or package publication.
 </Warning>
 
 Source access is available in the private GitHub repository: [Polynom-Labs/privacy-layer-sdk](https://github.com/Polynom-Labs/privacy-layer-sdk). Arcane must grant repository access before partners can clone it.
 
-For private beta access, install the package artifact provided by Arcane:
+For private beta access, install the package artifact Arcane provides:
 
 ```bash
 yarn add <path-or-registry-spec-for-arcane-solana-sdk>
 ```
 
-Replace the placeholder with the private registry package name, tarball path, or workspace alias Arcane provides during onboarding.
-
-If Arcane provides source access instead of a package artifact, build and pack it locally before adding it to your backend:
+If Arcane provides source access instead of a package artifact, build it locally:
 
 ```bash
 yarn install --frozen-lockfile
 yarn build
-yarn pack --filename arcane-solana-sdk.tgz
 ```
-
-After installation, the SDK package exposes TypeScript helpers for:
-
-- Program and provider setup.
-- UTXO keypairs, commitments, and nullifiers.
-- Private SOL and token deposits.
-- Private transfers.
-- Withdrawals to public Solana addresses.
-- UTXO scanning and balance calculation.
-- Relayer, indexer, Light RPC, Merkle, and prover utilities.
 
 ## Program
 
-The current deployed Arcane Solana program id is:
+The bundled IDL targets this deployed Arcane program:
 
 ```text
 2EyitVDBV38LSeGDKQuZWHMCmebMdGeVFgHC5LYxepLG
@@ -49,42 +38,64 @@ The current deployed Arcane Solana program id is:
 
 Confirm the target program id with Arcane before production deployment.
 
-## Direct SDK runtime configuration
+## Runtime configuration
 
-Most partners should not need to think about these values in the first product flow. They matter when your backend runs the Solana SDK, proof generation, indexer access, and relayer submission directly.
+The SDK reads configuration from Node `process.env` or Vite-style `import.meta.env`.
 
-Keep this configuration server-side. Do not expose backend signing material, proof authority, decoded UTXOs, or encrypted output caches in frontend code.
-
-| Variable | Purpose | Default in the SDK |
+| Variable | Purpose | Default |
 | --- | --- | --- |
-| `ARCANE_INDEXER_URL` | Indexer API used for Merkle roots, proofs, UTXO history, and compliance checks | `https://yona.cash/api` |
-| `ARCANE_RELAYER_URL` | Relayer API used for `/relayer/info`, `/relayer/submit-signed-transaction`, `/relayer/withdraw`, and job status polling | Same as indexer URL |
-| `ARCANE_LIGHT_RPC_URL` | Light Protocol RPC endpoint used for compressed account state | Empty; withdrawal falls back to the Solana connection RPC when needed |
-| `ARCANE_CIRCUIT_PATH` | Advanced prover setting: base path or URL for the Groth16 artifacts used as `<path>.wasm` and `<path>.zkey` | `/transaction2` |
-| `SOLANA_RPC_URL` | Solana RPC endpoint used by your backend to create the SDK `Connection` | Not read directly by the SDK |
-| `COMPLIANCE_REQUIRE_SENDER` | Optional sender signature enforcement for compliant withdrawals | `false` |
+| `ARCANE_INDEXER_URL` / `INDEXER_API_URL` / `VITE_INDEXER_URL` | Indexer API used for Merkle roots, proofs, UTXO history, and compliance checks | `https://yona.cash/api` |
+| `ARCANE_RELAYER_URL` / `RELAYER_URL` / `VITE_RELAYER_URL` | Relayer API used to submit signed private transactions | Indexer URL |
+| `ARCANE_LIGHT_RPC_URL` / `LIGHT_RPC_URL` / `VITE_LIGHT_RPC_URL` | Light Protocol RPC endpoint | Empty |
+| `ARCANE_CIRCUIT_PATH` / `CIRCUIT_PATH` / `VITE_CIRCUIT_PATH` | Groth16 circuit path or URL used by the prover | `/transaction2` |
+| `COMPLIANCE_REQUIRE_SENDER` / `VITE_COMPLIANCE_REQUIRE_SENDER` | Requires sender wallet message signatures for compliant withdrawals | `false` |
 
-Local and Vite-style aliases may exist for demos. Production backends should use server-side environment variables.
+Keep this configuration server-side for backend-managed integrations.
 
-If Arcane provides a managed prover or a preconfigured backend package, the circuit artifact path may be hidden from your application. Treat `ARCANE_CIRCUIT_PATH` as an advanced self-hosted SDK/prover setting, not as a product-level integration object.
+## Main exports
 
-## Common imports
+The main entrypoint exports:
+
+- `createProvider`, `createProgram`, `getProgram`
+- `PROGRAM_ID`, `INDEXER_API_URL`, `RELAYER_URL`, `LIGHT_RPC_URL`
+- `UtxoKeypair`, `Utxo`
+- `depositWithRelayer`, `transactTransfer`, `withdrawWithRelayer`
+- `consolidateUtxos`, `autoConsolidateAll`
+- `getMyUtxos`, `getBalanceFromUtxos`, `groupUtxosByMint`, `clearUtxoCache`
+- `EncryptionService`, `MerkleTree`, `prove`, `pollSignatureStatus`
+
+Package subpath exports are available for transaction modules and selected utilities:
 
 ```ts
-import {
-  createProvider,
-  createProgram,
-  getMyUtxos,
-  getBalanceFromUtxos,
-  depositWithRelayer,
-  transactTransfer,
-  withdrawWithRelayer,
-} from "<arcane-solana-sdk-package>";
+import { transactTransfer } from "@arcane-labs/privacy-layer-sdk/transactions/transact";
+import { getMyUtxos } from "@arcane-labs/privacy-layer-sdk/utils/getMyUtxos";
 ```
+
+## Create a program client
+
+```ts
+import { Connection } from "@solana/web3.js";
+import { createProvider, createProgram } from "@arcane-labs/privacy-layer-sdk";
+
+const connection = new Connection(process.env.SOLANA_RPC_URL!, "confirmed");
+const provider = createProvider(connection, wallet);
+const program = createProgram(provider);
+```
+
+## Scan private UTXOs
+
+```ts
+import { getMyUtxos, getBalanceFromUtxos } from "@arcane-labs/privacy-layer-sdk";
+
+const utxos = await getMyUtxos(signedWallet, connection, console.log, lightWasm);
+const privateSol = getBalanceFromUtxos(utxos);
+```
+
+Backend-managed integrations should persist scan state, decoded UTXOs, and encrypted outputs on the server.
 
 ## Deposit and shield
 
-Use a deposit flow after your backend detects public funding.
+Use `depositWithRelayer` after your backend detects public funds at the stealth deposit address.
 
 ```ts
 const result = await depositWithRelayer(
@@ -100,32 +111,11 @@ const result = await depositWithRelayer(
 );
 ```
 
-The first argument is a UI amount. For native SOL, `0.5` means 0.5 SOL. For tokens, the SDK converts the UI amount using the selected mint decimals.
+Record the returned signature and timing metadata in your operation history.
 
-The SDK prepares private output state, creates the proof, builds the transaction, signs where required, and submits through the relayer.
+## Private spend
 
-For product flows, map this operation to your partner-owned funding session or product record.
-
-## Scan private balance
-
-Scan and decode private state before showing available balance or spending.
-
-```ts
-const utxos = await getMyUtxos(
-  signedWallet,
-  connection,
-  setStatus,
-  lightWasm
-);
-
-const balance = getBalanceFromUtxos(utxos);
-```
-
-Persist scan state and decoded UTXOs on the backend. Do not store decoded private state in browser local storage.
-
-## Private transfer
-
-Use private transfers for account-to-account movement inside the privacy layer.
+Use `transactTransfer` for movement inside the privacy layer.
 
 ```ts
 const result = await transactTransfer(
@@ -143,11 +133,9 @@ const result = await transactTransfer(
 );
 ```
 
-For product flows, map this operation to your partner-owned transfer, payroll, order, or treasury record.
+## Withdraw to Solana
 
-## Withdrawal
-
-Use withdrawals to move private balance back to a public Solana address.
+Use `withdrawWithRelayer` to move private balance to a public Solana address.
 
 ```ts
 const result = await withdrawWithRelayer(
@@ -163,12 +151,8 @@ const result = await withdrawWithRelayer(
 );
 ```
 
-For product flows, map this operation to your partner-owned withdrawal or payout record.
+## Related page
 
-## Production guidance
-
-- Use [Backend-Managed Wallets](/sdks/backend-managed-wallets) for card funding, payroll, and treasury flows.
-- Store private keys in KMS, HSM, or an equivalent managed signing service.
-- Treat proof generation, relayer submission, chain confirmation, and indexer state as separate failure domains.
-- Persist status history and operation ids for reconciliation.
-- Do not expose UTXOs, nullifiers, proof inputs, or backend signing keys to the browser.
+<Card title="Private payments integration guide" icon="route" href="/integration-guides/private-payments-integration-guide">
+  Implement the backend-managed wallet pattern around these SDK calls.
+</Card>

@@ -1,0 +1,29 @@
+---
+title: "Prover and Circuits"
+description: "Proof generation and circuit artifact configuration for the Solana SDK."
+---
+
+The Solana SDK generates proofs for private transactions.
+
+## Circuit path
+
+The SDK reads the circuit path from:
+
+- `ARCANE_CIRCUIT_PATH`
+- `CIRCUIT_PATH`
+- `VITE_CIRCUIT_PATH`
+
+The default value is:
+
+```text
+/transaction2
+```
+
+The value is used as the Groth16 circuit path or URL for prover artifacts.
+
+## Production guidance
+
+- Keep circuit configuration server-side in backend-managed integrations.
+- Treat proof generation as a separate failure domain.
+- Record proof-generation failures in operation history.
+- Retry with the same product reference when the product action is still valid.

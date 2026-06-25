@@ -1,0 +1,36 @@
+---
+title: "SDK Guide"
+description: "Choose the supported Arcane SDK path for your integration."
+---
+
+Use this page to understand which SDK path is available today.
+
+## SDK availability
+
+| SDK | Status | Start here |
+| --- | --- | --- |
+| Solana SDK | Live | [Private Payments Integration Guide](/integration-guides/private-payments-integration-guide) |
+| Stellar SDK | Coming soon | No integration guide is available yet |
+
+## Solana SDK
+
+The Solana SDK is the current partner integration path.
+
+It is a standalone TypeScript SDK for the Arcane privacy layer on Solana. It includes reusable protocol client code for private payments:
+
+- Create private balances.
+- Scan UTXOs.
+- Generate proofs.
+- Submit relayed transactions.
+- Withdraw to Solana.
+
+Source access is available in the private GitHub repository: [Polynom-Labs/privacy-layer-sdk](https://github.com/Polynom-Labs/privacy-layer-sdk). Arcane must grant repository access before partners can clone it.
+
+The npm package name in the SDK repository is `@arcane-labs/privacy-layer-sdk`, but the package is not publicly published yet. Use the private package, tarball, or source workflow Arcane provides during onboarding.
+
+## Recommended path
+
+1. Read [Private Payments Integration Guide](/integration-guides/private-payments-integration-guide).
+2. Use [Solana SDK Reference](/sdks/solana-sdk) when implementing SDK calls.
+3. Use [Private Card Funding](/integration-guides/private-card-funding) if your product flow is card funding.
+4. Use [Production Checklist](/operations/production-checklist) before moving real value.

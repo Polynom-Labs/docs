@@ -1,72 +1,54 @@
 ---
-title: "Sandbox / Testnet Setup"
-description: "Prepare a safe environment for your first Arcane integration."
+title: "Testnet Setup"
+description: "Prepare a safe Solana test environment for the first Arcane integration."
 ---
 
-Use a sandbox or testnet environment before moving real value through Arcane.
+Use a test environment before moving real value through Arcane.
 
 ## Environment checklist
 
 | Requirement | Purpose |
 | --- | --- |
-| Arcane SDK access | Build and submit privacy-layer operations from your backend |
-| Test chain RPC | Read funding transactions and submit test transactions |
-| Test asset | Exercise deposit, transfer, and withdrawal flows |
-| Partner backend environment | Store managed wallet state, product references, scan state, and operation history |
-| Secure signing setup | Keep backend-managed keys out of frontend code |
+| Arcane Solana SDK access | Build and submit private payment operations from your backend |
+| Solana RPC endpoint | Read deposit balances and confirm transactions |
+| Arcane API endpoint | Access indexer and relayer APIs |
+| Light RPC endpoint | Support compressed account state where required |
+| Circuit artifacts | Generate proofs for private transactions |
+| Backend database | Persist wallet rows, scan progress, UTXOs, encrypted outputs, and operation history |
 
-## Suggested environments
+## Backend environment
 
-| Rail | Use for |
-| --- | --- |
-| Solana devnet or test deployment | Backend-managed card funding and relayer flows |
-| Stellar testnet or Futurenet | Stellar/Soroban privacy-pool flows |
-| Local integration environment | Backend orchestration, state machine, and retry testing |
-
-## Direct Solana SDK configuration
-
-Keep Arcane, chain, and signing configuration server-side. For the current Solana SDK path, the backend needs indexer, relayer, Light RPC, prover, and Solana RPC configuration.
+Keep configuration server-side.
 
 ```bash
-ARCANE_INDEXER_URL=<arcane-sandbox-indexer-url>
-ARCANE_RELAYER_URL=<arcane-sandbox-relayer-url>
+ARCANE_INDEXER_URL=<arcane-indexer-url>
+ARCANE_RELAYER_URL=<arcane-relayer-url>
 ARCANE_LIGHT_RPC_URL=<light-rpc-url>
 ARCANE_CIRCUIT_PATH=<circuit-base-path-or-url>
-SOLANA_RPC_URL=<solana-devnet-rpc-url>
+SOLANA_RPC_URL=<solana-rpc-url>
 ```
 
-`ARCANE_CIRCUIT_PATH` is an advanced prover setting. The SDK default is `/transaction2`, and the value is used as the base path for the `.wasm` and `.zkey` proof artifacts. See [Solana SDK](/sdks/solana-sdk).
-
-For Stellar testing, configure the target testnet RPC and deployed contract details described in [Stellar SDK](/sdks/stellar-sdk).
+The SDK default indexer is `https://yona.cash/api`. The default circuit path is `/transaction2`.
 
 ## Test sequence
 
-1. Create or restore a managed wallet row.
-2. Create a partner-owned funding session.
-3. Fund the returned address with test assets.
-4. Shield the funds with the SDK.
-5. Scan private state and read the private balance.
-6. Submit a private transfer.
-7. Withdraw a small amount to a public address.
-8. Confirm product reconciliation and retry behavior.
-
-## Sandbox data
-
-Use realistic product identifiers without using production customer data.
-
-| Field | Example |
-| --- | --- |
-| `card_load_id` | `card_load_test_001` |
-| `customer_reference` | `test_customer_001` |
-| `payroll_cycle_reference` | `test_payroll_2026_06` |
-| `metadata.environment` | `sandbox` |
+1. Connect an external Solana wallet.
+2. Create or restore the backend wallet row.
+3. Initialize scan state.
+4. Display a stealth deposit address.
+5. Send a small test amount to that address.
+6. Check the public balance through Solana RPC.
+7. Shield the funds with `depositWithRelayer`.
+8. Scan private state with `getMyUtxos`.
+9. Submit a small private spend or withdrawal.
+10. Confirm status history and reconciliation data.
 
 ## Go-live gate
 
 Move to production only after:
 
-- Product operations and retries are idempotent.
-- Funding, shielding, transfer, withdrawal, and reconciliation paths pass.
+- The first private transaction succeeds in testnet or sandbox.
+- Wallet rows, scan progress, decoded UTXOs, encrypted outputs, and operation history persist correctly.
 - Secrets are stored in KMS, HSM, or an equivalent managed signing layer.
-- Your team can explain every status in [Status Lifecycle](/operations/status-lifecycle).
-- Your compliance owner has reviewed [Controlled Disclosure](/integration-guides/controlled-disclosure).
+- Retry behavior is idempotent.
+- Support can find product records by transaction signature.

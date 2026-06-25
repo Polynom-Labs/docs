@@ -1,0 +1,148 @@
+---
+title: "Private Payments Integration Guide"
+description: "Implement the backend-managed wallet pattern from the Arcane Solana SDK integration guide."
+---
+
+This guide describes the backend-managed wallet pattern for private payments on Solana.
+
+The frontend never receives private keys or Arcane proof authority. It connects the user's external Solana wallet, shows balances and forms, and calls your backend. Your backend owns session state, database state, SDK calls, Solana signing, and relayer submission.
+
+## Components
+
+| Component | Responsibility |
+| --- | --- |
+| Frontend | Connects the user's external Solana wallet, shows balances and forms, and calls backend APIs |
+| Product backend | Owns sessions, generated private keys, proof signatures, UTXO cache, history, and SDK calls |
+| Database | Persists wallet rows, scan progress, decoded UTXOs, encrypted outputs, and operation history |
+| Privacy Layer SDK | Builds Arcane instructions, scans UTXOs, creates proofs, and submits through a relayer |
+| Arcane API | Provides indexer and relayer APIs |
+| Solana RPC | Reads public SOL balances and confirms transactions |
+
+## Runtime configuration
+
+Recommended backend environment:
+
+```bash
+ARCANE_INDEXER_URL=https://yona.cash/api
+ARCANE_RELAYER_URL=https://yona.cash/api
+ARCANE_LIGHT_RPC_URL=<light-rpc-url>
+ARCANE_CIRCUIT_PATH=/transaction2
+SOLANA_RPC_URL=<solana-rpc-url>
+```
+
+If your backend runs a local relayer endpoint, set:
+
+```bash
+ARCANE_RELAYER_URL=http://127.0.0.1:<backend-port>
+```
+
+The relayer URL must expose:
+
+```http
+POST /relayer/submit-signed-transaction
+GET /relayer/info
+```
+
+## User-side state
+
+Keep user-side state minimal.
+
+| User-side field | Purpose |
+| --- | --- |
+| `owner_wallet_public_key` | External Solana wallet identity used to find the backend wallet row |
+| Session cookie or auth token | Authenticates future backend requests; prefer an HttpOnly cookie for browser apps |
+
+Do not store these in browser local storage:
+
+- Backend-generated private keys.
+- Proof signatures.
+- Stealth deposit private keys.
+- Decoded UTXOs.
+- Encrypted output cache.
+
+## Database state
+
+The SDK does not enforce a database schema. A backend-managed integration needs equivalent storage for these records.
+
+| Store | Purpose |
+| --- | --- |
+| `wallets` | One row per external owner wallet |
+| `arcane_utxo_scan_state` | Tracks how far the backend has scanned the Arcane indexer for one owner wallet |
+| `arcane_utxos` | Stores decoded private UTXOs owned by the managed wallet |
+| `arcane_utxo_encrypted_outputs` | Stores encrypted outputs cached from the indexer |
+| `arcane_utxo_history` | Stores scan events and user-visible operation history |
+
+Store private keys with KMS, HSM, or an equivalent managed signing layer in production.
+
+## Login or session restore
+
+1. The frontend connects the user's Solana wallet and sends `owner_wallet_public_key` to the backend.
+2. The backend looks up `wallets.owner_wallet_public_key`.
+3. If no row exists, the backend generates a Solana keypair and stores the managed signing reference.
+4. The backend creates `proof_signature_base58` once from the managed signer.
+5. The backend derives the active stealth deposit address using `proof_signature_base58` and `stealth_deposit_index`.
+6. The backend initializes scan state.
+7. The backend returns public context only.
+
+For a new user, initialize scan state from the current Arcane API total and set `start_at_current=true`.
+
+## Balance scan
+
+Call this when the wallet screen opens, after shield, after spend, after withdrawal, and on user refresh.
+
+1. Load the wallet row and scan state.
+2. Query the current Arcane API index.
+3. Call SDK UTXO scanning with server-side storage scoped by `owner_wallet_public_key`.
+4. Persist encrypted outputs, decoded UTXOs, and scan progress.
+5. Return private balances, scan state, and user-visible history.
+
+## Stealth deposit and shield
+
+1. The frontend displays the current stealth SOL deposit address.
+2. The user sends public SOL to that address.
+3. The frontend calls your backend to check the deposit balance.
+4. The backend reads public SOL balance from Solana RPC.
+5. If SOL is available, the backend calls `depositWithRelayer`.
+6. The SDK creates private output UTXOs, generates the proof, builds the Arcane transaction, and submits through the relayer.
+7. The backend records `shield_deposit_submitted`.
+
+To rotate the deposit address, increment `wallets.stealth_deposit_index` and derive the next stealth address. Keep historical deposit addresses if your product needs reconciliation.
+
+## Private spend
+
+Use private spend when value should move inside the privacy layer.
+
+1. Scan or refresh cached UTXOs.
+2. Choose the amount.
+3. Derive the recipient's Arcane UTXO public key and X25519 public key.
+4. Call `transactTransfer`.
+5. Record `spend_submitted` with the signature and timing metadata.
+
+## Withdraw to Solana
+
+Use withdrawals when the user enters a public Solana recipient and amount.
+
+1. Validate the recipient public key and amount.
+2. Scan or refresh cached UTXOs.
+3. Call `withdrawWithRelayer`.
+4. Record `withdraw_submitted`.
+5. Refresh private balance and history.
+
+## Production notes
+
+- Authenticate sessions before using `owner_wallet_public_key` as the wallet scope.
+- Do not restore a "latest wallet" in multi-user production.
+- Add rate limits for deposit checks, spend, withdrawal, and relayer endpoints.
+- Store enough history metadata to explain failures and reconcile signatures.
+- Treat Arcane API, Solana RPC, proof generation, and relayer submission as independent failure points.
+
+## Related pages
+
+<Columns cols={2}>
+  <Card title="Solana SDK reference" icon="braces" href="/sdks/solana-sdk">
+    See SDK package status, exports, configuration, and examples.
+  </Card>
+  <Card title="Private card funding" icon="credit-card" href="/integration-guides/private-card-funding">
+    Apply this pattern to a card funding flow.
+  </Card>
+</Columns>
