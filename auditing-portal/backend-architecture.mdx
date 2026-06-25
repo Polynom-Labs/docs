@@ -1,20 +1,95 @@
 ---
 title: "Auditing Architecture"
-description: "Backend services and enforcement surfaces for the Arcane Auditing Portal."
+description: "NestJS backend modules, scheduled jobs, API groups, and portal enforcement surfaces."
 ---
 
-The Auditing Portal is separate from the user transaction path. It supports scoped disclosure, case review, reports, permissions, and activity logs.
+The backend is a NestJS application with TypeORM and scheduled jobs.
 
-## Runtime areas
+## Runtime modules
 
-| Area | Purpose |
+`AppModule` imports the runtime modules below.
+
+| Module | Area |
 | --- | --- |
-| Authentication | Identifies portal users and organization context |
-| Applications | Scopes disclosure and reports to partner applications |
-| Cases | Stores disclosure requests, approvals, assignments, and review state |
-| Reports | Generates, lists, and downloads approved reports |
-| Activity log | Records review and reporting activity |
-| Scanner and interpretation | Reads registered transaction evidence and prepares normalized review records |
+| `ConfigModule` | Environment parsing and runtime configuration |
+| `ScheduleModule` | Scanner and interpretation intervals |
+| `TypeOrmModule` | PostgreSQL connection, entities, migrations |
+| `BlockchainModule` | Chain metadata |
+| `ContractsModule` | Pool contracts and keys |
+| `AssetsModule` | Asset metadata |
+| `ApplicationsModule` | Applications and route segments |
+| `ScannerModule` | Stellar and Solana scanner providers and scheduled scanner service |
+| `AuditModule` | Raw audit rows and audit query endpoint |
+| `AuditInterpretationModule` | Interpretation worker and interpreted records |
+| `AuthModule` | `GET /auth/me`, permissions, guards |
+| `WorkosAuthModule` | WorkOS identity implementation |
+| `MagicAuthModule` | OTP authentication implementation |
+| `AdminsModule` | Organization, team, and access administration |
+| `CasesModule` | Case requests, approvals, case review, assignments |
+| `DisclosureRequestModule` | Disclosure request storage and status model |
+| `ReportsModule` | Report generation, listing, download |
+| `AuditorsLogModule` | Activity-log staging, persistence, list, export |
+
+## Backend component map
+
+```mermaid
+flowchart TB
+  api["HTTP controllers"]
+  guards["WorkosAuthGuard\nPermissionsGuard\nApplicationScopeGuard\nExternalAuditorScopeGuard"]
+  auth["AuthMeService"]
+  apps["ApplicationsModule"]
+  contracts["ContractsModule"]
+  scanner["LedgerScannerSchedulerService\nchain scanner services"]
+  interpreter["AuditInterpretationRunnerService"]
+  cases["CasesModule"]
+  reports["ReportsModule"]
+  log["AuditorsLogModule"]
+  db["PostgreSQL"]
+  rpc["Chain RPC providers"]
+
+  api --> guards
+  guards --> auth
+  api --> apps
+  api --> contracts
+  api --> cases
+  api --> reports
+  api --> log
+  scanner --> rpc
+  scanner --> db
+  interpreter --> db
+  auth --> db
+  apps --> db
+  contracts --> db
+  cases --> db
+  reports --> db
+  log --> db
+```
+
+## API groups
+
+Representative API groups:
+
+| API group | Example route | Main checks |
+| --- | --- | --- |
+| Auth | `GET /auth/me` | Authenticated identity |
+| Applications | `POST /api/applications`, `GET /api/applications` | Owner application permissions |
+| Contracts | `POST /api/contracts` | Auth and contract-management checks |
+| Audit rows | `GET /api/audit/contract/:contractId` | `reports:view_transactions` |
+| Cases | `/api/applications/:foreignId/cases/...` | Application scope, case permissions, assignments |
+| Admin case decisions | `/api/applications/:foreignId/case-requests/:id/approve` | `cases:approve_creation` |
+| Reports | `/api/applications/:foreignId/case-reports`, `/api/applications/:foreignId/case-reports/:reportId/download` | `reports:create`, `reports:list`, `reports:download` |
+| Activity log | `/api/auditors-log`, `/api/applications/:foreignId/auditors-log`, `/api/applications/:foreignId/cases/:caseId/auditors-log` | `logs:view_activity` or `reports:view_transactions` |
+| Team and admin | `/api/admin/team/...` | Organization owner and team-management checks |
+
+## Scheduled jobs
+
+| Job | Service | Purpose |
+| --- | --- | --- |
+| Stellar scanner tick | `LedgerScannerSchedulerService` | Scan configured Stellar chain names for registered contracts |
+| Solana scanner tick | `LedgerScannerSchedulerService` | Scan configured Solana chain names through the Solana path |
+| Interpretation batch | `AuditInterpretationRunnerService` | Lock uninterpreted rows and write normalized interpretation rows |
+
+The Stellar/Soroban scanner path and the Solana confidential-token scanner path share workflow tables after normalization. The chain adapters remain separate.
 
 ## Enforcement surfaces
 
@@ -22,11 +97,12 @@ Server-side enforcement uses:
 
 | Mechanism | Purpose |
 | --- | --- |
-| Auth guard | Verifies authenticated session or JWT |
-| Permissions guard | Checks required permission keys |
-| Application scope guard | Resolves application scope and prevents cross-application reads |
+| `WorkosAuthGuard` | Verifies authenticated session or JWT |
+| `PermissionsGuard` | Checks required permission keys |
+| `ApplicationScopeGuard` | Resolves `:foreignId` and attaches internal `applicationId` |
+| `ExternalAuditorScopeGuard` | Restricts external auditor access where used |
+| Query-level org/application filters | Prevent cross-organization and cross-application reads |
 | Case assignment checks | Restrict case review to assigned auditors |
 | Case access-window checks | Enforce disclosure expiration |
-| Query-level filters | Prevent cross-organization and cross-application reads |
 
 Client-side permission checks shape navigation. API guards and scoped queries are the source of truth.

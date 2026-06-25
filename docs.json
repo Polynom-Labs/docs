@@ -38,7 +38,27 @@
           "use-cases/auditor/create-disclosure-request",
           "use-cases/auditor/review-case-transactions",
           "use-cases/auditor/generate-reports-and-activity-logs",
-          "auditing-portal/identity-and-access"
+          "auditing-portal/identity-and-access",
+          "auditing-portal/disclosure-cases-and-reports",
+          {
+            "group": "Administrator workflows",
+            "pages": [
+              "use-cases/auditor/overview",
+              "use-cases/application-administrator/overview",
+              "use-cases/application-administrator/approve-disclosure-request",
+              "use-cases/application-administrator/manage-case-auditors",
+              "use-cases/application-administrator/application-reports-and-activity-logs",
+              "use-cases/organization-administrator/overview"
+            ]
+          },
+          {
+            "group": "Portal internals",
+            "pages": [
+              "auditing-portal/data-model",
+              "auditing-portal/indexing-and-interpretation",
+              "auditing-portal/audit-ui"
+            ]
+          }
         ]
       },
       {
