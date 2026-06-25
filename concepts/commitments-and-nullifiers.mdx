@@ -17,12 +17,11 @@ A nullifier prevents double spending. When private value is spent, the protocol 
 
 Your product should work with:
 
-- Private accounts.
-- Funding intents.
-- Private transfers.
-- Withdrawals.
-- Balances.
-- Audit records.
+- Product records, such as card loads, payroll cycles, payouts, and treasury operations.
+- Managed wallet references.
+- SDK operation history.
+- Transaction signatures.
+- Status and reconciliation records.
 
 The SDK and protocol handle:
 
@@ -34,4 +33,4 @@ The SDK and protocol handle:
 
 ## When you need to care
 
-You may need commitment and nullifier details when debugging low-level SDK behavior, auditing protocol state, or building custom chain adapters. Most partner integrations should use higher-level SDK or API resources.
+You may need commitment and nullifier details when debugging low-level SDK behavior, auditing protocol state, or building custom chain adapters. Most partner integrations should keep these details behind SDK calls and backend tooling.

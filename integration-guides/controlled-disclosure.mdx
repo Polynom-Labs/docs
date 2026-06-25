@@ -34,7 +34,7 @@ Disclosure should be limited by scope.
 | Application | Which app, card program, payroll product, or treasury product |
 | Time window | Start and end time for permitted review |
 | Asset | USDC, SOL, native token, or supported private asset |
-| Resource ids | Funding intent, private transfer, withdrawal, audit record |
+| Operation references | Product object ids, transaction signatures, disclosure cases, and reports |
 | Role | Auditor, application administrator, organization administrator |
 | Case | Specific investigation, dispute, report, or legal request |
 
@@ -56,7 +56,7 @@ Do not use controlled disclosure as a general analytics export. Build product an
 
 Your backend should:
 
-- Store the audit record id for each relevant product action.
+- Store product references and transaction signatures for each relevant product action.
 - Keep product references stable and searchable.
 - Preserve status history.
 - Route sensitive review through the Auditing Portal or an equivalent scoped workflow.

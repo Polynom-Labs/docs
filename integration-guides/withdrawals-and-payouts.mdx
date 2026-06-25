@@ -9,32 +9,35 @@ Withdrawals move value from Arcane private state to a public destination. Use th
 
 ```mermaid
 flowchart LR
-  balance["Private balance"]
-  request["Withdrawal request"]
-  proof["Proof and transaction"]
+  scan["Scan private state"]
+  request["Partner withdrawal request"]
+  sdk["withdrawWithRelayer"]
   public["Public destination"]
-  audit["Audit record"]
+  reconcile["Product reconciliation"]
 
-  balance --> request
-  request --> proof
-  proof --> public
-  proof --> audit
+  scan --> request
+  request --> sdk
+  sdk --> public
+  public --> reconcile
 ```
 
-## Create a withdrawal
+## Create a withdrawal request
 
-Your backend should validate the destination before creating the withdrawal.
+Your backend should create its own withdrawal or payout record before calling the SDK.
 
 ```json
 {
-  "private_account_id": "pa_...",
+  "withdrawal_reference": "withdrawal_123",
+  "wallet_reference": "customer_456",
   "amount": "50.00",
   "asset": "USDC",
   "chain": "solana",
   "destination_address": "...",
-  "external_reference": "withdrawal_123"
+  "status": "preparing"
 }
 ```
+
+For Solana, the SDK call maps to `withdrawWithRelayer`.
 
 ## Backend checks
 
@@ -42,9 +45,9 @@ Before submission:
 
 - Confirm the user or product action is authorized.
 - Validate the destination address format.
-- Confirm available private balance.
+- Scan private state and confirm spendable balance.
 - Apply compliance, velocity, and product controls.
-- Create the withdrawal idempotently.
+- Make the withdrawal request idempotent.
 
 ## Status lifecycle
 
@@ -52,10 +55,10 @@ Before submission:
 | --- | --- |
 | `requires_balance` | Private balance is insufficient |
 | `requires_review` | Product or compliance policy requires review |
-| `preparing` | Arcane is preparing proof and transaction data |
+| `preparing` | Proof and transaction data are being prepared |
 | `submitted` | Transaction was submitted |
 | `confirmed` | Public chain confirmed the withdrawal |
-| `indexed` | Arcane indexed the spend and audit record |
+| `indexed` | Private spend is visible to the indexer |
 | `paid_out` | Your product has marked the payout complete |
 | `failed` | Retry or review is required |
 
@@ -63,20 +66,20 @@ Before submission:
 
 Store:
 
-- Withdrawal id.
+- Withdrawal reference.
 - Destination address.
 - Public transaction signature or hash.
-- Private transaction id.
-- Audit record id.
+- Managed wallet reference.
 - Product reference.
 - Status history.
+- Retry attempts and errors.
 
-For payroll and card products, keep the product ledger update separate from the Arcane withdrawal status. This prevents double accounting when a chain transaction succeeds but a downstream ledger update needs retry.
+For payroll and card products, keep the product ledger update separate from the withdrawal transaction status. This prevents double accounting when a chain transaction succeeds but a downstream ledger update needs retry.
 
 ## Production notes
 
 - Never let the browser provide unrestricted withdrawal parameters.
 - Use idempotency keys for withdrawal creation and retries.
 - Treat relayer, chain RPC, and indexer failures as independent retry domains.
-- Keep audit access scoped and logged.
+- Keep support and disclosure access scoped and logged.
 - Consider manual review for large, unusual, or compliance-sensitive withdrawals.

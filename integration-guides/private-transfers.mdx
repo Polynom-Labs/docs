@@ -1,6 +1,6 @@
 ---
 title: "Private Transfers"
-description: "Move value privately between Arcane private accounts or recipients."
+description: "Move value privately between managed wallets or private recipients."
 ---
 
 Use private transfers when value should move inside the privacy layer without exposing sender, recipient, amount, or product context as public chain-level data.
@@ -9,53 +9,56 @@ Use private transfers when value should move inside the privacy layer without ex
 
 | Type | Use when |
 | --- | --- |
-| Account-to-account | Both sender and recipient are known private accounts in your application |
-| Account-to-recipient | The sender knows a recipient private address or derived private recipient key |
+| Wallet-to-wallet | Both sender and recipient are managed by your application |
+| Wallet-to-recipient | The sender knows a recipient private key or derived private recipient address |
 | Treasury-to-user | A platform treasury allocates funds to users, employees, or contractors |
 | User-to-treasury | A user pays a merchant, card program, or application treasury privately |
 
 ## Basic flow
 
-1. Confirm the sender has available private balance.
-2. Resolve the recipient private account or private recipient key.
-3. Create a `PrivateTransfer`.
-4. Submit the transfer through the SDK or API.
-5. Track status until indexed.
-6. Store the audit record id for permissioned review.
+1. Scan the sender's private state.
+2. Confirm enough spendable UTXOs exist.
+3. Resolve the recipient UTXO public key and X25519 public key.
+4. Call the SDK private transfer path.
+5. Store the returned transaction signature and status history.
+6. Scan again after confirmation and indexing.
 
 ```mermaid
 sequenceDiagram
   participant Backend as Partner backend
-  participant Arcane
+  participant SDK as Arcane SDK
   participant Relayer
   participant Chain
+  participant Indexer
 
-  Backend->>Arcane: Create PrivateTransfer
-  Arcane->>Arcane: Select private inputs and outputs
-  Arcane->>Relayer: Submit transaction
+  Backend->>SDK: getMyUtxos(...)
+  Backend->>SDK: transactTransfer(...)
+  SDK->>Relayer: Submit signed transaction
   Relayer->>Chain: Broadcast
   Chain-->>Relayer: Confirmation
-  Arcane-->>Backend: Transfer indexed
+  Backend->>Indexer: Scan new private state
 ```
 
-## Request shape
+## Operation record
+
+Store private transfer operations in your backend using your own product references.
 
 ```json
 {
-  "from_private_account_id": "pa_...",
-  "to_private_account_id": "pa_...",
+  "product_reference": "order_123",
+  "sender_wallet_reference": "treasury_wallet",
+  "recipient_reference": "customer_456",
   "amount": "25.00",
   "asset": "USDC",
-  "external_reference": "order_123",
-  "metadata": {
-    "use_case": "private_transfer"
-  }
+  "operation": "transfer"
 }
 ```
 
+This is not an Arcane request shape. It is the kind of product record your backend can use to drive SDK calls and reconciliation.
+
 ## Status handling
 
-Treat the transfer as asynchronous. A submitted private transfer is not final until Arcane indexes the resulting private state.
+Treat the transfer as asynchronous. A submitted private transfer is not final until the chain confirms it and your backend scan sees the resulting private state.
 
 | Status | Meaning |
 | --- | --- |
@@ -63,14 +66,14 @@ Treat the transfer as asynchronous. A submitted private transfer is not final un
 | `preparing` | Inputs, outputs, proof, or transaction data are being prepared |
 | `submitted` | The transaction was submitted |
 | `confirmed` | The chain confirmed the transaction |
-| `indexed` | Arcane indexed the new private state |
+| `indexed` | The indexer reflects the new private state |
 | `available` | Recipient balance is usable |
 | `failed` | Retry or operations review is required |
 
 ## Product guidance
 
 - Use product references, not raw protocol ids, in your customer-facing UI.
-- Keep transfer creation idempotent.
-- Separate "submitted" from "available" in your backend state machine.
+- Make transfer operations idempotent in your backend.
+- Separate `submitted` from `available` in your backend state machine.
 - Keep enough history to reconcile customer support and compliance questions.
 - Do not expose decoded UTXOs, nullifiers, private keys, or proof inputs to the browser.

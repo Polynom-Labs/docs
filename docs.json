@@ -42,24 +42,9 @@
         ]
       },
       {
-        "group": "API Model",
-        "pages": [
-          "api-model/overview",
-          "api-model/authentication",
-          "api-model/private-accounts",
-          "api-model/funding-intents",
-          "api-model/private-transfers",
-          "api-model/withdrawals",
-          "api-model/balances",
-          "api-model/audit-records",
-          "api-model/webhooks"
-        ]
-      },
-      {
         "group": "Concepts",
         "pages": [
-          "concepts/private-accounts",
-          "concepts/funding-intents",
+          "concepts/managed-wallets",
           "concepts/commitments-and-nullifiers",
           "concepts/shielding-and-unshielding",
           "concepts/selective-disclosure",
@@ -71,7 +56,6 @@
         "group": "Operations",
         "pages": [
           "operations/status-lifecycle",
-          "operations/webhooks-and-retries",
           "operations/failure-modes",
           "operations/security-checklist",
           "operations/production-checklist"

@@ -6,39 +6,40 @@ description: "Link Arcane private activity to partner product state without maki
 Arcane integrations need two views of the same activity:
 
 - A simple product view for users and operations.
-- A permissioned audit view for compliance, support, disputes, and reporting.
+- A permissioned review view for compliance, support, disputes, and reporting.
 
 Reconciliation connects those views without leaking private transaction details publicly.
 
 ## Reconciliation keys
 
-Store stable references on both sides of the integration.
+Store stable references in your backend.
 
 | Key | Owner | Purpose |
 | --- | --- | --- |
-| `external_reference` | Partner | Links Arcane activity to your product object |
-| `private_account_id` | Arcane and partner | Identifies private balance scope |
-| `funding_intent_id` | Arcane and partner | Tracks public funding into private state |
-| `private_transaction_id` | Arcane and partner | Tracks private movement |
-| `audit_record_id` | Arcane and partner | Enables scoped disclosure |
-| Public transaction hash | Chain | Confirms funding, withdrawal, or settlement |
+| Product object id | Partner | Card load, payroll cycle, payout, customer action, or treasury operation |
+| Managed wallet reference | Partner | Links the product action to backend wallet state |
+| Funding address | Partner | Explains where public funds were sent |
+| Public transaction signature | Chain and partner | Confirms public funding or withdrawal |
+| Shield or private transfer signature | Chain, relayer, and partner | Tracks SDK-submitted privacy-layer execution |
+| Scan state | Partner | Explains what private state was indexed and when |
+| Disclosure case or report id | Arcane auditing portal, when used | Supports scoped review |
 
 ## What to record
 
 For each user-visible money movement, record:
 
 - Product object id.
-- Arcane resource id.
 - Amount, asset, and chain.
+- Managed wallet reference.
+- Public funding or withdrawal signature if one exists.
+- Shield, private transfer, or withdrawal signature.
 - Status history.
-- Public transaction hash if one exists.
-- Audit record id.
-- Webhook delivery ids.
-- Retry attempts and error codes.
+- Retry attempts and error messages.
+- Disclosure case or report reference when the audit portal is used.
 
-## Audit record access
+## Review access
 
-An audit record should not automatically expose all private details. It should be accessed through a controlled workflow.
+Review access should not automatically expose all private details. It should be routed through a controlled workflow.
 
 | Actor | Typical access |
 | --- | --- |
@@ -53,17 +54,17 @@ See [Controlled Disclosure](/integration-guides/controlled-disclosure) for the a
 
 Common reports include:
 
-- Funding intents by status.
-- Private transfers by product reference.
+- Card funding sessions by status.
+- Payroll operations by cycle or employee reference.
 - Withdrawals by destination chain.
 - Failed or delayed shielding operations.
-- Audit cases and approved disclosures.
-- Card-load or payroll-cycle reconciliation.
+- Disclosure cases and approved reports.
+- Product-ledger reconciliation.
 
 ## Design guidance
 
-- Treat Arcane ids as durable references.
-- Keep product ids private to your backend and audit metadata.
-- Do not put personally identifiable information in public chain data.
+- Treat product ids as your durable source of truth.
+- Keep personally identifiable information out of public chain data.
 - Make status updates append-only when possible.
 - Use idempotency for all product ledger updates.
+- Preserve enough SDK and chain evidence to explain failures.

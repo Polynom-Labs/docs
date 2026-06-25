@@ -1,0 +1,37 @@
+---
+title: "Managed Wallets"
+description: "Understand the backend-managed wallet context used by the current Solana integration."
+---
+
+A managed wallet is the backend-controlled Solana wallet context your application uses to interact with the Arcane privacy layer.
+
+This is not a hosted Arcane account object. It is partner backend state.
+
+## What the backend stores
+
+For a backend-managed Solana flow, store an owner scope and the managed wallet material needed to derive private state.
+
+| State | Purpose |
+| --- | --- |
+| `owner_wallet_public_key` | External wallet or product identity used to find the wallet row |
+| `managed_public_key` | Backend-managed public key used by SDK calls |
+| Signing key reference | KMS, HSM, or encrypted key reference for the managed signer |
+| `proof_signature_base58` | Stable proof authority signature used for private key derivation |
+| `stealth_deposit_index` | Offset used to rotate deposit addresses |
+| Scan state | Last scanned index, cache key, and indexer total |
+
+## What the frontend sees
+
+The frontend should only receive product-safe context:
+
+- The funding address or wallet action.
+- The current product status.
+- Public transaction signatures when you choose to show them.
+- Product-level history.
+
+Do not expose backend signing keys, proof signatures, decoded UTXOs, encrypted output caches, or proof inputs to the browser.
+
+## Related pages
+
+- [Backend-Managed Wallets](/sdks/backend-managed-wallets)
+- [Build Your First Private Transaction](/get-started/first-private-transaction)

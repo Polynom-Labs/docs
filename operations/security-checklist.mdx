@@ -7,8 +7,8 @@ Review this checklist before moving production value through Arcane.
 
 ## Credentials
 
-- Store Arcane API keys or SDK service credentials in a secret manager.
-- Never expose API keys, relayer credentials, or backend signing material in frontend code.
+- Store SDK service credentials, RPC credentials, and relayer configuration in a secret manager.
+- Never expose relayer credentials or backend signing material in frontend code.
 - Use separate keys and service credentials for sandbox, staging, and production.
 - Rotate keys when team access changes.
 - Log administrative key changes.
@@ -21,13 +21,12 @@ Review this checklist before moving production value through Arcane.
 - Restrict access to scan state and encrypted outputs.
 - Use secure session cookies or equivalent backend session controls.
 
-## Webhooks
+## Operation tracking
 
-- If hosted webhooks are enabled, verify webhook signatures.
-- Store webhook or internal event ids.
-- Process events idempotently.
-- Use TLS for webhook endpoints.
-- Alert on repeated delivery or polling failures.
+- Store operation ids and status history.
+- Process retries idempotently.
+- Use TLS for backend endpoints.
+- Alert on repeated relayer, RPC, indexer, or polling failures.
 
 ## Product controls
 

@@ -1,161 +1,132 @@
 ---
 title: "Build Your First Private Transaction"
-description: "Create a first end-to-end Arcane transaction from product intent to confirmed private state."
+description: "Create a first end-to-end Arcane transaction using the current SDK-backed integration path."
 ---
 
-This guide walks through the first successful integration path. It uses a card-funding style flow because it exercises the main primitives: intent creation, public funding, shielding, status tracking, and reconciliation.
+This guide walks through the first successful backend-managed Solana flow: create or restore a managed wallet, show a funding address, detect public funds, shield them with the SDK, scan private state, and reconcile the product result.
 
-The same lifecycle also applies to payroll, treasury, wallet, and embedded finance integrations.
+It uses a card-funding style example, but the same mechanics apply to payroll, treasury, wallet, and embedded finance integrations.
 
 ## Before you begin
 
 You need:
 
-- An Arcane environment with SDK access for the selected rail.
-- Hosted API credentials only if Arcane has enabled hosted API access for your environment.
-- A partner backend that can store product references and call the Arcane SDK, indexer, relayer, or hosted API.
-- A chain RPC endpoint for the rail you are testing.
-- A test asset such as native SOL, test USDC, or a Stellar testnet asset.
+- Arcane SDK source or package access for the selected rail.
+- A partner backend that can store product records, managed wallet state, scan state, and operation history.
+- A Solana RPC endpoint for the environment you are testing.
+- Arcane indexer, relayer, Light RPC, and prover configuration for direct SDK use.
+- A test asset such as native SOL or test USDC.
 
 For local testing, see [Sandbox / Testnet Setup](/get-started/sandbox-testnet-setup).
 
-## Step 1: Create or retrieve a private account
+## Step 1: Create or restore the managed wallet
 
-Create a `PrivateAccount` for the product identity that will own private balance.
+When the user opens the funding flow, your frontend identifies the user or product actor and calls your backend.
 
-Examples:
+For wallet-authenticated products, the frontend sends the user's external Solana wallet public key. Your backend uses that value as the owner scope.
 
-| Product identity | Private account scope |
+Your backend should create or load a wallet row with:
+
+| Field | Purpose |
 | --- | --- |
-| Cardholder | One private account per cardholder or card funding profile |
-| Employee | One private account per employee |
-| Employer treasury | One private account per treasury wallet or payroll program |
-| Application wallet | One private account per partner application environment |
+| `owner_wallet_public_key` | External wallet or product identity used to find the row |
+| `managed_public_key` | Backend-managed public key used by the SDK |
+| Signing key reference | KMS, HSM, or encrypted key reference for the managed signer |
+| `proof_signature_base58` | Stable proof authority signature used for private key derivation |
+| `stealth_deposit_index` | Current deposit address offset |
 
-Store both ids:
+Return only public context to the frontend, such as the funding address, asset, amount, and current product status.
 
-| Field | Stored by |
-| --- | --- |
-| Partner user, card, payroll, or treasury id | Partner backend |
-| Arcane `private_account_id` | Partner backend and Arcane |
+## Step 2: Create your product funding session
 
-Do not expose backend signing keys, proof authority, decoded UTXOs, or encrypted output caches to the browser.
-
-## Step 2: Create a funding intent
-
-Create a `FundingIntent` when the user or partner system starts a private funding action. In the current SDK integration, this can be your own backend resource that maps product state to Arcane operations. If hosted API access is enabled, Arcane may create and store the hosted `FundingIntent` resource.
+Create a partner-owned product record for the user action. For card funding, this might be a `card_load` or `card_funding_session` row.
 
 ```json
 {
-  "private_account_id": "pa_...",
+  "card_load_id": "card_load_123",
+  "customer_reference": "customer_456",
   "amount": "100.00",
   "asset": "USDC",
   "chain": "solana",
-  "external_reference": "card_load_123",
-  "metadata": {
-    "product": "card_funding"
-  }
+  "status": "awaiting_public_funds"
 }
 ```
 
-The response should give your backend a stable intent id and a funding destination for the selected rail.
-
-```json
-{
-  "id": "fi_...",
-  "status": "requires_funding",
-  "chain": "solana",
-  "asset": "USDC",
-  "amount": "100.00",
-  "funding_address": "..."
-}
-```
+This is your object, not an Arcane SDK object. Keep it idempotent: if the user refreshes, return the same open funding session.
 
 ## Step 3: Show the funding action
 
-Your frontend shows the product action in normal language.
+Your frontend shows normal product instructions:
 
-For a card funding product, show:
+- Amount and asset.
+- Funding address or wallet action.
+- Current status.
+- Expiration or cancellation state if your product supports it.
 
-- The amount and asset.
-- The public funding address or wallet action.
-- The current status.
-- A cancellation or timeout state if your product supports it.
-
-The frontend should not call low-level privacy-layer functions directly in a backend-managed integration.
+The frontend should not call low-level privacy-layer functions in a backend-managed integration.
 
 ## Step 4: Detect public funding
 
-Your backend watches for public funding on the selected chain. After the expected transfer is visible, update the funding intent status to `funding_detected`.
+Your backend watches the funding address through chain RPC. After the expected transfer is visible, mark your product session as `public_funds_detected`.
 
 ```mermaid
 sequenceDiagram
   participant User
   participant App as Partner frontend
   participant Backend as Partner backend
-  participant RPC as Chain RPC
-  participant Arcane
+  participant RPC as Solana RPC
+  participant SDK as Arcane SDK
+  participant Relayer as Arcane relayer
 
-  User->>App: Starts private funding
-  App->>Backend: Request funding intent
-  Backend->>Backend: Create or restore FundingIntent
-  Backend->>Arcane: Request or derive funding destination
-  Arcane-->>Backend: funding context
-  Backend-->>App: funding instructions
+  User->>App: Starts funding
+  App->>Backend: Create or restore card funding session
+  Backend->>Backend: Load managed wallet and deposit address
+  Backend-->>App: Funding instructions
   User->>RPC: Sends public funds
   Backend->>RPC: Watches funding address
-  Backend->>Arcane: Shield confirmed funding
+  Backend->>SDK: depositWithRelayer(...)
+  SDK->>Relayer: Submit signed transaction
+  Relayer-->>SDK: Transaction signature
+  SDK-->>Backend: Shield result
+  Backend->>Backend: Save operation history
 ```
 
-## Step 5: Shield funds into private balance
+## Step 5: Shield funds into private state
 
-After public funding is detected, your backend calls Arcane through the SDK, or through the hosted API if Arcane has enabled it for your environment, to shield the funds.
+After public funding is detected, your backend calls the SDK deposit flow.
 
-For a Solana SDK integration, this maps to the deposit flow described in [Solana SDK](/sdks/solana-sdk) and [Backend-Managed Wallets](/sdks/backend-managed-wallets).
+For Solana, this maps to `depositWithRelayer` in [Solana SDK](/sdks/solana-sdk).
 
 The shielding operation should:
 
 - Create private output state.
-- Generate or request the required proof.
-- Submit the transaction through the relayer or wallet path.
-- Persist operation history for reconciliation.
-- Advance status when the transaction is confirmed and indexed.
+- Generate the required proof.
+- Submit through the relayer.
+- Store the transaction signature and SDK timing details.
+- Continue only after chain confirmation and indexer visibility.
 
-## Step 6: Track status
+## Step 6: Scan private state
 
-Your backend should track the lifecycle until Arcane confirms indexed private state.
+After shielding, scan private state before showing spendable balance or using the funds.
 
-| Status | Meaning |
-| --- | --- |
-| `requires_funding` | The intent exists and waits for public funds |
-| `funding_detected` | The public transfer was observed |
-| `shielding` | Arcane is creating private state |
-| `submitted` | A transaction was submitted to the chain or relayer |
-| `confirmed` | The chain confirmed the transaction |
-| `indexed` | Arcane indexed the private state |
-| `available` | The private balance is ready for product use |
-| `failed` | The operation needs retry or manual review |
-| `expired` | The funding window closed before completion |
+For Solana, this maps to `getMyUtxos` and backend-side UTXO persistence. The current SDK helper uses browser-style `localStorage`, so backend-managed integrations need a server-side storage shim.
 
-Use webhooks when available and polling as a fallback. See [Status Lifecycle](/operations/status-lifecycle) and [Webhooks and Retries](/operations/webhooks-and-retries).
+## Step 7: Reconcile the product result
 
-## Step 7: Reconcile or disclose
-
-After the intent reaches `available`, your application can complete the product action.
+When the private balance is confirmed and indexed, update your product ledger.
 
 For card funding, this usually means:
 
-- Link the private funding event to the card-load record.
-- Mark the card balance or treasury instruction as ready.
-- Store the Arcane transaction id and audit record id.
+- Link the card-load row to the public funding transaction and private shield transaction.
+- Mark the card load ready only after chain confirmation and indexed private state.
 - Keep customer-facing history simple.
-- Keep compliance and support history permissioned.
+- Keep support and compliance history permissioned.
 
 For payroll, this usually means:
 
-- Link the private transfer to payroll cycle, employee, employer, and accrual records.
-- Keep external chain activity private.
-- Preserve an authorized disclosure path for disputes, tax, or regulatory review.
+- Link the private operation to payroll cycle, employee, employer, and accrual records.
+- Preserve enough transaction and scan history to explain failures or retries.
+- Keep external chain activity decoupled from employee-facing payroll history.
 
 ## Next guides
 

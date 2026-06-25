@@ -27,7 +27,7 @@ Arcane does not make every private transaction public. It creates a controlled p
 
 | User | Responsibility |
 | --- | --- |
-| Application team | Integrates Arcane APIs or SDKs and builds the product flow around private accounts, funding intents, transfers, and withdrawals |
+| Application team | Integrates Arcane SDKs and infrastructure into product flows such as card funding, payroll, transfers, and withdrawals |
 | Application administrator | Manages disclosure case approvals, auditor access, reports, and application-level activity |
 | Auditor | Requests disclosure, reviews approved case transactions, and generates reports |
 | Organization administrator | Manages organization-level users, applications, and administration boundaries |
@@ -36,8 +36,8 @@ Arcane does not make every private transaction public. It creates a controlled p
 
 | Capability | Implementation area |
 | --- | --- |
-| Private transaction execution | Solana SDK, Stellar/Soroban privacy-pool contract, circuits, and partner API resources |
-| Integration resources | Private accounts, funding intents, private transfers, withdrawals, balances, webhooks, and audit records |
+| Private transaction execution | Solana SDK, Stellar/Soroban privacy-pool contract, circuits, indexer, relayer, and prover utilities |
+| Integration model | Backend-managed wallets, partner-owned product records, SDK operations, private state scanning, and reconciliation |
 | Audit event handoff | Encrypted audit payloads and chain events emitted by supported privacy rails |
 | Indexing | Backend scanners and indexers for registered private transaction sources |
 | Interpretation | Backend worker that decrypts and normalizes audit payloads |
@@ -51,7 +51,7 @@ Arcane does not make every private transaction public. It creates a controlled p
     End-to-end path from a private transaction to an approved disclosure workflow.
   </Card>
   <Card title="Build Your First Private Transaction" icon="play" href="/get-started/first-private-transaction">
-    Create the first partner integration from intent to reconciliation.
+    Create the first partner integration from managed wallet setup to reconciliation.
   </Card>
   <Card title="Private Card Funding" icon="credit-card" href="/integration-guides/private-card-funding">
     Build a private card-funding flow without partner-specific naming.

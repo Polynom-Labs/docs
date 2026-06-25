@@ -9,14 +9,14 @@ Arcane integrations cross several systems. Design your product state machine so 
 
 | Failure | What happened | Recommended handling |
 | --- | --- | --- |
-| Funding not received | User did not send funds or sent to the wrong address | Keep intent open until expiration, then show expired |
+| Funding not received | User did not send funds or sent to the wrong address | Keep the funding session open until expiration, then show expired |
 | Amount mismatch | Funding amount differs from expected amount | Hold for review or apply product-specific partial funding rules |
 | Prover failure | Proof generation failed or timed out | Retry with the same product reference |
 | Relayer failure | Transaction was not submitted or job failed | Retry submission after checking job status |
 | Chain RPC failure | Confirmation read failed | Retry or use another RPC provider |
 | Chain confirmation delay | Transaction is submitted but not finalized | Show processing and keep polling |
 | Indexer lag | Chain confirmed but Arcane has not indexed state | Wait before marking balance spendable |
-| Product ledger failure | Arcane succeeded but partner ledger update failed | Retry product ledger update idempotently |
+| Product ledger failure | SDK and chain execution succeeded but partner ledger update failed | Retry product ledger update idempotently |
 
 ## Do not collapse statuses
 
@@ -24,8 +24,8 @@ Avoid a single `processing` state in your backend. Track enough detail to recove
 
 Minimum recommended backend states:
 
-- Product resource state.
-- Arcane resource state.
+- Product operation state.
+- SDK operation state.
 - Chain transaction state.
 - Product ledger update state.
 - Retry count and last error.
@@ -43,4 +43,4 @@ Use review states for:
 
 ## Recovery rule
 
-When retrying, keep the same external reference and idempotency key unless you intentionally create a new product action.
+When retrying, keep the same product reference and idempotency key unless you intentionally create a new product action.

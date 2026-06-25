@@ -10,13 +10,13 @@ Use this checklist before launching an Arcane integration with real funds.
 - First private transaction succeeds in sandbox.
 - Funding, shielding, private transfer, withdrawal, and reconciliation paths are tested.
 - Product state distinguishes submitted, confirmed, indexed, and product-complete states.
-- Webhook or internal event processing is idempotent.
+- Operation retries are idempotent.
 - Polling fallback exists for critical status reads.
 - Product references are stable and searchable.
 
 ## Security readiness
 
-- API keys or SDK service credentials are stored server-side.
+- SDK service credentials, RPC credentials, and relayer configuration are stored server-side.
 - Backend signing uses KMS, HSM, or managed signing.
 - Secrets are not present in logs or analytics.
 - Frontend never receives backend keys, decoded private state, or proof authority.
@@ -24,8 +24,8 @@ Use this checklist before launching an Arcane integration with real funds.
 
 ## Operations readiness
 
-- Support can find a product action by Arcane resource id.
-- Operations can find an Arcane resource by product reference.
+- Support can find SDK and chain operations by product reference.
+- Operations can find product records by transaction signature.
 - Retry paths exist for prover, relayer, RPC, indexer, and product ledger failures.
 - Manual review states are defined.
 - Alerts exist for failed or delayed money movement.
@@ -42,7 +42,7 @@ Use this checklist before launching an Arcane integration with real funds.
 
 1. Run a production dry run with minimal value.
 2. Confirm funding, shielding, indexing, and reconciliation.
-3. Confirm webhook delivery if hosted events are enabled; otherwise confirm internal event and polling behavior.
-4. Confirm audit record creation.
+3. Confirm status tracking and polling behavior.
+4. Confirm operation history and disclosure case linkage when the audit portal is used.
 5. Confirm scoped disclosure access.
 6. Enable wider traffic gradually.

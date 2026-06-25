@@ -3,7 +3,7 @@ title: "Private Payroll Flows"
 description: "Use Arcane for private payroll, streaming compensation, and employee payout workflows."
 ---
 
-Private payroll flows let an employer or payroll platform move compensation with less public transaction leakage while preserving an authorized review path.
+Private payroll flows let an employer or payroll platform move compensation with less public transaction leakage while preserving a controlled review path.
 
 Use this pattern for payroll streaming, contractor payouts, earned wage access, employee withdrawals, and payroll-funded cards.
 
@@ -13,51 +13,55 @@ Use this pattern for payroll streaming, contractor payouts, earned wage access, 
 flowchart LR
   employer["Employer treasury"]
   payroll["Payroll cycle or stream"]
+  wallet["Employee managed wallet"]
   private["Private employee balance"]
   payout["Withdrawal or card funding"]
-  audit["Authorized audit record"]
 
   employer --> payroll
-  payroll --> private
+  payroll --> wallet
+  wallet --> private
   private --> payout
-  private --> audit
 ```
 
-## Core resources
+## Backend-owned records
 
-| Resource | Payroll meaning |
+Your backend should keep payroll concepts in your payroll system, not as Arcane-hosted objects.
+
+| Record | Purpose |
 | --- | --- |
-| `PrivateAccount` | Employee, contractor, employer treasury, or payroll program scope |
-| `FundingIntent` | Employer deposit into private payroll liquidity |
-| `PrivateTransfer` | Private movement from employer or payroll pool to employee |
-| `Withdrawal` | Employee payout to a public wallet, bank-linked rail, or treasury settlement path |
-| `AuditRecord` | Scoped evidence for disputes, payroll records, taxes, or compliance |
+| Payroll cycle or stream | Employer, employee, amount, asset, and schedule |
+| Employer managed wallet | Backend signer and private state for employer-funded liquidity |
+| Employee managed wallet | Backend signer and scan state for employee private balance |
+| Operation history | Shield, private transfer, withdrawal, retry, and failure records |
+| Product ledger entry | Employee-facing payroll, card, or payout status |
 
 ## Employer funding
 
-The employer or payroll platform first funds a private treasury account.
+The employer or payroll platform first funds private payroll liquidity.
 
-1. Create or retrieve the employer treasury `PrivateAccount`.
-2. Create a `FundingIntent` for the payroll cycle.
-3. Detect public funding.
-4. Shield funds into private payroll liquidity.
-5. Record the payroll cycle id in `external_reference`.
+1. Create or load the employer managed wallet.
+2. Create a payroll funding record in your backend.
+3. Detect public funding through chain RPC.
+4. Shield funds with the SDK deposit flow.
+5. Store the payroll cycle id, public funding signature, and shield signature.
 
 ## Employee allocation
 
-When employees accrue wages, create private transfers from the payroll pool to employee private accounts.
+When employees accrue wages, your backend can transfer value privately from the employer or payroll wallet to the employee wallet.
+
+For Solana, this maps to `transactTransfer`.
+
+Store the payroll reference next to the SDK operation:
 
 ```json
 {
-  "from_private_account_id": "pa_employer_...",
-  "to_private_account_id": "pa_employee_...",
+  "payroll_cycle_id": "payroll_2026_06",
+  "employee_reference": "employee_123",
   "amount": "250.00",
   "asset": "USDC",
-  "external_reference": "payroll_cycle_2026_06_employee_123"
+  "operation": "transfer"
 }
 ```
-
-Your product can expose this as streaming or accrued compensation. Arcane only needs the private movement and reconciliation reference.
 
 ## Employee withdrawal
 
@@ -66,29 +70,30 @@ Employees can move available private balance to:
 - A public wallet.
 - A card funding flow.
 - A treasury-managed payout flow.
-- Another private account.
+- Another private recipient.
 
 Use [Withdrawals and Payouts](/integration-guides/withdrawals-and-payouts) for public payout flows and [Private Card Funding](/integration-guides/private-card-funding) for card-linked flows.
 
-## Audit path
+## Review path
 
 Payroll privacy should not remove the ability to resolve regulated or operational questions.
 
-Use audit records to support:
+Preserve:
 
-- Employee disputes.
-- Employer payroll reconciliation.
-- Tax and accounting review.
-- Legal or regulatory disclosure.
-- Internal fraud and support investigations.
+- Payroll cycle and employee references.
+- Public funding signatures.
+- Private transfer signatures.
+- Withdrawal signatures.
+- Status history and retry attempts.
+- Scoped disclosure or support case references when the audit portal is used.
 
 Disclosure should be scoped by organization, application, case, time window, asset, and transaction references. See [Controlled Disclosure](/integration-guides/controlled-disclosure).
 
 ## Integration checklist
 
-- Define whether each employee has one private account or one account per payroll program.
+- Decide whether each employee has one managed wallet or one wallet per payroll program.
 - Store payroll cycle, employee, and employer references in your backend.
-- Use idempotent private transfers for recurring payroll events.
+- Make recurring payroll operations idempotent.
 - Keep private transaction status separate from payroll product status.
 - Decide how card funding and public withdrawals consume private payroll balance.
-- Test audit access before moving production payroll data.
+- Test the support and disclosure path before moving production payroll data.

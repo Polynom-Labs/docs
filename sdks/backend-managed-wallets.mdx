@@ -15,7 +15,7 @@ flowchart LR
   backend["Partner backend"]
   db["Partner database"]
   sdk["Arcane SDK"]
-  arcane["Arcane APIs"]
+  arcane["Arcane indexer and relayer"]
   rpc["Chain RPC"]
 
   frontend --> backend
@@ -37,7 +37,7 @@ flowchart LR
 | SDK calls | Deposit, scan, transfer, withdraw, and consolidate |
 | Chain interaction | Detect public funding and confirm public withdrawals |
 | Relayer submission | Submit signed privacy-layer transactions |
-| Reconciliation | Link Arcane ids back to product ids |
+| Reconciliation | Link SDK outputs and transaction signatures back to product ids |
 
 ## Suggested stored state
 
@@ -61,7 +61,7 @@ The current Solana SDK UTXO helper uses browser-style `localStorage` for cache s
 ### Login or session restore
 
 1. Authenticate the user or product actor.
-2. Create or retrieve the private account.
+2. Create or retrieve the managed wallet row.
 3. Create or retrieve the managed key.
 4. Initialize scan state.
 5. Return only public context to the frontend.
@@ -69,13 +69,13 @@ The current Solana SDK UTXO helper uses browser-style `localStorage` for cache s
 ### Balance scan
 
 1. Query the Arcane indexer.
-2. Decode outputs for the private account.
+2. Decode outputs for the managed wallet.
 3. Persist scan state and decoded spendable state.
 4. Return product-level balances to the frontend.
 
 ### Deposit and shield
 
-1. Create a funding intent.
+1. Create or restore a product funding session.
 2. Watch the public funding address.
 3. Confirm public funding.
 4. Call the SDK deposit flow.
@@ -85,11 +85,11 @@ The current Solana SDK UTXO helper uses browser-style `localStorage` for cache s
 
 ### Private spend
 
-1. Resolve recipient private account or key.
+1. Resolve recipient managed wallet or private recipient key.
 2. Scan spendable state.
 3. Build private transfer.
 4. Submit through the relayer.
-5. Persist status history and audit record id.
+5. Persist status history and transaction signature.
 
 ### Withdrawal
 
@@ -106,5 +106,5 @@ The current Solana SDK UTXO helper uses browser-style `localStorage` for cache s
 - Do not put private state in browser local storage.
 - Use idempotency keys for funding, transfer, and withdrawal creation.
 - Rate limit sensitive endpoints.
-- Log access to audit records and disclosure workflows.
+- Log access to support and disclosure workflows.
 - Treat relayer, indexer, chain RPC, and prover failures as independent retry domains.

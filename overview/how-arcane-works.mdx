@@ -5,14 +5,14 @@ description: "End-to-end flow from private transaction execution to scoped audit
 
 Arcane separates transaction execution from disclosure review.
 
-Applications execute private transactions through Arcane APIs, SDKs, or supported privacy-pool contracts. The Auditing Portal does not sit in the user transaction path. It observes registered private transaction records, interprets encrypted audit payloads, and exposes reviewed data through permissioned workflows.
+Applications execute private transactions through Arcane SDKs, indexer/relayer infrastructure, or supported privacy-pool contracts. The Auditing Portal does not sit in the user transaction path. It observes registered private transaction records, interprets encrypted audit payloads, and exposes reviewed data through permissioned workflows.
 
 ## End-to-end flow
 
 | Step | Component | Result |
 | --- | --- | --- |
-| 1 | Partner application | Creates a product intent such as funding, transfer, payroll allocation, or withdrawal |
-| 2 | Arcane API or SDK | Prepares private transaction inputs, proof data, encrypted outputs, and submission payloads |
+| 1 | Partner application | Creates a product record such as card funding, transfer, payroll allocation, or withdrawal |
+| 2 | Arcane SDK | Prepares private transaction inputs, proof data, encrypted outputs, and submission payloads |
 | 3 | Privacy rail | Verifies proof data, updates private state, and performs public token legs when needed |
 | 4 | Event or index boundary | Emits or exposes encrypted audit and transaction state |
 | 5 | Arcane indexer or scanner | Reads registered activity and writes raw audit rows |
@@ -35,7 +35,7 @@ The platform is built around scoped disclosure rather than global visibility.
 
 | Boundary | What crosses it |
 | --- | --- |
-| Application to Arcane | Product intent, private account, amount, asset, destination, and external reference |
+| Application to SDK and infrastructure | Managed wallet context, amount, asset, destination, and product reference |
 | Arcane to privacy rail | Proof bytes, public signals, encrypted audit payload, relayer job, or wallet-signed transaction |
 | Privacy rail to ledger | State updates, public token legs, and audit events |
 | Ledger to backend | Registered events and indexed transaction state |
@@ -46,7 +46,7 @@ The platform is built around scoped disclosure rather than global visibility.
 
 | Domain | Can be used independently? | Notes |
 | --- | --- | --- |
-| Privacy execution | Yes | Applications can use Arcane transaction APIs or SDKs without the portal being in the user transaction path |
+| Privacy execution | Yes | Applications can use Arcane SDKs and privacy infrastructure without the portal being in the user transaction path |
 | Auditing Portal | Yes, with registered data sources | The portal consumes indexed and interpreted audit data; it is organized around applications, cases, reports, and user access |
 
 The two domains are connected by the audit boundary: private execution emits or exposes encrypted records; the backend indexes and interprets them for scoped disclosure.
