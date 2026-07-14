@@ -9,101 +9,88 @@
     "dark": "#1D4ED8"
   },
   "navigation": {
-    "groups": [
+    "pages": [
+      "start-here",
+      "what-is-arcane",
       {
-        "group": "Get Started",
-        "root": "start-here",
-        "pages": []
-      },
-      {
-        "group": "What is Arcane",
-        "root": "what-is-arcane",
-        "pages": []
-      },
-      {
-        "group": "Products",
+        "group": "Compliance Platform",
         "pages": [
+          "products/compliance-platform/overview",
+          "products/compliance-platform/how-it-works",
           {
-            "group": "Compliance Platform",
+            "group": "Architecture",
+            "root": "products/compliance-platform/architecture/overview",
             "pages": [
-              "products/compliance-platform/overview",
-              "products/compliance-platform/how-it-works",
-              {
-                "group": "Architecture",
-                "root": "products/compliance-platform/architecture/overview",
-                "pages": [
-                  "products/compliance-platform/architecture/key-management"
-                ]
-              },
-              {
-                "group": "User guide",
-                "pages": [
-                  "products/compliance-platform/user-guide/start-and-setup",
-                  {
-                    "group": "Organisation management",
-                    "pages": [
-                      "products/compliance-platform/user-guide/organisation-management/application-management",
-                      "products/compliance-platform/user-guide/organisation-management/user-management"
-                    ]
-                  },
-                  "products/compliance-platform/user-guide/how-to-create-case",
-                  "products/compliance-platform/user-guide/risk-incidents"
-                ]
-              },
-              {
-                "group": "Integration",
-                "pages": [
-                  "products/compliance-platform/integration/overview",
-                  "products/compliance-platform/integration/frontend-reference",
-                  {
-                    "group": "Solana",
-                    "pages": [
-                      "products/compliance-platform/integration/solana/integration-overview",
-                      "products/compliance-platform/integration/solana/reference"
-                    ]
-                  },
-                  {
-                    "group": "Stellar",
-                    "pages": [
-                      "products/compliance-platform/integration/stellar/integration-overview",
-                      "products/compliance-platform/integration/stellar/reference"
-                    ]
-                  },
-                  {
-                    "group": "Fhenix",
-                    "pages": [
-                      "products/compliance-platform/integration/fhenix/integration-overview",
-                      "products/compliance-platform/integration/fhenix/reference"
-                    ]
-                  }
-                ]
-              }
+              "products/compliance-platform/architecture/key-management"
             ]
           },
           {
-            "group": "Privacy Layer",
+            "group": "User guide",
             "pages": [
-              "products/privacy-layer/about",
-              "products/privacy-layer/how-it-works",
+              "products/compliance-platform/user-guide/start-and-setup",
               {
-                "group": "Integration",
+                "group": "Organisation management",
                 "pages": [
-                  {
-                    "group": "Stellar",
-                    "pages": [
-                      "products/privacy-layer/integration/stellar/integration-overview",
-                      "products/privacy-layer/integration/stellar/reference",
-                      "products/privacy-layer/integration/stellar/troubleshooting"
-                    ]
-                  },
-                  {
-                    "group": "Solana",
-                    "pages": [
-                      "products/privacy-layer/integration/solana/integration-overview",
-                      "products/privacy-layer/integration/solana/reference",
-                      "products/privacy-layer/integration/solana/troubleshooting"
-                    ]
-                  }
+                  "products/compliance-platform/user-guide/organisation-management/application-management",
+                  "products/compliance-platform/user-guide/organisation-management/user-management"
+                ]
+              },
+              "products/compliance-platform/user-guide/how-to-create-case",
+              "products/compliance-platform/user-guide/risk-incidents"
+            ]
+          },
+          {
+            "group": "Integration",
+            "pages": [
+              "products/compliance-platform/integration/overview",
+              "products/compliance-platform/integration/frontend-reference",
+              {
+                "group": "Solana",
+                "pages": [
+                  "products/compliance-platform/integration/solana/integration-overview",
+                  "products/compliance-platform/integration/solana/reference"
+                ]
+              },
+              {
+                "group": "Stellar",
+                "pages": [
+                  "products/compliance-platform/integration/stellar/integration-overview",
+                  "products/compliance-platform/integration/stellar/reference"
+                ]
+              },
+              {
+                "group": "Fhenix",
+                "pages": [
+                  "products/compliance-platform/integration/fhenix/integration-overview",
+                  "products/compliance-platform/integration/fhenix/reference"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "group": "Privacy Layer",
+        "pages": [
+          "products/privacy-layer/about",
+          "products/privacy-layer/how-it-works",
+          {
+            "group": "Integration",
+            "pages": [
+              {
+                "group": "Stellar",
+                "pages": [
+                  "products/privacy-layer/integration/stellar/integration-overview",
+                  "products/privacy-layer/integration/stellar/reference",
+                  "products/privacy-layer/integration/stellar/troubleshooting"
+                ]
+              },
+              {
+                "group": "Solana",
+                "pages": [
+                  "products/privacy-layer/integration/solana/integration-overview",
+                  "products/privacy-layer/integration/solana/reference",
+                  "products/privacy-layer/integration/solana/troubleshooting"
                 ]
               }
             ]
