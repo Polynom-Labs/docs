@@ -1,6 +1,150 @@
 ---
 title: "How to create a case"
-description: "Create a case in the Arcane Compliance Platform."
+description: "Request a scoped investigation case and understand the approval and access lifecycle."
 ---
 
-{/* TODO: Add the case creation workflow. */}
+A case is a time-limited review boundary for private transaction evidence in
+one application. It records why access is required, which historical period is
+in scope, which fields may be disclosed, and which auditors may review the
+approved evidence.
+
+<Info>
+  Creating a case starts an approval request. It does not provide immediate
+  access to private evidence. The case opens only after an authorized
+  application administrator approves the request.
+</Info>
+
+## Before you begin
+
+Confirm that:
+
+- you are working in the correct application;
+- your application assignment includes the `cases:create` permission;
+- at least one eligible auditor is available for assignment;
+- the requested review period, access duration, and disclosure fields are
+  proportionate to the stated purpose.
+
+An auditor is eligible for case assignment when they belong to the same
+organization, have access to the current application, and hold the
+`reports:view_transactions` permission for that application.
+
+## What the request defines
+
+| Field | What to provide |
+| --- | --- |
+| **Basis** | Select **Internal Investigation**, **External Audit**, or **Regulator Request**. |
+| **Reason** | State the investigative purpose, the evidence required, and why the proposed boundary is sufficient. |
+| **Review period** | Set the first and last dates of the historical transaction activity to be reviewed. |
+| **Access duration** | Set how long assigned auditors may access the case after approval. The duration begins when the approved case is created. |
+| **Assigned auditors** | Select one or more eligible auditors from the current application. Only assigned auditors can access the approved case. |
+| **Disclosure scope** | Select the elevated identifiers or address fields required for the review. Unselected sensitive fields remain hidden. |
+| **Application scope** | The current application supplies the default contract boundary for the case. |
+
+The **Review period** and **Access duration** serve different purposes. The
+review period limits which historical transactions are included. The access
+duration limits how long assigned auditors can inspect that evidence after the
+case is approved.
+
+## Create a case request
+
+<Steps>
+  <Step title="Open the application">
+    Select the application that owns the transaction evidence. Case requests,
+    approvals, assignments, and approved cases remain isolated to this
+    application.
+  </Step>
+
+  <Step title="Open Case Review">
+    Open **Case Review** and select **Request Investigation Case**.
+  </Step>
+
+  <Step title="Record the purpose">
+    Select the request **Basis** and enter a clear **Reason**. The reason should
+    allow an administrator to assess the purpose and proportionality of the
+    requested disclosure without relying on information outside the request.
+  </Step>
+
+  <Step title="Define the review period">
+    Set **Period From** and **Period To**. Only interpreted transaction evidence
+    within this inclusive date range can appear in the approved case.
+  </Step>
+
+  <Step title="Set the access duration">
+    Define the temporary access period required for the review. Access begins
+    only after the request receives the required approval and ends when the
+    configured duration expires.
+  </Step>
+
+  <Step title="Assign auditors">
+    Select at least one eligible auditor. The assignment is retained with the
+    request and transferred to the case when the request is approved.
+  </Step>
+
+  <Step title="Select the disclosure scope">
+    Start with the standard masked view and enable only the additional fields
+    required for the stated purpose.
+  </Step>
+
+  <Step title="Review and submit">
+    Review the application, basis, period, duration, assigned auditors, and
+    disclosure fields. Confirm that access is time-limited and logged, then
+    select **Submit Request**.
+  </Step>
+</Steps>
+
+## Disclosure scope
+
+The approved case always includes the transaction information required for a
+scoped review, such as date, operation type, amount, asset, chain, and contract
+context. Sensitive identifiers remain hidden unless they are explicitly
+included in the request.
+
+| Option | Effect after approval |
+| --- | --- |
+| **Full transaction hashes** | Reveals complete transaction identifiers for in-scope records. |
+| **Full counterparty addresses** | Reveals sender information for in-scope records when that information is available. |
+| **Withdrawal destination details** | Reveals recipient or withdrawal-destination information when that information is available. |
+
+<Note>
+  Selective disclosure changes which fields are visible; it does not expand
+  the application, contract, review-period, assignment, or access-duration
+  boundary.
+</Note>
+
+## What happens after submission
+
+| State | What it means |
+| --- | --- |
+| `Pending` | The request is waiting for an application administrator with `cases:approve_creation` to review it. No case evidence is available yet. |
+| `Active` | The required approval has been recorded, the case has been created, and assigned auditors can review the approved evidence until access expires. |
+| `Closed` | The request was rejected or withdrawn before it created an accessible case. |
+| `Expired` | The approved case reached the end of its access duration. Transaction and analytics access is blocked. |
+
+The requester can withdraw a pending request if it is no longer required. An
+application administrator can approve the request or close it with a decision
+reason. Approval creates a stable case identifier, applies the approved
+application and contract scope, and activates the recorded auditor
+assignments.
+
+All request creation, approval, rejection, withdrawal, and auditor-assignment
+changes are recorded in the activity history.
+
+## Next steps
+
+<Columns cols={2}>
+  <Card
+    title="Manage users"
+    icon="users-round"
+    href="/products/compliance-platform/user-guide/organisation-management/user-management"
+  >
+    Assign the application permissions required for case review and approval.
+  </Card>
+
+  <Card
+    title="How the platform works"
+    icon="workflow"
+    href="/products/compliance-platform/how-it-works"
+  >
+    Review the complete disclosure and approval model.
+  </Card>
+</Columns>

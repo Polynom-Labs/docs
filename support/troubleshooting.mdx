@@ -1,6 +1,87 @@
 ---
 title: "Troubleshooting"
-description: "Find verified solutions to common Arcane issues."
+description: "Choose the affected Arcane product and continue to its verified troubleshooting runbook."
 ---
 
-{/* TODO: Add cross-product troubleshooting guidance. */}
+Arcane products have different operating boundaries. Choose the affected
+product before changing configuration or retrying an operation.
+
+<Warning>
+  If the result of a state-changing action is unknown, check its current status
+  before submitting it again. A timeout does not prove that the operation
+  failed.
+</Warning>
+
+## Choose the affected product
+
+<Columns cols={3}>
+  <Card
+    title="Compliance Platform"
+    icon="shield-check"
+    href="/products/compliance-platform/troubleshooting"
+  >
+    Diagnose organization access, applications, cases, evidence, and reports.
+  </Card>
+
+  <Card
+    title="Privacy Layer for Stellar"
+    icon="star"
+    href="/products/privacy-layer/integration/stellar/troubleshooting"
+  >
+    Diagnose wallet, private-state, proof, Soroban, delivery, and audit issues.
+  </Card>
+
+  <Card
+    title="Privacy Layer for Solana"
+    icon="network"
+    href="/products/privacy-layer/integration/solana/troubleshooting"
+  >
+    Diagnose wallet, indexer, proof, relayer, and transaction issues.
+  </Card>
+</Columns>
+
+<Note>
+  Stellar and Solana use separate network-specific implementations. Follow the
+  runbook for the network configured in the affected client deployment.
+</Note>
+
+## Determine the scope
+
+| Observed impact | Likely boundary | Next owner |
+| --- | --- | --- |
+| One user or wallet is affected | Identity, wallet state, assignment, permission, or local client state | User or client operator |
+| One application, case, contract, or transaction is affected | Product configuration, workflow state, approved scope, or transaction state | Product administrator or integration operator |
+| Several authorized users are affected in one product | Shared configuration or product service | Deployment owner or Arcane support |
+| Several products or environments are affected | Deployment or service operation | Deployment owner or Arcane support |
+
+When several users are affected, preserve evidence before changing shared
+permissions, endpoints, or configuration. Broad changes can hide the original
+cause.
+
+## Prepare evidence
+
+Collect the minimum information needed to reproduce the issue:
+
+- UTC date and time;
+- affected product and environment;
+- organization, application, network, contract, case, job, or public
+  transaction identifier, where relevant;
+- exact error message and response status;
+- last confirmed workflow stage;
+- whether another authorized user can reproduce the issue.
+
+<Warning>
+  Never share access tokens, passwords, recovery phrases, wallet secret keys,
+  wallet signatures used to derive private state, relayer private keys, private
+  audit decoding material, or unredacted private transaction payloads.
+</Warning>
+
+## Escalate the issue
+
+Use the support channel assigned to your deployment. If you do not know that
+channel, contact your organization's Arcane deployment owner and provide the
+minimum evidence above.
+
+<Card title="Contact Arcane support" icon="messages-square" href="/support/contact-us">
+  Review the escalation path and evidence requirements.
+</Card>

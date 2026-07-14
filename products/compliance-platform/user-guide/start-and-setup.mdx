@@ -1,6 +1,97 @@
 ---
 title: "Start and setup"
-description: "Set up the Arcane Compliance Platform through the user interface."
+description: "Create and activate your organization in the Arcane Compliance Platform."
 ---
 
-{/* TODO: Add setup prerequisites and steps. */}
+The Arcane Compliance Platform is organized around an organization workspace. The workspace defines the client account, its members, and the applications operated under it.
+
+Before the organization can use operational platform features, it must be verified and activated by a platform administrator.
+
+<Info>
+  You do not need to assemble a team before getting started. The person who creates the organization becomes its first member and can operate it as the sole participant.
+</Info>
+
+## Setup flow
+
+<Steps>
+  <Step title="Register your account">
+    Select **Register organization** and provide your name, work email address, and organization name.
+
+    The account used for registration becomes the initial owner of the organization.
+  </Step>
+
+  <Step title="Create the organization">
+    Complete the organization profile. The organization becomes the administrative boundary for member access and application management.
+  </Step>
+
+  <Step title="Add members, if required">
+    Add the people who need access and assign responsibilities appropriate to their work.
+
+    This step is optional. An organization with one member can continue through activation and use the platform.
+  </Step>
+
+  <Step title="Submit the organization for review">
+    Send the organization registration request to the platform administrator. The organization enters the `Under Review` state while its details are being verified.
+
+    Operational access remains unavailable during this review, but you can continue preparing the organization and its applications.
+  </Step>
+
+  <Step title="Complete verification">
+    The platform administrator reviews the organization and confirms that it can access the Compliance Platform.
+  </Step>
+
+  <Step title="Activate the organization">
+    After approval, the organization moves to the `Active` state. Its authorized members can then configure and operate the available Compliance Platform applications.
+  </Step>
+</Steps>
+
+## Prepare during review
+
+An organization in the `Under Review` state remains available for administrative setup. You can use the review period to prepare the operating structure that will be required after activation.
+
+<Columns cols={2}>
+  <Card title="Create applications" icon="folder-plus">
+    Create and configure the applications that the organization plans to operate.
+  </Card>
+
+  <Card title="Build the access structure" icon="users-round">
+    Add members and define the access structure for the organization and its applications.
+  </Card>
+</Columns>
+
+<Note>
+  Applications created during the review period are not operational. An application can be used only after it reaches the `Active` state.
+</Note>
+
+## Organization status
+
+| Status | Meaning | Platform access |
+| --- | --- | --- |
+| `Under Review` | The organization has been created and its registration request is awaiting verification. | Administrative setup is available, but applications cannot operate. |
+| `Active` | The platform administrator has verified and approved the organization. | Authorized members can use the organization's available applications. |
+
+<Note>
+  Creating an account or organization does not activate operational access. The organization must reach the `Active` state first.
+</Note>
+
+## Continue setup
+
+After activation, configure the organization for its operating model.
+
+<Columns cols={2}>
+  <Card
+    title="Manage applications"
+    icon="settings-2"
+    href="/products/compliance-platform/user-guide/organisation-management/application-management"
+  >
+    Create and manage the application workspaces used by the organization.
+  </Card>
+
+  <Card
+    title="Manage members"
+    icon="users-round"
+    href="/products/compliance-platform/user-guide/organisation-management/user-management"
+  >
+    Add members and maintain access as the organization grows.
+  </Card>
+</Columns>

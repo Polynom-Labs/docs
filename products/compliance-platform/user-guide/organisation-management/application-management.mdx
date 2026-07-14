@@ -1,6 +1,208 @@
 ---
 title: "Application management"
-description: "Manage applications in an Arcane organisation."
+description: "Create and manage organization-scoped applications and their contract associations."
 ---
 
-{/* TODO: Add application management instructions. */}
+An application is an organization-scoped boundary for private transaction
+data, application access, audit cases, reports, and activity records.
+
+Each application has a stable workspace identifier and is associated with an
+existing privacy contract. Application routes and records are resolved within
+the current organization, preventing a user from addressing an application in
+another organization.
+
+<Info>
+  The current organization is taken from the authenticated session. It is not
+  selected or supplied when an application is created.
+</Info>
+
+## What an application defines
+
+<Columns cols={2}>
+  <Card title="Workspace identity" icon="settings-2">
+    A unique workspace identifier, display name, description, and application
+    type.
+  </Card>
+
+  <Card title="Contract association" icon="blocks">
+    The privacy contract that supplies transaction data for the application.
+  </Card>
+
+  <Card title="Application access" icon="users-round">
+    A primary contact and explicit permission assignments for organization
+    members.
+  </Card>
+
+  <Card title="Audit boundary" icon="shield-check">
+    Application-specific audit identity and public integration material when
+    required by the selected privacy system.
+  </Card>
+</Columns>
+
+## Access required
+
+Application management uses two organization-level permissions:
+
+| Permission | Allowed action |
+| --- | --- |
+| `applications:read` | List applications and open application details for the current organization. |
+| `applications:create` | Create, update, and revoke applications for the current organization. |
+
+The organization owner receives these permissions through the owner access
+policy. Other members can receive only the access explicitly assigned to them.
+
+## Before creating an application
+
+Confirm that:
+
+- the associated privacy contract already exists in the current organization;
+- the workspace identifier is unique within the organization;
+- the application type matches the intended privacy integration;
+- any selected primary contact is already an organization member.
+
+The supported application types are:
+
+| Application type | Intended association |
+| --- | --- |
+| `stellar-pool` | A Stellar privacy pool contract. |
+| `solana-confidential-token` | A Solana confidential-token contract. |
+
+## Create an application
+
+<Steps>
+  <Step title="Open Applications">
+    Open the organization workspace and select **Applications**.
+  </Step>
+
+  <Step title="Start application creation">
+    Select **Add Application**.
+  </Step>
+
+  <Step title="Define the workspace identity">
+    Provide a unique workspace identifier, application name, and optional
+    description. The workspace identifier is used as the application route
+    segment and cannot be changed later.
+  </Step>
+
+  <Step title="Select the application type and contract">
+    Choose the application type and associate the application with an existing
+    contract from the current organization.
+  </Step>
+
+  <Step title="Assign a primary contact">
+    Optionally select an existing organization member as the primary contact.
+    The selected member receives application-administrator permissions for the
+    new application.
+  </Step>
+
+  <Step title="Create the application">
+    Confirm the application. The platform creates the organization-scoped
+    record and adds an `Application registered` event to the activity history.
+  </Step>
+</Steps>
+
+After creation:
+
+- the application creator receives application-administrator permissions when
+  the creator has a synchronized organization member record;
+- the selected primary contact receives application-administrator permissions;
+- the application appears in the organization's application list;
+- its detail view includes the members who currently have application access.
+
+<Note>
+  For a Stellar privacy pool associated with a Stellar contract, the platform
+  creates an application-specific audit identity and public audit key. Private
+  audit decoding material remains server-side and is never returned in the
+  application response.
+</Note>
+
+## Review applications
+
+The organization application list is paginated and includes the information
+needed to identify and route work:
+
+- workspace identifier and application name;
+- application type and contract association;
+- optional description and primary contact;
+- number of members with application access;
+- creation timestamp.
+
+Open an application to review its full metadata and current access members.
+
+## Update an application
+
+The current application management model allows the following fields to be
+updated:
+
+- application name;
+- description;
+- primary contact.
+
+The workspace identifier, application type, and contract association are not
+changed through the application update operation.
+
+A new primary contact must belong to the same organization. Assigning a new
+primary contact grants that member application-administrator permissions.
+The primary contact can also be cleared.
+
+<Note>
+  Changing or clearing the primary contact does not automatically revoke access
+  previously granted to another member. Review that member's application
+  assignment separately in **User management**.
+</Note>
+
+## Manage application access
+
+Application access is stored per organization member and per application. Each
+assignment contains common, administrator, and auditor permission groups.
+
+Use **User management** to:
+
+- grant a member access to an application;
+- update the member's permissions for that application;
+- remove one application assignment without affecting other assignments;
+- review every application currently available to the member.
+
+## Application lifecycle
+
+The current application record does not maintain a separate `Setup needed`,
+`Workspace active`, or `Suspended` status. The management service distinguishes
+between applications that are available in the organization registry and
+applications that have been revoked.
+
+Organization verification and application integration readiness are separate
+controls. A listed application is not necessarily ready for production use;
+the associated contract, access assignments, integration configuration, and
+operational controls must also be ready.
+
+## Revoke an application
+
+Revoking an application performs a soft deletion within the current
+organization. The application is removed from active application queries, but
+the revoke action remains represented in the activity history.
+
+<Warning>
+  The current management interface does not expose an application restore
+  operation. Confirm the application identity and downstream dependencies
+  before revoking it.
+</Warning>
+
+## Next steps
+
+<Columns cols={2}>
+  <Card
+    title="User management"
+    icon="users-round"
+    href="/products/compliance-platform/user-guide/organisation-management/user-management"
+  >
+    Assign organization and application access to team members.
+  </Card>
+
+  <Card
+    title="Stellar integration"
+    icon="blocks"
+    href="/products/compliance-platform/integration/stellar/integration-overview"
+  >
+    Continue to the Stellar integration documentation.
+  </Card>
+</Columns>

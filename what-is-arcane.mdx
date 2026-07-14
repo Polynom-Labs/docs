@@ -1,6 +1,105 @@
 ---
 title: "What is Arcane"
-description: "Learn what Arcane is and where it fits."
+description: "Privacy and governance infrastructure for institutional and enterprise on-chain finance."
 ---
 
-{/* TODO: Add the Arcane product overview. */}
+Arcane is infrastructure for financial organizations that need to operate
+on-chain without making sensitive transaction activity broadly visible.
+
+It combines confidential transaction capabilities with controlled access,
+reporting, and auditability. Clients can add privacy to financial products
+while preserving a governed path for authorized review.
+
+<Info>
+  **Arcane in one line:** private financial activity by default, controlled
+  visibility when review is required.
+</Info>
+
+## Why Arcane
+
+Public blockchains provide shared settlement and verifiable transaction
+history, but their transparency can expose balances, payment amounts, and
+patterns of financial activity.
+
+Financial organizations need a different operating model. Transaction data
+should remain confidential during normal use, while approved compliance,
+audit, support, and investigation workflows must still be able to access the
+specific evidence they are authorized to review.
+
+Arcane is designed around this separation: privacy for the transaction path and
+governed visibility for the review path.
+
+## The Arcane product family
+
+<Columns cols={2}>
+  <Card
+    title="Privacy Layer"
+    icon="lock-keyhole"
+    href="/products/privacy-layer/about"
+  >
+    Confidential transaction infrastructure for private payments, balances,
+    and financial activity inside client products.
+  </Card>
+
+  <Card
+    title="Compliance Platform"
+    icon="clipboard-check"
+    href="/products/compliance-platform/overview"
+  >
+    Governed access to private transaction evidence through scoped review,
+    reporting, and administrative controls.
+  </Card>
+</Columns>
+
+The two products address different responsibilities. The Privacy Layer protects
+the transaction flow. The Compliance Platform governs when and how authorized
+users can review private evidence.
+
+## What Arcane adds to a client product
+
+| Requirement | Arcane capability |
+| --- | --- |
+| **Transaction confidentiality** | Private transfers, balances, and protected financial activity. |
+| **Controlled visibility** | Access to specific evidence based on purpose, scope, role, and approval. |
+| **Auditability** | Review cases, reports, and activity records for authorized workflows. |
+| **Product integration** | Infrastructure and integration tools that connect to an existing client application. |
+
+Arcane does not replace the client's customer experience, business logic,
+ledger, or system of record. It adds privacy and governed review capabilities
+to the client's financial product.
+
+## Designed for financial workflows
+
+Arcane can support products and operations such as:
+
+- wallet and stablecoin payments;
+- payroll, payouts, and partner distributions;
+- treasury and corporate payment operations;
+- confidential tokens and digital-asset workflows;
+- financial actions embedded in client applications.
+
+## Explore the products
+
+<Columns cols={2}>
+  <Card
+    title="How the Privacy Layer works"
+    icon="arrow-right-left"
+    href="/products/privacy-layer/how-it-works"
+    cta="View the transaction model"
+    arrow="true"
+  >
+    Follow the private transaction path and understand the client integration
+    boundary.
+  </Card>
+
+  <Card
+    title="How the Compliance Platform works"
+    icon="scan-eye"
+    href="/products/compliance-platform/how-it-works"
+    cta="View the review model"
+    arrow="true"
+  >
+    Follow the controlled disclosure path from request to approved review and
+    reporting.
+  </Card>
+</Columns>

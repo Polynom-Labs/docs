@@ -1,6 +1,101 @@
 ---
-title: "How it works"
-description: "Learn how the Arcane Compliance Platform works."
+title: "How the Compliance Platform works"
+sidebarTitle: "How it works"
+description: "Understand how Arcane governs disclosure, review, reporting, and access to private transaction evidence."
 ---
 
-{/* TODO: Describe the Compliance Platform workflow. */}
+The Compliance Platform is the review and disclosure surface for Arcane. It is
+separate from the end-user transaction path and is used when an approved
+compliance, audit, support, or investigation workflow requires access to
+private transaction evidence.
+
+<Info>
+  Access to the Compliance Platform does not make every private transaction
+  visible. Users can review only the evidence allowed by their organization,
+  application, permissions, case assignment, and access window.
+</Info>
+
+## Disclosure flow
+
+<Steps>
+  <Step title="Arcane indexes transaction evidence">
+    The platform reads registered transaction sources and stores the records
+    required for interpretation and authorized review.
+  </Step>
+
+  <Step title="A user requests disclosure">
+    The request records the purpose of access and the proposed scope, including
+    the relevant organization, application, case, time window, assets, and
+    transaction references.
+  </Step>
+
+  <Step title="An authorized administrator reviews the request">
+    The administrator approves or rejects the request according to the client's
+    access model. Approval creates the basis for a controlled review case.
+  </Step>
+
+  <Step title="The platform establishes the review boundary">
+    The case defines assigned reviewers, permitted evidence, approved fields,
+    and the duration of access.
+  </Step>
+
+  <Step title="An assigned reviewer examines the approved evidence">
+    The reviewer can access only the transaction data available within the
+    active case scope. Unrelated private activity remains outside the review.
+  </Step>
+
+  <Step title="The platform records the outcome">
+    Authorized users can generate reports within their permissions. Access,
+    report generation, downloads, and administrative actions are written to the
+    activity trail.
+  </Step>
+</Steps>
+
+## Control model
+
+| Control | What it limits |
+| --- | --- |
+| **Organization** | Which client organization owns the data. |
+| **Application** | Which client product or application the evidence belongs to. |
+| **Purpose and case** | Why access is requested and which review workflow authorizes it. |
+| **Role and permissions** | Which actions the authenticated user can perform. |
+| **Assignment** | Which reviewers are authorized for the approved case. |
+| **Time and duration** | Which transaction period can be reviewed and when access expires. |
+| **Asset, operation, and fields** | Which evidence and data elements can be disclosed. |
+
+## Platform responsibilities
+
+The Compliance Platform provides:
+
+- organization and application boundaries;
+- identity, roles, and permission enforcement;
+- disclosure request and approval workflows;
+- review cases, assignments, and access windows;
+- scoped transaction review;
+- report generation and downloads;
+- activity records for access and administrative actions.
+
+<Note>
+  Controlled disclosure is a review workflow, not a general analytics export.
+  The client should route sensitive access through an approved case and retain
+  stable product references and transaction signatures in its own system of
+  record.
+</Note>
+
+<Columns cols={2}>
+  <Card
+    title="Create a case"
+    icon="folder-plus"
+    href="/products/compliance-platform/user-guide/how-to-create-case"
+  >
+    Continue to the case creation workflow.
+  </Card>
+
+  <Card
+    title="Review the architecture"
+    icon="network"
+    href="/products/compliance-platform/architecture/overview"
+  >
+    See how the Compliance Platform components fit together.
+  </Card>
+</Columns>

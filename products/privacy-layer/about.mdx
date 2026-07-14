@@ -1,6 +1,187 @@
 ---
-title: "About"
-description: "Learn what the Arcane Privacy Layer is."
+title: "Privacy Layer"
+sidebarTitle: "About"
+description: "Confidential transaction infrastructure for payments and financial activity inside client products."
 ---
 
-{/* TODO: Add the Privacy Layer overview. */}
+The Arcane Privacy Layer enables a client application to execute confidential
+on-chain transactions without transferring ownership of the client product,
+ledger, or customer relationship to Arcane.
+
+It adds private balances, protected transfers, and controlled movement between
+public and private transaction state to an existing financial product. The
+client continues to own the customer experience, business rules, accounting,
+and operational records.
+
+<Info>
+  The Privacy Layer protects the transaction path. The separate Compliance
+  Platform governs authorized review and disclosure when private evidence must
+  be examined.
+</Info>
+
+## Why the Privacy Layer exists
+
+Public blockchains provide verifiable settlement, but they can also expose
+balances, payment amounts, counterparties, and patterns of financial activity.
+This creates an unacceptable information boundary for many payment, treasury,
+payroll, and digital-asset products.
+
+Clients need transaction confidentiality without losing the ability to:
+
+- reconcile product and blockchain state;
+- investigate failed or disputed operations;
+- support authorized compliance and audit workflows;
+- retain control of customer records and accounting;
+- move value between public and private environments when required.
+
+The Privacy Layer provides the private execution infrastructure for this
+operating model.
+
+## Core capabilities
+
+<Columns cols={2}>
+  <Card title="Private balances and transfers" icon="lock-keyhole">
+    Maintain shielded value and execute protected transfers without exposing
+    private transaction details as ordinary public payment records.
+  </Card>
+
+  <Card title="Public and private movement" icon="arrow-right-left">
+    Shield value into private state, transfer it within the Privacy Layer, and
+    withdraw it to a public blockchain address when required.
+  </Card>
+
+  <Card title="Integration infrastructure" icon="blocks">
+    Use the Arcane SDK with indexer, prover, relayer, and chain integration
+    services to build private operations into a client backend.
+  </Card>
+
+  <Card title="Reconciliation evidence" icon="file-clock">
+    Preserve transaction signatures, confirmation state, private-state scan
+    progress, and operation history for client operations and support.
+  </Card>
+</Columns>
+
+## Product model
+
+The Privacy Layer is embedded into a client-controlled financial product. End
+users interact with the client's interface; the client backend calls Arcane to
+prepare and execute private transactions.
+
+| Layer | Primary responsibility |
+| --- | --- |
+| **Client interface** | Customer experience, authenticated product actions, balances, and transaction status. |
+| **Client backend and database** | Sessions, business rules, wallet scope, product ledger, private-state records, and reconciliation. |
+| **Arcane Privacy Layer** | SDK, proof generation, private-state scanning, transaction construction, indexing, and relayed submission. |
+| **Blockchain network** | Transaction settlement, confirmation, and public network state. |
+
+<Note>
+  The client backend remains the system of record. A submitted private
+  transaction should be reconciled with chain confirmation, indexed private
+  state, and the client ledger before the product action is considered
+  complete.
+</Note>
+
+## Privacy and visibility
+
+The Privacy Layer separates confidential transaction data from the public
+settlement layer. Private balances and protected operations use private state
+and cryptographic proofs, while the blockchain verifies and settles the
+result.
+
+Privacy does not remove every public signal. Funding and withdrawal operations
+that interact with public blockchain addresses remain part of public network
+state. Clients must also protect backend keys, wallet mappings, product
+references, logs, and other metadata that could reveal sensitive context.
+
+When an approved compliance, audit, support, or investigation workflow needs
+private evidence, the Compliance Platform provides a separate, scoped review
+path. The Privacy Layer does not make private transaction data generally
+visible to platform users.
+
+## Who the product is for
+
+<Columns cols={2}>
+  <Card title="Product and engineering teams" icon="settings-2">
+    Add private transaction capabilities to wallets, payment products, and
+    application backends.
+  </Card>
+
+  <Card title="Treasury and payment operations" icon="building-2">
+    Operate protected payment, payout, and treasury flows while retaining
+    reconciliation records.
+  </Card>
+
+  <Card title="Support and investigation teams" icon="life-buoy">
+    Trace product status and transaction evidence without using private data as
+    a general operational analytics feed.
+  </Card>
+
+  <Card title="Compliance and audit teams" icon="shield-check">
+    Use the separate governed review path when specific private evidence is
+    required for an authorized purpose.
+  </Card>
+</Columns>
+
+## Common use cases
+
+The Privacy Layer can support financial workflows such as:
+
+- wallet and stablecoin payments;
+- payroll, contributor payments, and partner payouts;
+- treasury and corporate payment operations;
+- private funding and withdrawal flows;
+- protected digital-asset transfers;
+- financial actions embedded in client applications.
+
+## Product boundary
+
+The Privacy Layer provides transaction privacy infrastructure. It does not
+replace the client's:
+
+- interface, authentication, or customer accounts;
+- business logic, product approvals, or accounting rules;
+- database, ledger, or transaction history;
+- key-management and backend security controls;
+- operational monitoring, reconciliation, or support procedures;
+- legal, compliance, or risk-management responsibilities.
+
+<Info>
+  Stellar and Solana use separate network-specific integration paths. Select
+  the path that matches the client's configured network and deployment.
+</Info>
+
+## Next steps
+
+<Columns cols={2}>
+  <Card
+    title="How it works"
+    icon="workflow"
+    href="/products/privacy-layer/how-it-works"
+  >
+    Follow the private transaction path and understand system responsibilities.
+  </Card>
+
+  <Card
+    title="Stellar troubleshooting"
+    icon="star"
+    href="/products/privacy-layer/integration/stellar/troubleshooting"
+  >
+    Diagnose the Stellar wallet, Soroban, private-state, and audit flow.
+  </Card>
+
+  <Card
+    title="Solana integration"
+    icon="blocks"
+    href="/products/privacy-layer/integration/solana/integration-overview"
+  >
+    Continue to the Solana integration documentation.
+  </Card>
+
+  <Card
+    title="Compliance Platform"
+    icon="scan-eye"
+    href="/products/compliance-platform/overview"
+  >
+    Understand the governed review and disclosure path for private evidence.
+  </Card>
+</Columns>

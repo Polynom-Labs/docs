@@ -1,6 +1,106 @@
 ---
-title: "How it works"
-description: "Learn how the Arcane Privacy Layer works."
+title: "How the Privacy Layer works"
+sidebarTitle: "How it works"
+description: "Understand how client applications execute and reconcile private transactions with Arcane."
 ---
 
-{/* TODO: Describe the Privacy Layer workflow. */}
+The Privacy Layer adds confidential transaction execution to a client
+application. The client owns the product flow and system of record. Arcane
+provides the SDK and transaction infrastructure used to create and submit
+private operations.
+
+<Info>
+  Stellar and Solana use separate network-specific integration paths. Follow
+  the documentation for the configured network; wallet, state, proof,
+  submission, and reconciliation controls are not interchangeable.
+</Info>
+
+## Execution flow
+
+<Steps>
+  <Step title="The client application starts the product action">
+    The client interface collects the user intent and calls the client's
+    backend. The client remains responsible for authentication, product rules,
+    and the customer experience.
+  </Step>
+
+  <Step title="The client backend prepares the operation">
+    The backend owns session state, product references, wallet state, private
+    state, operation history, and SDK calls.
+  </Step>
+
+  <Step title="The SDK builds the private transaction">
+    The Privacy Layer SDK scans private state, selects the required inputs,
+    creates the proof, builds the Arcane instructions, and prepares the
+    transaction for submission.
+  </Step>
+
+  <Step title="Arcane infrastructure submits and indexes the result">
+    Arcane indexer, prover, and relayer services support proof generation,
+    transaction submission, and private-state updates. The blockchain network
+    provides settlement and confirmation.
+  </Step>
+
+  <Step title="The client reconciles product state">
+    The backend waits for chain confirmation and the required indexed private
+    state before updating the client ledger and marking the product action
+    complete.
+  </Step>
+</Steps>
+
+## System responsibilities
+
+| Component | Responsibility |
+| --- | --- |
+| **Client interface** | Presents the product flow and sends authenticated requests to the client backend. |
+| **Client backend** | Owns sessions, product rules, wallet scope, SDK calls, status handling, and reconciliation. |
+| **Client database** | Stores product records, operation history, scan progress, and the state required by the client product. |
+| **Privacy Layer SDK** | Builds private operations, scans private state, generates proofs, and submits through the relayer. |
+| **Arcane API and infrastructure** | Provide indexer, prover, and relayer services used by the SDK. |
+| **Blockchain network** | Settles transactions and provides confirmation and public chain state. |
+
+## Transaction and product state
+
+Private execution and product accounting are related but separate. The SDK can
+return a submitted transaction, but the client should not treat the product
+action as complete until the required state has been reconciled.
+
+For each client-visible money movement, the backend should preserve:
+
+- a stable product reference;
+- the relevant wallet scope;
+- amount and asset context;
+- public funding or withdrawal signatures when applicable;
+- private operation signatures;
+- scan and confirmation state;
+- status history, retry attempts, and errors.
+
+This gives operations and support teams enough evidence to determine whether a
+transaction was funded, submitted, confirmed, indexed, and reflected in the
+client product.
+
+## Integration boundary
+
+<Note>
+  The Privacy Layer SDK does not own the client's UI, backend routes, sessions,
+  database schema, business records, or ledger. The client application remains
+  the system of record and uses Arcane for private transaction execution.
+</Note>
+
+<Columns cols={2}>
+  <Card
+    title="Stellar troubleshooting"
+    icon="star"
+    href="/products/privacy-layer/integration/stellar/troubleshooting"
+  >
+    Diagnose the Stellar wallet, Soroban, private-state, and audit flow.
+  </Card>
+
+  <Card
+    title="Solana troubleshooting"
+    icon="network"
+    href="/products/privacy-layer/integration/solana/troubleshooting"
+  >
+    Diagnose the Solana wallet, indexer, proof, relayer, and transaction flow.
+  </Card>
+</Columns>

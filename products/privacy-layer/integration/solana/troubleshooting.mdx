@@ -1,6 +1,380 @@
 ---
 title: "Troubleshooting"
-description: "Resolve common Privacy Layer integration issues for Solana."
+description: "Diagnose wallet, indexer, proof, relayer, and transaction issues in a Solana Privacy Layer integration."
 ---
 
-{/* TODO: Add verified Solana troubleshooting guidance. */}
+Use this guide for client integrations built on the Solana Privacy Layer SDK.
+Identify the last completed stage before retrying an operation.
+
+<Info>
+  Wallet authorization, proof generation, relayer acceptance, Solana
+  confirmation, indexer availability, private-state discovery, and client
+  reconciliation are separate stages. Success at one stage does not prove that
+  every later stage has completed.
+</Info>
+
+<Warning>
+  If a withdrawal or swap has a `jobId`, check that job before submitting the
+  proof again. The relayer detects duplicate proofs while an earlier job is
+  `pending` or `processing`, and a client-side timeout does not cancel the job.
+</Warning>
+
+## Quick triage
+
+| Symptom | Boundary to check | First action |
+| --- | --- | --- |
+| The client does not initialize | RPC and environment configuration | Confirm the RPC, indexer, relayer, and deployed program belong to the same Solana environment. |
+| The private balance does not load | Wallet signature, indexer scan, or local private-state cache | Confirm the wallet and environment, then verify that the indexer exposes the expected commitment. |
+| Proof preparation fails | Indexer tree state, Merkle proof, or proof artifacts | Check the current root and the commitment proof before generating a new proof. |
+| A withdrawal or swap remains in progress | Relayer job | Preserve the `jobId` and read its current status. |
+| A transaction signature exists but the product action is incomplete | Confirmation, indexer, or client reconciliation | Check Solana confirmation, then indexed private state, then the client record. |
+| The program rejects the transaction | Program constraint | Use the exact program error to identify the failed proof, amount, mint, fee, recipient, or swap constraint. |
+
+## Configuration and connectivity
+
+<AccordionGroup>
+<Accordion title="The client reports VITE_SOLANA_RPC_HOST is not set">
+
+The client requires `VITE_SOLANA_RPC_HOST`. It also uses
+`VITE_INDEXER_URL` and `VITE_RELAYER_URL` for private-state and relayer
+operations.
+
+Confirm that:
+
+1. `VITE_SOLANA_RPC_HOST` resolves to the intended Solana environment.
+2. `VITE_INDEXER_URL` resolves to the indexer for the same environment and
+   program.
+3. `VITE_RELAYER_URL` resolves to the relayer for that deployment.
+4. The indexer `PROGRAM_ID` matches the program used by the client SDK.
+
+Do not mix localnet, devnet, or production endpoints. A healthy endpoint from
+another environment still produces inconsistent roots, commitments, and
+transaction state.
+
+**Resolved when:** The client initializes and all three services resolve inside
+the same environment.
+</Accordion>
+
+<Accordion title="The indexer is unavailable">
+
+The SDK reads the current tree from `GET /root`, commitment pages from
+`GET /commitments`, and Merkle proofs from `GET /proof/:commitment`.
+
+Check `GET /health` first. Then verify that `GET /root` returns the current
+root and next index. If those calls fail, do not attempt to build a new private
+operation from cached tree data.
+
+Messages such as `Failed to fetch Merkle root and nextIndex`,
+`Failed to fetch tree state from indexer`, or `API request failed` identify the
+indexer boundary.
+
+**Resolved when:** Health, root, commitment, and proof reads succeed for the
+configured program.
+</Accordion>
+
+<Accordion title="The relayer is unavailable">
+
+The client considers the relayer available only when `GET /health` reports
+`status: ok` and the relayer is enabled. Relayer configuration also requires a
+valid relayer key and sufficient operational balance.
+
+`Failed to connect to relayer` means the client received no usable response.
+Confirm the configured URL and health response before preparing another proof.
+
+**Resolved when:** The health response reports an enabled relayer and a new job
+can be accepted.
+</Accordion>
+</AccordionGroup>
+
+## Wallet and request validation
+
+<AccordionGroup>
+<Accordion title="The wallet is not connected or the signature is rejected">
+
+Private-state discovery derives its decryption context from a wallet
+signature. The same connected wallet must authorize the scan and operation.
+
+Messages include `Wallet not connected`, `Failed to get wallet signature`, and
+`Failed to get signature. Please ensure your wallet is connected`.
+
+1. Reconnect the intended wallet.
+2. Confirm that the wallet is connected to the configured Solana environment.
+3. Approve the signature request through the wallet.
+4. Restart the private-state scan before retrying the operation.
+
+Do not send the resulting wallet signature to support. It is used to derive
+private state.
+
+**Resolved when:** The intended wallet signs the request and its private-state
+scan starts.
+</Accordion>
+
+<Accordion title="An amount or address is rejected before submission">
+
+Client validation can return:
+
+| Message | Correction |
+| --- | --- |
+| `Enter amount` | Provide an amount. |
+| `Use a positive decimal amount` | Use digits with an optional decimal fraction. |
+| `Amount must be greater than 0` | Enter a positive amount. |
+| `This token supports up to <n> decimal places` | Use no more than the token's supported precision. |
+| `Amount exceeds available balance` | Reduce the amount to the available balance. |
+| `Wallet address must be valid base58` | Correct the Solana address. |
+| `Wallet address must decode to 32 bytes` | Use a valid 32-byte Solana public key. |
+
+Correct the request before generating a proof. Repeating an unchanged request
+cannot resolve a validation error.
+</Accordion>
+
+<Accordion title="The compliance check blocks a deposit">
+
+The deposit flow performs its configured compliance check before fetching
+private inputs or generating a proof. `AML compliance check failed. Please
+contact support` means the operation stopped at that control.
+
+Do not bypass the check or retry with modified identity data. Preserve the
+public wallet address, UTC time, environment, and exact response, then use the
+approved escalation path.
+</Accordion>
+</AccordionGroup>
+
+## Private balance and commitments
+
+<AccordionGroup>
+<Accordion title="The private balance is empty after a confirmed deposit">
+
+The client obtains commitment pages from the indexer, attempts to decrypt
+encrypted outputs for the connected wallet, checks whether each UTXO has been
+spent, and caches the resulting private state by program and wallet.
+
+Check in this order:
+
+1. Confirm the deposit signature on the configured Solana environment.
+2. Confirm the indexer is following the same program.
+3. Verify that `GET /commitments` includes the expected public transaction
+   signature or commitment.
+4. Confirm that the same wallet approved the private-state signature request.
+5. Run a controlled private-state rescan if the client integration exposes one.
+
+If the commitment is not indexed, local cache changes cannot recover it. If the
+commitment is indexed but the intended wallet cannot discover it, preserve the
+program ID, wallet public key, commitment, and transaction signature for
+escalation. Do not share the encrypted output or wallet signature.
+
+**Resolved when:** The unspent private output is discovered and reflected in
+the client balance.
+</Accordion>
+
+<Accordion title="The operation reports no unspent UTXOs or insufficient balance">
+
+Withdrawals and swaps require an unspent private input for the selected mint.
+Messages include:
+
+- `Need at least 1 unspent UTXO to perform a withdrawal`;
+- `No balance available`;
+- `Insufficient balance`;
+- `No unspent UTXOs found for the input mint. Please deposit first`;
+- `Insufficient balance in UTXO`.
+
+Confirm the selected mint, private balance, spent status, amount, and required
+fee. Do not treat a public wallet balance as available private balance.
+
+**Resolved when:** The selected private inputs cover the operation and its fee.
+</Accordion>
+</AccordionGroup>
+
+## Tree state and proof generation
+
+<AccordionGroup>
+<Accordion title="The SDK cannot fetch the tree state or Merkle proof">
+
+Proof generation requires a current indexer root and a Merkle path for each
+real input commitment.
+
+- `Failed to fetch tree state from indexer` means the SDK could not obtain the
+  root and next index.
+- `Failed to fetch Merkle proof` means the commitment proof was unavailable.
+
+Verify indexer health, environment, program ID, commitment presence, and the
+current root. Generate a new proof only after those reads are consistent.
+</Accordion>
+
+<Accordion title="The program reports Root is not known in the tree">
+
+`Root is not known in the tree` means the proof uses a root the program does
+not accept as part of its current root history. This commonly indicates stale
+or cross-environment tree state.
+
+Do not resubmit the same proof. Refresh the indexer state, confirm the program
+boundary, fetch current Merkle paths, and generate a new proof.
+
+**Resolved when:** The proof is generated from a root accepted by the deployed
+program.
+</Accordion>
+
+<Accordion title="The program reports Proof is invalid or an external-data mismatch">
+
+`Proof is invalid` and `External data hash does not match the one in the proof`
+mean the proof and submitted transaction data are not consistent.
+
+Rebuild the operation from the original client intent. Do not edit proof bytes,
+recipient, mint, fee, amount, encrypted output, or swap data after proof
+generation.
+
+Escalate if a newly generated proof fails against a confirmed current root and
+unchanged transaction data.
+</Accordion>
+</AccordionGroup>
+
+## Deposit issues
+
+<AccordionGroup>
+<Accordion title="A deposit is not confirmed">
+
+The deposit flow checks compliance, scans private state, encrypts outputs,
+generates a proof, builds and signs the transaction, sends it, and waits for
+confirmation.
+
+If the client reports a blockhash expiry, it can rebuild with a new blockhash.
+If it reports `Transaction confirmation timeout after polling` or
+`Failed to confirm transaction after maximum retries`, first determine whether
+a transaction signature was produced.
+
+- If a signature exists, query that signature on the configured Solana
+  environment before retrying.
+- If the transaction is confirmed, wait for the indexer and private-state scan.
+- If no signature exists, preserve the last displayed stage and exact error.
+
+**Resolved when:** The signature is confirmed and its new commitments are
+available through the indexer.
+</Accordion>
+
+<Accordion title="The deposit reports ALT not found">
+
+`ALT not found: <address>` means the configured Address Lookup Table is not
+available through the current RPC environment. Confirm the deployment's ALT
+address and network. Do not substitute an address from another deployment.
+</Accordion>
+
+<Accordion title="The program rejects the mint or deposit amount">
+
+| Message | Meaning |
+| --- | --- |
+| `Unsupported mint address` | The selected mint is not configured for the deployed program. |
+| `Deposit limit exceeded` | The requested deposit exceeds the configured program limit. |
+| `Public amount is invalid` | The submitted public amount does not satisfy the program constraint. |
+
+Correct the mint or amount through the client product. Program limits must be
+changed only through the authorized deployment process.
+</Accordion>
+</AccordionGroup>
+
+## Relayer, withdrawal, and swap issues
+
+<AccordionGroup>
+<Accordion title="A withdrawal or swap remains pending">
+
+The relayer processes withdrawals and swaps asynchronously.
+
+| Status | Meaning | Action |
+| --- | --- | --- |
+| `pending` | The job is waiting in the queue. | Preserve the `jobId` and continue status checks. |
+| `processing` | The relayer is executing the job. | Do not submit the proof again. |
+| `completed` | The relayer returned a successful result and transaction signature. | Confirm the signature, then reconcile indexed private state. |
+| `failed` | The relayer recorded a final error. | Use the stored error to correct or escalate the operation. |
+
+`Withdrawal processing timed out. Check job status later` and `Swap processing
+timed out. Check job status later` refer to client polling, not necessarily to
+the relayer result.
+
+If `GET /relayer/status/:jobId` returns `Job not found`, preserve the `jobId`,
+UTC submission time, environment, and operation type for escalation.
+</Accordion>
+
+<Accordion title="A withdrawal is rejected">
+
+Use the exact message:
+
+| Message | Check |
+| --- | --- |
+| `Insufficient funds for withdrawal` | Private input value and requested amount |
+| `Insufficient funds for fee` | Private balance available for the configured fee |
+| `Fee recipient does not match global configuration` | Deployment and relayer configuration |
+| `Fee amount is below minimum required` | Fee calculation for the current deployment |
+| `Recipient account does not match the ExtData recipient` | Recipient used during proof generation and submission |
+
+Generate a new proof after correcting the source request. Do not modify the
+existing proof payload.
+</Accordion>
+
+<Accordion title="A private swap is rejected">
+
+Use the exact message:
+
+| Message | Check |
+| --- | --- |
+| `Invalid Jupiter swap data` | Quote and Jupiter instruction used to build the operation |
+| `Insufficient swap output: received amount is less than minimum required` | Quote freshness, minimum output, and configured slippage |
+| `Unsupported mint address` | Input and output mints configured for the deployment |
+
+Obtain a current quote and rebuild the operation. Do not reuse an old proof
+with new swap data.
+</Accordion>
+</AccordionGroup>
+
+## Reconcile the final state
+
+For every client-visible operation, determine the last confirmed stage:
+
+| Stage | Evidence |
+| --- | --- |
+| Request validated | Final validated amount, mint, recipient, and client reference |
+| Proof generated | Operation reached proof completion without changing its inputs |
+| Relayer accepted | `jobId` and initial job status |
+| Solana confirmed | Public transaction signature on the configured environment |
+| Commitments indexed | Expected encrypted outputs and commitments available from the indexer |
+| Client reconciled | Client system of record reflects the confirmed operation |
+
+A transaction is not operationally complete until the client system of record
+has reconciled the confirmed and indexed result.
+
+## Escalate safely
+
+Collect:
+
+- UTC date and time;
+- Solana environment and program ID;
+- client operation reference;
+- wallet public key;
+- input and output mint addresses;
+- relayer `jobId`, if created;
+- public transaction signature, if created;
+- last completed stage and exact error;
+- indexer health state and current root, where relevant.
+
+<Warning>
+  Never include a wallet secret key, recovery phrase, wallet signature used to
+  derive private state, relayer private key, proof witness, decrypted UTXO,
+  unredacted encrypted output, or private client ledger data.
+</Warning>
+
+## Related guidance
+
+<Columns cols={3}>
+  <Card
+    title="How it works"
+    icon="workflow"
+    href="/products/privacy-layer/how-it-works"
+  >
+    Review the private transaction flow.
+  </Card>
+
+  <Card title="Support home" icon="route" href="/support/troubleshooting">
+    Choose another product or network.
+  </Card>
+
+  <Card title="Contact support" icon="messages-square" href="/support/contact-us">
+    Review the escalation path.
+  </Card>
+</Columns>

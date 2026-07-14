@@ -3,10 +3,17 @@
   "theme": "mint",
   "name": "Arcane",
   "description": "Documentation for Arcane products and integrations.",
+  "logo": {
+    "light": "/logo/arcane-light.svg",
+    "dark": "/logo/arcane-dark.svg"
+  },
   "colors": {
     "primary": "#0065F4",
     "light": "#3B82F6",
     "dark": "#1D4ED8"
+  },
+  "icons": {
+    "library": "lucide"
   },
   "navigation": {
     "pages": [
@@ -35,8 +42,7 @@
                   "products/compliance-platform/user-guide/organisation-management/user-management"
                 ]
               },
-              "products/compliance-platform/user-guide/how-to-create-case",
-              "products/compliance-platform/user-guide/risk-incidents"
+              "products/compliance-platform/user-guide/how-to-create-case"
             ]
           },
           {
@@ -66,7 +72,8 @@
                 ]
               }
             ]
-          }
+          },
+          "products/compliance-platform/troubleshooting"
         ]
       },
       {

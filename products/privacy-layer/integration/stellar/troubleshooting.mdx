@@ -1,6 +1,430 @@
 ---
 title: "Troubleshooting"
-description: "Resolve common Privacy Layer integration issues for Stellar."
+description: "Diagnose wallet, private-state, proof, Soroban transaction, delivery, and audit issues in a Stellar Privacy Layer integration."
 ---
 
-{/* TODO: Add verified Stellar troubleshooting guidance. */}
+Use this guide for the current Stellar Privacy Layer reference client. Identify
+the last completed stage before retrying an operation.
+
+<Info>
+  Wallet authorization, private-address derivation, proof generation, Soroban
+  submission, local note storage, encrypted coin delivery, and audit ingestion
+  are separate stages. Success at one stage does not prove that every later
+  stage has completed.
+</Info>
+
+<Warning>
+  If an operation produced a transaction hash, check that transaction on the
+  configured Stellar network before submitting it again. A client timeout or a
+  locally pending status does not prove that the transaction failed.
+</Warning>
+
+## Quick triage
+
+| Symptom | Boundary to check | First action |
+| --- | --- | --- |
+| The client does not initialize | Environment and contract configuration | Confirm the API, contract, audit public key, wallet, and Soroban RPC belong to the same Stellar environment. |
+| A private address cannot be created | Wallet SEP-43 message signing | Use a supported wallet and approve the message-signing request. |
+| The pool state does not load | Soroban RPC, contract, or Merkle state | Confirm the contract address and read the current contract state from the configured network. |
+| A deposit remains pending | Soroban transaction status | Preserve the transaction hash and check whether the transaction reached `SUCCESS`. |
+| A confirmed private balance is missing | Local note data or encrypted coin delivery | Confirm the same wallet, browser, contract, and locally stored commitment. |
+| A transfer or withdrawal proof fails | Note, commitment, Merkle root, or leaf key | Refresh the contract state and verify that the selected local note exists on-chain. |
+| A transfer succeeds but the recipient sees no funds | Encrypted coin delivery | Confirm the chain result first, then diagnose delivery and recipient polling. |
+| A confirmed operation is absent from the Compliance Platform | Scanner or audit interpretation | Check the application-contract association, scanner progress, and interpretation state. |
+
+## Configuration and wallet access
+
+<AccordionGroup>
+<Accordion title="The client and contract use different Stellar environments">
+
+The current reference client is configured for **Stellar testnet**. Its wallet
+network, Soroban RPC, generated contract bindings, and deployed contract must
+refer to that same environment.
+
+Confirm that:
+
+1. `VITE_CONTRACT_ADDRESS` identifies the intended testnet contract.
+2. `VITE_API_URL` identifies the API deployed for that environment.
+3. `VITE_STELLAR_AUDIT_PUBLIC_KEY` is the public audit key assigned to the
+   deployment.
+4. The connected wallet is operating on testnet.
+5. The Soroban RPC can read the configured contract.
+
+`Contract address not configured` means the client did not receive a usable
+contract address. Do not substitute an address from another deployment.
+
+**Resolved when:** The wallet, API, contract, audit public key, and Soroban RPC
+all belong to the same deployment.
+</Accordion>
+
+<Accordion title="SEP-10 authentication fails">
+
+The client requests a SEP-10 challenge from `GET /auth`, signs the challenge
+with the connected wallet, and submits the signed XDR to `POST /auth`.
+
+Use the last successful stage:
+
+- `Failed to get SEP-10 challenge` identifies challenge creation or API
+  connectivity.
+- `SEP-10 authentication failed` identifies signed-challenge validation or
+  token issuance.
+
+Confirm the API URL, connected account, network passphrase, challenge expiry,
+and wallet signature. If auditor access is expected, also confirm that the
+authenticated account is authorized for the configured contract.
+
+Do not send the signed challenge, access token, or wallet secret to support.
+
+**Resolved when:** The intended account receives a valid session for the
+configured contract.
+</Accordion>
+
+<Accordion title="The wallet cannot create a private address">
+
+The private address is derived from a wallet message signature. The wallet
+must support Stellar SEP-43 message signing.
+
+Messages that mention `signMessage`, `sign message`, `does not support`, or
+`SEP-43` indicate this boundary. Use a supported wallet, such as Freighter,
+xBull, Lobstr, Hana, or Klever, and approve the signing request.
+
+The signature remains in the browser and is used to recover private state.
+Never provide it to support.
+
+**Resolved when:** The client creates and stores the private address for the
+connected wallet.
+</Accordion>
+</AccordionGroup>
+
+## Private address and local note data
+
+<AccordionGroup>
+<Accordion title="A private operation requires a private address">
+
+`Stealth address required: create one on the overview page` means the connected
+wallet does not yet have the private address required by the operation.
+
+Create the private address with the intended wallet before retrying. A partial
+transfer or partial withdrawal also needs this address because the remaining
+private value must be returned as change.
+
+**Resolved when:** The connected wallet has a private address and the operation
+can derive its private recipient or change output.
+</Accordion>
+
+<Accordion title="The selected commitment has no saved note data">
+
+The reference client stores each private coin and its commitment in the local
+browser after a successful deposit or incoming delivery. Withdrawal and
+confidential transfer require this note data.
+
+Messages include:
+
+- `No saved note data for this commitment in this browser`;
+- `This commitment is not in your local shield history`;
+- `Withdraw note must include coin and commitmentHex`;
+- `Transfer note must include coin and commitmentHex`.
+
+Use the same browser profile and device that created or received the note.
+Confirm the same wallet and contract are selected. Clearing browser storage or
+switching profiles can remove the local record even when the commitment still
+exists on-chain.
+
+Do not share the coin, note, wallet signature, or private key material during
+recovery or escalation.
+
+**Resolved when:** The selected commitment has its corresponding local coin
+data and appears in the wallet's private history.
+</Accordion>
+
+<Accordion title="The proof SDK is not ready">
+
+`SDK not initialized` means the proof SDK or one of its required artifacts was
+not available when the operation started. The client loads the SDK WASM,
+witness WASM, and proving key before creating a proof.
+
+Reload the client, confirm those artifacts are available from the deployment,
+and wait for initialization to complete. Do not repeatedly submit the same
+operation while initialization is incomplete.
+
+**Resolved when:** The SDK and all proof artifacts load successfully before
+the operation begins.
+</Accordion>
+</AccordionGroup>
+
+## Pool state and proof generation
+
+<AccordionGroup>
+<Accordion title="The client reports Failed to load pool state">
+
+The client reads the commitment count, Merkle root, and commitment list from
+the configured Soroban contract. `Loading Merkle tree...` is an in-progress
+state; `Failed to load pool state` means one or more contract reads failed.
+
+Check:
+
+1. Soroban RPC availability for the configured environment.
+2. The contract address and deployment network.
+3. Whether the contract exposes the expected commitment and Merkle methods.
+4. Whether a fresh read returns the current root and commitment list.
+
+Do not generate a new proof from stale cached state after a failed refresh.
+
+**Resolved when:** The client reads a consistent current root, commitment
+count, and commitment list from the configured contract.
+</Accordion>
+
+<Accordion title="The commitment or leaf key is missing on-chain">
+
+Use the exact message:
+
+| Message | Meaning | Action |
+| --- | --- | --- |
+| `Coin commitment not found in on-chain Merkle state` | The selected local note is absent from the current contract commitment list. | Confirm the contract and network, refresh the pool state, and select a note created for that deployment. |
+| `Missing leaf ephemeral key on contract` | The contract does not expose the ephemeral key required for the selected leaf. | Preserve the commitment and contract address, then escalate the contract-state inconsistency. |
+
+A note from another deployment cannot be used against the configured contract.
+Do not edit the local commitment or proof inputs to force a match.
+
+**Resolved when:** The selected commitment and required leaf key are present in
+the same current contract state.
+</Accordion>
+
+<Accordion title="The audit public key is missing or invalid">
+
+The client encrypts the audit record before submitting a private operation.
+`VITE_STELLAR_AUDIT_PUBLIC_KEY is not set` means the required public key was
+not supplied to the client deployment.
+
+Confirm that the deployment uses the audit public key assigned to its Arcane
+application and contract. Do not replace it with a private decoding key and do
+not expose private audit material to the browser.
+
+**Resolved when:** The client can encrypt the audit payload with the configured
+public audit key.
+</Accordion>
+</AccordionGroup>
+
+## Deposit issues
+
+<AccordionGroup>
+<Accordion title="A deposit is rejected before submission">
+
+Correct the request according to the exact message:
+
+| Message | Correction |
+| --- | --- |
+| `Wallet not connected` | Connect the intended Stellar wallet. |
+| `Stealth address required` | Create a private address for the connected wallet. |
+| `Amount must be a positive finite number` | Enter a valid positive amount. |
+| `Amount must be at least one stroop` | Increase the amount to at least one stroop. |
+| `Amount exceeds maximum` | Reduce the amount to the supported range. |
+| `Invalid commitment hex length` | Recreate the operation from valid client state. |
+
+Correct validation errors before generating another proof. Repeating an
+unchanged request cannot resolve them.
+</Accordion>
+
+<Accordion title="A deposit is pending or reports Transaction failed">
+
+The client creates the private output and proof, encrypts the audit record,
+submits the contract transaction, and then tracks the transaction hash.
+
+- If a transaction hash exists, check its Soroban status. The client finalizes
+  the local entry only after the network reports `SUCCESS`.
+- If the transaction is successful, allow the client to reconcile the local
+  entry and private balance.
+- If no hash exists, preserve the last completed stage and exact error before
+  retrying.
+
+`Transaction failed` alone does not establish whether a previously submitted
+transaction later succeeded. Check the network first.
+
+**Resolved when:** The transaction reaches `SUCCESS` and the corresponding
+local note appears as finalized.
+</Accordion>
+</AccordionGroup>
+
+## Confidential transfer and withdrawal
+
+<AccordionGroup>
+<Accordion title="The amount, recipient, or destination is rejected">
+
+Use the exact message:
+
+| Message | Correction |
+| --- | --- |
+| `Invalid recipient stealth address` | Use the recipient's valid Stellar private address. |
+| `Invalid destination Stellar address` | Use a valid public Stellar withdrawal address. |
+| `Invalid transfer amount` | Enter a valid amount in the supported range. |
+| `Transfer amount must be positive and not exceed the note` | Reduce the transfer to the available note value. |
+| `Invalid withdraw amount` | Enter a valid positive withdrawal amount. |
+| `Withdraw amount exceeds note value` | Reduce the withdrawal to the selected note value. |
+| `Withdraw amount is too large for audit encoding` | Reduce the amount to the supported audit-encoding range. |
+| `Change amount is too large for audit encoding` | Adjust the operation so the private change fits the supported range. |
+
+Rebuild the proof after correcting the source request. Do not modify the
+recipient, destination, amount, or change after proof generation.
+</Accordion>
+
+<Accordion title="A partial operation cannot create change">
+
+A transfer or withdrawal below the full note value creates a new private
+change output. The connected wallet must already have a private address for
+that output.
+
+If the client requests a private address, return to the overview, create it
+with the same wallet, refresh the private history, and rebuild the operation.
+
+**Resolved when:** The partial operation can assign the remainder to the
+connected wallet's private address.
+</Accordion>
+
+<Accordion title="A note appears available but cannot be spent">
+
+The client checks the contract to determine whether the note's nullifier has
+already been consumed. Local history can temporarily lag that on-chain state.
+
+Refresh the pool and private history. If the nullifier is consumed, treat the
+note as spent and do not submit another proof. If it is not consumed, verify
+the commitment, current Merkle state, and local coin data before rebuilding
+the operation.
+
+**Resolved when:** The local spent state matches the contract nullifier state.
+</Accordion>
+</AccordionGroup>
+
+## Encrypted coin delivery
+
+<AccordionGroup>
+<Accordion title="The transfer succeeded but the recipient notification failed">
+
+The contract transaction and encrypted coin delivery are separate operations.
+The client can report:
+
+`Transaction succeeded but encrypted notification to the recipient failed`
+
+In this state, do not repeat the transfer. First confirm the transaction hash
+and commitment on-chain. Then check the coin-delivery API and recipient polling
+for the same deployment.
+
+The delivery service stores encrypted payloads; decryption occurs in the
+recipient's browser. Do not send the delivery ciphertext, coin data, or
+recipient signature to support.
+
+**Resolved when:** The existing successful transfer is discovered by the
+recipient and stored in the recipient's local private history.
+</Accordion>
+
+<Accordion title="Incoming private funds are not discovered">
+
+The recipient client periodically checks for incoming encrypted deliveries,
+filters candidate messages, decrypts the matching payload, and stores the coin
+locally.
+
+Confirm:
+
+1. The recipient uses the intended wallet, browser profile, and private
+   address.
+2. The client is connected to the same API and contract deployment.
+3. The page runs in a secure browser context such as HTTPS or localhost;
+   browser cryptography is required.
+4. The coin-delivery API is reachable and recipient polling continues.
+5. The original transfer transaction reached `SUCCESS`.
+
+`crypto.subtle is required` identifies a browser security-context boundary.
+API messages such as `GET /coin-deliveries/incoming failed` or
+`POST /coin-deliveries failed` identify delivery-service availability.
+
+**Resolved when:** The recipient decrypts the existing delivery and the note
+appears in local private history.
+</Accordion>
+</AccordionGroup>
+
+## Audit visibility
+
+<AccordionGroup>
+<Accordion title="A confirmed Stellar operation is not visible in the Compliance Platform">
+
+On-chain confirmation and audit visibility are separate stages. The Stellar
+scanner follows the associated contract, ingests its audit record, and the
+Compliance Platform interprets that record for the configured application.
+
+Check in this order:
+
+1. Confirm the transaction reached `SUCCESS` on the expected network.
+2. Confirm the contract is associated with the intended Arcane application
+   and Stellar chain configuration.
+3. Confirm the scanner checkpoint has reached or passed the transaction
+   ledger.
+4. Confirm the audit record was ingested for that transaction.
+5. Confirm the application's audit identifier and public audit key match the
+   deployed client and contract.
+6. Check whether audit interpretation recorded a decoding error.
+
+`no_decoder_configured`, `out_of_range`, or `decode_failed` identify the audit
+interpretation boundary. Escalate those states to the authorized deployment
+owner. Never expose or copy the private audit decoding key into client
+configuration.
+
+**Resolved when:** The scanner has passed the transaction ledger and the audit
+record is interpreted for the intended application without a decoding error.
+</Accordion>
+</AccordionGroup>
+
+## Reconcile the final state
+
+For every client-visible private operation, determine the last confirmed
+stage:
+
+| Stage | Evidence |
+| --- | --- |
+| Request validated | Final amount, recipient or destination, wallet, contract, and client reference |
+| Proof generated | Proof completed against the current contract Merkle state without changing its inputs |
+| Soroban submitted | Public transaction hash on the configured Stellar environment |
+| Network confirmed | Transaction status is `SUCCESS` |
+| Private state stored | Coin and commitment are present in the intended browser profile |
+| Recipient discovered | Encrypted delivery is decrypted and stored by the recipient, where applicable |
+| Audit reconciled | Scanner and interpretation expose the record to the intended Arcane application |
+
+A transaction can be confirmed while local private state, recipient delivery,
+or audit reconciliation is still incomplete. Diagnose the first incomplete
+stage instead of repeating the original operation.
+
+## Escalate safely
+
+Collect:
+
+- UTC date and time;
+- Stellar environment and contract address;
+- wallet public key and client operation reference;
+- public transaction hash, if created;
+- commitment identifier, where relevant;
+- last completed stage and exact error;
+- scanner checkpoint or transaction ledger, for audit-visibility issues.
+
+<Warning>
+  Never include a wallet secret key, recovery phrase, wallet signature used to
+  derive private state, SEP-10 token, local coin or note data, proof witness,
+  encrypted delivery payload, or private audit decoding material.
+</Warning>
+
+## Related guidance
+
+<Columns cols={3}>
+  <Card
+    title="How it works"
+    icon="workflow"
+    href="/products/privacy-layer/how-it-works"
+  >
+    Review the private transaction flow.
+  </Card>
+
+  <Card title="Support home" icon="route" href="/support/troubleshooting">
+    Choose another product or network.
+  </Card>
+
+  <Card title="Contact support" icon="messages-square" href="/support/contact-us">
+    Review the escalation path.
+  </Card>
+</Columns>

@@ -1,6 +1,142 @@
 ---
-title: "Overview"
-description: "Understand the purpose and scope of the Arcane Compliance Platform."
+title: "Compliance Platform"
+sidebarTitle: "Overview"
+description: "Governed review, selective disclosure, and auditability for private transaction systems."
 ---
 
-{/* TODO: Explain why the Compliance Platform is needed. */}
+The Arcane Compliance Platform gives client organizations a controlled way to
+review private transaction evidence without making private activity broadly
+visible.
+
+It provides a control layer for access, approvals, reporting, and
+accountability when a compliance, audit, support, or investigation workflow
+needs specific transaction evidence.
+
+<Info>
+  The Compliance Platform is separate from the end-user transaction path.
+  Access to the platform does not provide blanket visibility into private
+  activity.
+</Info>
+
+## Why the platform exists
+
+Privacy infrastructure keeps sensitive financial activity out of broad view
+during normal operation. Clients still need a governed way to respond when an
+authorized review is required.
+
+Without a dedicated control layer, clients face two unacceptable outcomes:
+
+- private data must be exposed too broadly simply to enable review; or
+- legitimate compliance, audit, support, and investigation teams cannot access
+  the evidence they are permitted to examine.
+
+The Compliance Platform addresses this trade-off by tying disclosure to a
+defined purpose, scope, reviewer, and access period.
+
+## Core capabilities
+
+<Columns cols={2}>
+  <Card title="Selective disclosure" icon="scan-eye">
+    Make specific private transaction evidence available only through an
+    authorized review workflow.
+  </Card>
+
+  <Card title="Case-based review" icon="folder-search">
+    Organize requests, approvals, reviewer assignments, access periods, and
+    review activity around a defined case.
+  </Card>
+
+  <Card title="Access governance" icon="users-round">
+    Apply organization, application, role, permission, and data-scope
+    boundaries to every review.
+  </Card>
+
+  <Card title="Reports and activity history" icon="file-clock">
+    Generate controlled reports and retain records of access, downloads, and
+    administrative actions.
+  </Card>
+</Columns>
+
+## What the platform controls
+
+| Control area | Client outcome |
+| --- | --- |
+| **Data boundary** | Evidence remains associated with the correct organization and application. |
+| **Review purpose** | Access is connected to an explicit request, case, or investigation. |
+| **Authorization** | Roles, permissions, approvals, and assignments determine who can act. |
+| **Disclosure scope** | Time, asset, operation, and field limits constrain what can be reviewed. |
+| **Access duration** | Review access can be limited to the period approved for the case. |
+| **Accountability** | Reports, downloads, review activity, and administrative actions are recorded. |
+
+## Who uses the platform
+
+<Columns cols={2}>
+  <Card title="Organization administrators" icon="building-2">
+    Manage organization users, applications, and high-level access boundaries.
+  </Card>
+
+  <Card title="Application administrators" icon="settings-2">
+    Manage application access and review disclosure requests for their product
+    scope.
+  </Card>
+
+  <Card title="Auditors and compliance reviewers" icon="scan-eye">
+    Examine approved case evidence and generate reports within the permitted
+    scope.
+  </Card>
+
+  <Card title="Operations and support teams" icon="life-buoy">
+    Route disputes, reconciliations, and escalations into controlled review when
+    private evidence is required.
+  </Card>
+</Columns>
+
+## Typical review scenarios
+
+Clients can use the Compliance Platform for workflows such as:
+
+- internal compliance or audit review;
+- investigation of a specific transaction or time period;
+- dispute and support escalation;
+- controlled evidence collection for reporting;
+- review of activity associated with a client application or private asset.
+
+## Product boundary
+
+The Compliance Platform provides technical controls for access, disclosure,
+review, and reporting. It does not replace the client's compliance policies,
+approval responsibilities, product records, or regulatory decision-making.
+
+<Note>
+  Controlled disclosure is not a general analytics export. Private evidence
+  should be reviewed only for an authorized purpose and within the approved
+  scope.
+</Note>
+
+## Next steps
+
+<Columns cols={3}>
+  <Card
+    title="How it works"
+    icon="workflow"
+    href="/products/compliance-platform/how-it-works"
+  >
+    Follow the disclosure workflow from indexed evidence to approved review.
+  </Card>
+
+  <Card
+    title="Start and setup"
+    icon="sliders-horizontal"
+    href="/products/compliance-platform/user-guide/start-and-setup"
+  >
+    Prepare the platform for your organization and application.
+  </Card>
+
+  <Card
+    title="Create a case"
+    icon="folder-plus"
+    href="/products/compliance-platform/user-guide/how-to-create-case"
+  >
+    Open a controlled review workflow for private evidence.
+  </Card>
+</Columns>
