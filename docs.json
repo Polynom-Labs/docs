@@ -22,13 +22,11 @@
         "pages": [
           {
             "group": "Compliance Platform",
-            "expanded": true,
             "pages": [
               "products/compliance-platform/overview",
               "products/compliance-platform/how-it-works",
               {
                 "group": "Architecture",
-                "expanded": true,
                 "root": "products/compliance-platform/architecture/overview",
                 "pages": [
                   "products/compliance-platform/architecture/key-management"
@@ -36,12 +34,10 @@
               },
               {
                 "group": "User guide",
-                "expanded": true,
                 "pages": [
                   "products/compliance-platform/user-guide/start-and-setup",
                   {
                     "group": "Organisation management",
-                    "expanded": true,
                     "pages": [
                       "products/compliance-platform/user-guide/organisation-management/application-management",
                       "products/compliance-platform/user-guide/organisation-management/user-management"
@@ -53,13 +49,11 @@
               },
               {
                 "group": "Integration",
-                "expanded": true,
                 "pages": [
                   "products/compliance-platform/integration/overview",
                   "products/compliance-platform/integration/frontend-reference",
                   {
                     "group": "Solana",
-                    "expanded": true,
                     "pages": [
                       "products/compliance-platform/integration/solana/integration-overview",
                       "products/compliance-platform/integration/solana/reference"
@@ -67,7 +61,6 @@
                   },
                   {
                     "group": "Stellar",
-                    "expanded": true,
                     "pages": [
                       "products/compliance-platform/integration/stellar/integration-overview",
                       "products/compliance-platform/integration/stellar/reference"
@@ -75,7 +68,6 @@
                   },
                   {
                     "group": "Fhenix",
-                    "expanded": true,
                     "pages": [
                       "products/compliance-platform/integration/fhenix/integration-overview",
                       "products/compliance-platform/integration/fhenix/reference"
@@ -87,17 +79,14 @@
           },
           {
             "group": "Privacy Layer",
-            "expanded": true,
             "pages": [
               "products/privacy-layer/about",
               "products/privacy-layer/how-it-works",
               {
                 "group": "Integration",
-                "expanded": true,
                 "pages": [
                   {
                     "group": "Stellar",
-                    "expanded": true,
                     "pages": [
                       "products/privacy-layer/integration/stellar/integration-overview",
                       "products/privacy-layer/integration/stellar/reference",
@@ -106,7 +95,6 @@
                   },
                   {
                     "group": "Solana",
-                    "expanded": true,
                     "pages": [
                       "products/privacy-layer/integration/solana/integration-overview",
                       "products/privacy-layer/integration/solana/reference",
