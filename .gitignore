@@ -2,5 +2,6 @@
 .agents/
 .app-build/
 dist/
+export.zip
 node_modules/
 skills-lock.json

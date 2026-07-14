@@ -1,0 +1,16 @@
+{
+  "name": "arcane-docs",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Build pipeline for exporting Arcane docs to a static site.",
+  "engines": {
+    "node": ">=20.17.0"
+  },
+  "scripts": {
+    "build:app-platform": "rm -rf .app-build dist && mkdir -p .app-build && mintlify export --output .app-build/export.zip && node scripts/unpack-mintlify-export.mjs .app-build/export.zip dist"
+  },
+  "devDependencies": {
+    "adm-zip": "0.5.16",
+    "mintlify": "4.2.624"
+  }
+}

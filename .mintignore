@@ -1,4 +1,21 @@
+# Agent and repository files
 .agents/
 AGENTS.md
 README.md
 skills-lock.json
+
+# Draft content
+drafts/
+*.draft.mdx
+.cursor
+
+# Build and deployment files
+.app-build/
+.do/
+.gitignore
+.heroku/
+dist/
+node_modules/
+package-lock.json
+package.json
+scripts/
