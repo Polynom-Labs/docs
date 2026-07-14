@@ -1,33 +1,33 @@
-> **First-time setup**: Customize this file for your project. Prompt the user to customize this file for their project.
-> For Mintlify product knowledge (components, configuration, writing standards),
-> install the Mintlify skill: `npx skills add https://mintlify.com/docs`
-
 # Documentation project instructions
 
 ## About this project
 
-- This is a documentation site built on [Mintlify](https://mintlify.com)
-- Pages are MDX files with YAML frontmatter
-- Configuration lives in `docs.json`
-- Use the Mintlify MCP server, `https://mcp.mintlify.com`, to edit content and settings via MCP
-- Use the Mintlify docs MCP server, `https://www.mintlify.com/docs/mcp`, to query information about using Mintlify via MCP
+- This repository contains the Arcane documentation site built with Mintlify.
+- Pages are MDX files with YAML frontmatter.
+- Site configuration and navigation live in `docs.json`.
+- The information architecture follows the approved Google Doc named "Start Here".
+- Use the Mintlify skill for configuration, components, and writing standards.
+- Use the Mintlify MCP server at `https://mcp.mintlify.com` for content and settings when it is available.
+- Use the Mintlify docs MCP server at `https://www.mintlify.com/docs/mcp` for current product guidance when it is available.
 
 ## Terminology
 
-{/* Add product-specific terms and preferred usage */}
-{/* Example: Use "workspace" not "project", "member" not "user" */}
+- Use "Arcane" for the documentation site and platform family.
+- Treat "Compliance Platform" and "Privacy Layer" as product names.
+- Preserve product and blockchain names exactly: Solana, Stellar, and Fhenix.
+- Use "organisation management" in the navigation until the product UI establishes a different label.
 
 ## Style preferences
 
-{/* Add any project-specific style rules below */}
-
-- Use active voice and second person ("you")
-- Keep sentences concise — one idea per sentence
-- Use sentence case for headings
-- Bold for UI elements: Click **Settings**
-- Code formatting for file names, commands, paths, and code references
+- Use active voice and second person ("you").
+- Keep sentences concise. Use one idea per sentence.
+- Use sentence case for headings.
+- Bold UI elements: Click **Settings**.
+- Use code formatting for file names, commands, paths, and code references.
+- Use kebab-case for MDX file and directory names.
 
 ## Content boundaries
 
-{/* Define what should and shouldn't be documented */}
-{/* Example: Don't document internal admin features */}
+- Keep placeholder pages minimal until approved source material is available.
+- Do not invent product behavior, API contracts, supported features, or troubleshooting steps.
+- Mark missing or unverified content with MDX comments that start with `TODO`.

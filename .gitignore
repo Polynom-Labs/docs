@@ -1,4 +1,6 @@
-node_modules/
-dist/
+.DS_Store
+.agents/
 .app-build/
-export.zip
+dist/
+node_modules/
+skills-lock.json

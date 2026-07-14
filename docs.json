@@ -1,107 +1,125 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Arcane Compliant Privacy Layer",
+  "name": "Arcane",
+  "description": "Documentation for Arcane products and integrations.",
   "colors": {
     "primary": "#0065F4",
     "light": "#3B82F6",
     "dark": "#1D4ED8"
   },
-  "favicon": "/favicon.svg",
   "navigation": {
-    "pages": [
+    "tabs": [
       {
-        "group": "Get Started",
+        "tab": "Start here",
         "pages": [
-          "overview/product-overview",
-          "overview/how-arcane-works",
-          "get-started/first-private-transaction",
-          "get-started/sandbox-testnet-setup"
+          "start-here",
+          "what-is-arcane"
         ]
       },
       {
-        "group": "Integration Guide",
-        "pages": [
-          "integration-guides/sdk-guide",
-          "integration-guides/private-payments-integration-guide",
-          "integration-guides/private-card-funding",
-          "integration-guides/reconciliation-and-support",
-          "sdks/solana-sdk",
-          "integration-guides/controlled-disclosure",
-          "operations/production-checklist"
-        ]
-      },
-      {
-        "group": "Auditing Portal",
-        "pages": [
-          "auditing-portal/overview",
-          "use-cases/auditor/create-disclosure-request",
-          "use-cases/auditor/review-case-transactions",
-          "use-cases/auditor/generate-reports-and-activity-logs",
-          "auditing-portal/identity-and-access",
-          "auditing-portal/disclosure-cases-and-reports",
+        "tab": "Products",
+        "groups": [
           {
-            "group": "Administrator workflows",
+            "group": "Compliance Platform",
             "pages": [
-              "use-cases/auditor/overview",
-              "use-cases/application-administrator/overview",
-              "use-cases/application-administrator/approve-disclosure-request",
-              "use-cases/application-administrator/manage-case-auditors",
-              "use-cases/application-administrator/application-reports-and-activity-logs",
-              "use-cases/organization-administrator/overview"
+              "products/compliance-platform/overview",
+              "products/compliance-platform/how-it-works",
+              {
+                "group": "Architecture",
+                "root": "products/compliance-platform/architecture/overview",
+                "pages": [
+                  "products/compliance-platform/architecture/key-management"
+                ]
+              },
+              {
+                "group": "User guide",
+                "pages": [
+                  "products/compliance-platform/user-guide/start-and-setup",
+                  {
+                    "group": "Organisation management",
+                    "pages": [
+                      "products/compliance-platform/user-guide/organisation-management/application-management",
+                      "products/compliance-platform/user-guide/organisation-management/user-management"
+                    ]
+                  },
+                  "products/compliance-platform/user-guide/how-to-create-case",
+                  "products/compliance-platform/user-guide/risk-incidents"
+                ]
+              },
+              {
+                "group": "Integration",
+                "pages": [
+                  "products/compliance-platform/integration/overview",
+                  "products/compliance-platform/integration/frontend-reference",
+                  {
+                    "group": "Solana",
+                    "pages": [
+                      "products/compliance-platform/integration/solana/integration-overview",
+                      "products/compliance-platform/integration/solana/reference"
+                    ]
+                  },
+                  {
+                    "group": "Stellar",
+                    "pages": [
+                      "products/compliance-platform/integration/stellar/integration-overview",
+                      "products/compliance-platform/integration/stellar/reference"
+                    ]
+                  },
+                  {
+                    "group": "Fhenix",
+                    "pages": [
+                      "products/compliance-platform/integration/fhenix/integration-overview",
+                      "products/compliance-platform/integration/fhenix/reference"
+                    ]
+                  }
+                ]
+              }
             ]
           },
           {
-            "group": "Portal internals",
+            "group": "Privacy Layer",
             "pages": [
-              "auditing-portal/data-model",
-              "auditing-portal/indexing-and-interpretation",
-              "auditing-portal/audit-ui"
+              "products/privacy-layer/about",
+              "products/privacy-layer/how-it-works",
+              {
+                "group": "Integration",
+                "pages": [
+                  {
+                    "group": "Stellar",
+                    "pages": [
+                      "products/privacy-layer/integration/stellar/integration-overview",
+                      "products/privacy-layer/integration/stellar/reference",
+                      "products/privacy-layer/integration/stellar/troubleshooting"
+                    ]
+                  },
+                  {
+                    "group": "Solana",
+                    "pages": [
+                      "products/privacy-layer/integration/solana/integration-overview",
+                      "products/privacy-layer/integration/solana/reference",
+                      "products/privacy-layer/integration/solana/troubleshooting"
+                    ]
+                  }
+                ]
+              }
             ]
           }
         ]
       },
       {
-        "group": "Architecture",
+        "tab": "Support",
         "pages": [
-          "architecture/system-context",
-          "architecture/solana-program",
-          "architecture/indexer-and-relayer",
-          "architecture/prover-and-circuits",
-          "auditing-portal/backend-architecture"
+          "support/troubleshooting",
+          "support/contact-us"
         ]
       }
     ]
   },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg",
-    "href": "/overview/product-overview"
+  "styling": {
+    "eyebrows": "breadcrumbs"
   },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:support@polynomlabs.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Start integrating",
-      "href": "/integration-guides/sdk-guide"
-    }
-  },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
-  },
-  "footer": {}
+  "interaction": {
+    "drilldown": false
+  }
 }
