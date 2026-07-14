@@ -11,11 +11,14 @@
   "navigation": {
     "groups": [
       {
-        "group": "Start here",
+        "group": "Get Started",
         "root": "start-here",
-        "pages": [
-          "what-is-arcane"
-        ]
+        "pages": []
+      },
+      {
+        "group": "What is Arcane",
+        "root": "what-is-arcane",
+        "pages": []
       },
       {
         "group": "Products",
