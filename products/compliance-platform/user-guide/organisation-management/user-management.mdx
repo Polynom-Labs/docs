@@ -3,10 +3,10 @@ title: "User management"
 description: "Manage organization memberships and application-scoped permissions."
 ---
 
-User management combines an organization membership with explicit Arcane
-access assignments. WorkOS maintains the user's identity, invitation, role,
-and membership status. Arcane maintains organization-level permissions,
-application assignments, and optional access expiry.
+User management combines organization membership with explicit Arcane access
+assignments. Membership determines whether a person belongs to the
+organization. Organization permissions, application assignments, and optional
+access expiry determine what that person can do.
 
 This separation allows an organization to keep membership administration and
 application authorization distinct while presenting them in one team view.
@@ -21,7 +21,7 @@ application authorization distinct while presenting them in one team view.
 
 | Layer | What it controls |
 | --- | --- |
-| **Organization membership** | Whether the user has an active, pending, or inactive WorkOS membership. |
+| **Organization membership** | Whether the user has an active, pending, or inactive membership. |
 | **Role** | The default access profile assigned when the invitation is sent. |
 | **Owner permissions** | Organization-level capabilities such as application, API key, report, and team administration. |
 | **Application assignments** | The applications the member can access and the permissions available in each one. |
@@ -43,9 +43,8 @@ An **External Auditor** uses the application-auditor role with an external
 organization reference and time-limited access. External access should always
 be scoped to the applications and permissions required for the review.
 
-The organization owner is identified from organization metadata rather than a
-separate invite role. Owner access can include organization-wide management
-permissions.
+The organization owner has a separate set of organization-wide management
+permissions and is not selected as an invitation role.
 
 ## Invite a member
 
@@ -64,7 +63,7 @@ permissions.
 
   <Step title="Select a role">
     Choose **Application Administrator** or **Application Auditor**. The role is
-    passed to WorkOS when the invitation is created.
+    applied when the invitation is created.
   </Step>
 
   <Step title="Define the application scope">
@@ -84,9 +83,9 @@ permissions.
   </Step>
 </Steps>
 
-The invitation and its role are created in WorkOS. Arcane stores the member
-metadata, application assignments, permission groups, and access expiry. The
-invitation is also recorded in the activity history.
+The platform records the invitation, role, application assignments, permission
+groups, and access expiry. The invitation is also recorded in the activity
+history.
 
 ## Permission groups
 
@@ -116,7 +115,7 @@ groups. They can provide the ability to:
 
 ## Review the team
 
-The organization team list combines WorkOS membership data with Arcane access
+The organization team list combines membership status with Arcane access
 metadata. It includes:
 
 - member name, email, organization, and role;
@@ -135,9 +134,9 @@ and suspended member counts.
 | Status | Meaning |
 | --- | --- |
 | `Pending` | The invitation has been sent, but the organization membership is not active yet. |
-| `Active` | The WorkOS membership is active and the assigned access has not expired. |
+| `Active` | The organization membership is active and the assigned access has not expired. |
 | `Expiring Soon` | Time-limited access expires within 30 days. The membership can still be active. |
-| `Suspended` | The WorkOS membership is inactive and organization access is blocked. |
+| `Suspended` | The organization membership is inactive and organization access is blocked. |
 | `Expired` | The configured access expiry has passed. Arcane treats the access as inactive. |
 
 ## Review and change access
@@ -154,9 +153,9 @@ For an existing member, an authorized administrator can:
 - extend access that is already time-limited;
 - suspend or reactivate the organization membership.
 
-Permission updates do not change the member's WorkOS role. The current
-management service assigns the role at invitation time and does not expose a
-separate role-change operation.
+Permission updates do not change the member's role. The role is assigned at
+invitation time, and the current management flow does not expose a separate
+role-change operation.
 
 <Note>
   Only time-limited access can be extended. Permanent access has no expiry to
@@ -165,15 +164,15 @@ separate role-change operation.
 
 ## Suspend or reactivate a member
 
-Suspension deactivates the WorkOS organization membership and blocks access to
-the organization. It is broader than removing a single application assignment.
+Suspension deactivates the organization membership and blocks access to the
+organization. It is broader than removing a single application assignment.
 
 The platform prevents an administrator from suspending their own membership.
-Use **Reactivate Access** to restore an inactive WorkOS membership when access
-should resume.
+Use **Reactivate Access** to restore an inactive membership when access should
+resume.
 
-The current backend does not expose a permanent member-deletion operation.
-Use suspension for organization-wide access removal and remove individual
+The platform does not expose a permanent member-deletion operation. Use
+suspension for organization-wide access removal and remove individual
 application assignments when only a narrower scope must be revoked.
 
 ## Audit history

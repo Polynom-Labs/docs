@@ -25,8 +25,8 @@ private transaction evidence.
 
   <Step title="A user requests disclosure">
     The request records the purpose of access and the proposed scope, including
-    the relevant organization, application, case, time window, assets, and
-    transaction references.
+    the relevant application, contract boundary, historical review period,
+    access duration, disclosure fields, and assigned reviewers.
   </Step>
 
   <Step title="An authorized administrator reviews the request">
@@ -45,9 +45,9 @@ private transaction evidence.
   </Step>
 
   <Step title="The platform records the outcome">
-    Authorized users can generate reports within their permissions. Access,
-    report generation, downloads, and administrative actions are written to the
-    activity trail.
+    Authorized users can generate reports within their permissions. Case
+    decisions, reviewer assignments, report generation, downloads, and
+    administrative changes are written to the activity trail.
   </Step>
 </Steps>
 
@@ -61,7 +61,7 @@ private transaction evidence.
 | **Role and permissions** | Which actions the authenticated user can perform. |
 | **Assignment** | Which reviewers are authorized for the approved case. |
 | **Time and duration** | Which transaction period can be reviewed and when access expires. |
-| **Asset, operation, and fields** | Which evidence and data elements can be disclosed. |
+| **Contract and fields** | Which transaction source is in scope and which sensitive fields can be disclosed. |
 
 ## Platform responsibilities
 
@@ -73,13 +73,12 @@ The Compliance Platform provides:
 - review cases, assignments, and access windows;
 - scoped transaction review;
 - report generation and downloads;
-- activity records for access and administrative actions.
+- activity records for governed workflow and administrative actions.
 
 <Note>
-  Controlled disclosure is a review workflow, not a general analytics export.
   The client should route sensitive access through an approved case and retain
-  stable product references and transaction signatures in its own system of
-  record.
+  stable product references and public transaction identifiers in its own
+  system of record.
 </Note>
 
 <Columns cols={2}>
@@ -92,10 +91,10 @@ The Compliance Platform provides:
   </Card>
 
   <Card
-    title="Review the architecture"
-    icon="network"
-    href="/products/compliance-platform/architecture/overview"
+    title="Manage user access"
+    icon="users-round"
+    href="/products/compliance-platform/user-guide/organisation-management/user-management"
   >
-    See how the Compliance Platform components fit together.
+    Configure organization membership and application-scoped permissions.
   </Card>
 </Columns>

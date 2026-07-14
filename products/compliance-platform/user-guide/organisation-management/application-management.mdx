@@ -104,7 +104,7 @@ The supported application types are:
 After creation:
 
 - the application creator receives application-administrator permissions when
-  the creator has a synchronized organization member record;
+  the creator has an organization member record;
 - the selected primary contact receives application-administrator permissions;
 - the application appears in the organization's application list;
 - its detail view includes the members who currently have application access.
@@ -163,17 +163,9 @@ Use **User management** to:
 - remove one application assignment without affecting other assignments;
 - review every application currently available to the member.
 
-## Application lifecycle
-
-The current application record does not maintain a separate `Setup needed`,
-`Workspace active`, or `Suspended` status. The management service distinguishes
-between applications that are available in the organization registry and
-applications that have been revoked.
-
-Organization verification and application integration readiness are separate
-controls. A listed application is not necessarily ready for production use;
-the associated contract, access assignments, integration configuration, and
-operational controls must also be ready.
+An application appearing in the organization registry does not by itself make
+the integration ready for production. Confirm the associated contract, access
+assignments, integration configuration, and operational controls before use.
 
 ## Revoke an application
 
@@ -199,10 +191,10 @@ the revoke action remains represented in the activity history.
   </Card>
 
   <Card
-    title="Stellar integration"
-    icon="blocks"
-    href="/products/compliance-platform/integration/stellar/integration-overview"
+    title="Create a case"
+    icon="folder-plus"
+    href="/products/compliance-platform/user-guide/how-to-create-case"
   >
-    Continue to the Stellar integration documentation.
+    Request controlled access to evidence inside an application.
   </Card>
 </Columns>
