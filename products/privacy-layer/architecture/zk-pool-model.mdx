@@ -1,0 +1,73 @@
+---
+title: "ZK pool model"
+description: "Understand commitments, roots, nullifiers, proofs, and private pool state."
+---
+
+A ZK pool represents private value as cryptographic outputs instead of public
+account balances. You spend an existing private output and create new outputs
+through a proof-backed pool transition.
+
+## Core elements
+
+| Element | Purpose |
+| --- | --- |
+| **Commitment** | Represents a private output in public pool state without publishing its underlying transaction details. |
+| **State root** | Commits to the current set of pool outputs. A transaction proves against an accepted recent root. |
+| **Nullifier** | Marks a private input as spent. The pool rejects a nullifier that was already used. |
+| **Zero-knowledge proof** | Shows that the private inputs and outputs satisfy the pool rules without revealing the private witness. |
+| **Encrypted output** | Carries protected transaction data outside the ordinary public payment record. |
+| **Encrypted audit output** | Supports the separate authorized disclosure and review path. |
+
+## Pool transition
+
+<Steps>
+  <Step title="Select private inputs">
+    The transaction selects the private output or outputs it will spend and an
+    accepted pool root.
+  </Step>
+
+  <Step title="Build outputs and a witness">
+    The transaction defines the new private outputs and builds the private
+    witness needed to prove the state transition.
+  </Step>
+
+  <Step title="Generate the proof">
+    The prover produces a zero-knowledge proof and the public signals required
+    by the pool verifier.
+  </Step>
+
+  <Step title="Authorize the transaction">
+    The wallet authorizes the blockchain invocation without publishing the
+    private witness.
+  </Step>
+
+  <Step title="Verify the transition">
+    The pool checks authorization, the accepted root, unused nullifiers, and
+    the zero-knowledge proof.
+  </Step>
+
+  <Step title="Commit the new state">
+    The pool records the nullifiers, adds the new commitments, updates its root,
+    and performs any required public deposit or withdrawal leg.
+  </Step>
+
+  <Step title="Emit encrypted audit data">
+    The transaction emits encrypted audit output for the separate controlled
+    disclosure workflow.
+  </Step>
+</Steps>
+
+## Public and private information
+
+| Operation | Public boundary | Private boundary |
+| --- | --- | --- |
+| **Deposit** | Public assets enter the pool and new pool state is recorded. | The resulting private output is represented by a commitment. |
+| **Private transfer** | The pool records a valid state transition, nullifier, and new commitments. | The private witness and protected payment details are not published as an ordinary transfer. |
+| **Withdrawal** | Public assets leave the pool for a public destination. | The spent private input remains hidden behind the proof. |
+
+<Warning>
+  Protect private witnesses, wallet-derived secrets, and decrypted outputs.
+  Publishing them can reveal information that the on-chain proof keeps private.
+</Warning>
+
+{/* TODO: Document network-specific state fields after their public interfaces are approved. */}

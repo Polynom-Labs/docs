@@ -3,6 +3,84 @@
   "theme": "mint",
   "name": "Arcane",
   "description": "Documentation for Arcane products and integrations.",
+  "redirects": [
+    {
+      "source": "/products/compliance-platform/integration/frontend-reference",
+      "destination": "/products/compliance-platform/integration/api-reference/user-api/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/client-api-reference",
+      "destination": "/products/compliance-platform/integration/api-reference/user-api/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/solana/integration-overview",
+      "destination": "/products/compliance-platform/integration/networks/solana"
+    },
+    {
+      "source": "/products/compliance-platform/integration/solana/reference",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/stellar/integration-overview",
+      "destination": "/products/compliance-platform/integration/networks/stellar"
+    },
+    {
+      "source": "/products/compliance-platform/integration/stellar/reference",
+      "destination": "/products/compliance-platform/integration/networks/stellar"
+    },
+    {
+      "source": "/products/compliance-platform/integration/fhenix/integration-overview",
+      "destination": "/products/compliance-platform/integration/networks/fhenix"
+    },
+    {
+      "source": "/products/compliance-platform/integration/fhenix/reference",
+      "destination": "/products/compliance-platform/integration/networks/fhenix"
+    },
+    {
+      "source": "/products/compliance-platform/troubleshooting",
+      "destination": "/support/troubleshooting"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/assets/audit-keys",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/assets/disclosure-keys",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/assets/:path*",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/service-api/entities",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/service-api/applications/:path*",
+      "destination": "/products/compliance-platform/integration/api-reference/user-api/methods"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/user-api/capabilities",
+      "destination": "/products/compliance-platform/integration/api-reference/user-api/methods"
+    },
+    {
+      "source": "/products/privacy-layer/integration/stellar/reference",
+      "destination": "/products/privacy-layer/sdk/overview/introduction"
+    },
+    {
+      "source": "/products/privacy-layer/integration/stellar/troubleshooting",
+      "destination": "/products/privacy-layer/sdk/concepts/operation-lifecycle"
+    },
+    {
+      "source": "/products/privacy-layer/integration/solana/reference",
+      "destination": "/products/privacy-layer/integration/solana/integration-overview"
+    },
+    {
+      "source": "/products/privacy-layer/integration/solana/troubleshooting",
+      "destination": "/products/privacy-layer/integration/solana/integration-overview"
+    }
+  ],
   "logo": {
     "light": "/logo/arcane-light.svg",
     "dark": "/logo/arcane-dark.svg"
@@ -120,24 +198,59 @@
           "products/privacy-layer/about",
           "products/privacy-layer/how-it-works",
           {
-            "group": "Integration",
+            "group": "Architecture",
+            "root": "products/privacy-layer/architecture/overview",
             "pages": [
+              "products/privacy-layer/architecture/zk-pool-model"
+            ]
+          },
+          {
+            "group": "SDK",
+            "root": "products/privacy-layer/sdk/overview/introduction",
+            "pages": [
+              "products/privacy-layer/sdk/overview/packages",
               {
-                "group": "Stellar",
+                "group": "Concepts",
                 "pages": [
-                  "products/privacy-layer/integration/stellar/integration-overview",
-                  "products/privacy-layer/integration/stellar/reference",
-                  "products/privacy-layer/integration/stellar/troubleshooting"
+                  "products/privacy-layer/sdk/concepts/domain-model",
+                  "products/privacy-layer/sdk/concepts/operations",
+                  "products/privacy-layer/sdk/concepts/operation-lifecycle",
+                  "products/privacy-layer/sdk/concepts/disclosure-policy",
+                  "products/privacy-layer/sdk/concepts/security-and-privacy"
                 ]
               },
               {
-                "group": "Solana",
+                "group": "Integration",
                 "pages": [
-                  "products/privacy-layer/integration/solana/integration-overview",
-                  "products/privacy-layer/integration/solana/reference",
-                  "products/privacy-layer/integration/solana/troubleshooting"
+                  "products/privacy-layer/sdk/integration/integration-paths",
+                  "products/privacy-layer/sdk/integration/quick-start",
+                  "products/privacy-layer/sdk/integration/state-integration",
+                  "products/privacy-layer/sdk/integration/data-sources"
+                ]
+              },
+              {
+                "group": "Stellar application development",
+                "root": "products/privacy-layer/sdk/application-development/install",
+                "pages": [
+                  "products/privacy-layer/sdk/application-development/setup",
+                  {
+                    "group": "How to",
+                    "pages": [
+                      "products/privacy-layer/sdk/application-development/how-to/deposit",
+                      "products/privacy-layer/sdk/application-development/how-to/withdraw",
+                      "products/privacy-layer/sdk/application-development/how-to/transfer-registered-recipient",
+                      "products/privacy-layer/sdk/application-development/how-to/transfer-unregistered-recipient"
+                    ]
+                  }
                 ]
               }
+            ]
+          },
+          {
+            "group": "Application examples",
+            "pages": [
+              "products/privacy-layer/integration/stellar/integration-overview",
+              "products/privacy-layer/integration/solana/integration-overview"
             ]
           }
         ]
@@ -156,67 +269,5 @@
   },
   "interaction": {
     "drilldown": true
-  },
-  "redirects": [
-    {
-      "source": "/products/compliance-platform/integration/frontend-reference",
-      "destination": "/products/compliance-platform/integration/api-reference/user-api/overview"
-    },
-    {
-      "source": "/products/compliance-platform/integration/client-api-reference",
-      "destination": "/products/compliance-platform/integration/api-reference/user-api/overview"
-    },
-    {
-      "source": "/products/compliance-platform/integration/solana/integration-overview",
-      "destination": "/products/compliance-platform/integration/networks/solana"
-    },
-    {
-      "source": "/products/compliance-platform/integration/solana/reference",
-      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
-    },
-    {
-      "source": "/products/compliance-platform/integration/stellar/integration-overview",
-      "destination": "/products/compliance-platform/integration/networks/stellar"
-    },
-    {
-      "source": "/products/compliance-platform/integration/stellar/reference",
-      "destination": "/products/compliance-platform/integration/networks/stellar"
-    },
-    {
-      "source": "/products/compliance-platform/integration/fhenix/integration-overview",
-      "destination": "/products/compliance-platform/integration/networks/fhenix"
-    },
-    {
-      "source": "/products/compliance-platform/integration/fhenix/reference",
-      "destination": "/products/compliance-platform/integration/networks/fhenix"
-    },
-    {
-      "source": "/products/compliance-platform/troubleshooting",
-      "destination": "/support/troubleshooting"
-    },
-    {
-      "source": "/products/compliance-platform/integration/api-reference/assets/audit-keys",
-      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
-    },
-    {
-      "source": "/products/compliance-platform/integration/api-reference/assets/disclosure-keys",
-      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
-    },
-    {
-      "source": "/products/compliance-platform/integration/api-reference/assets/:path*",
-      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
-    },
-    {
-      "source": "/products/compliance-platform/integration/api-reference/service-api/entities",
-      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
-    },
-    {
-      "source": "/products/compliance-platform/integration/api-reference/service-api/applications/:path*",
-      "destination": "/products/compliance-platform/integration/api-reference/user-api/methods"
-    },
-    {
-      "source": "/products/compliance-platform/integration/api-reference/user-api/capabilities",
-      "destination": "/products/compliance-platform/integration/api-reference/user-api/methods"
-    }
-  ]
+  }
 }

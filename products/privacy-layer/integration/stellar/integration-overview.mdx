@@ -1,6 +1,95 @@
 ---
-title: "Integration overview"
-description: "Understand the Privacy Layer integration for Stellar."
+title: "Stellar application example"
+sidebarTitle: "Stellar"
+description: "See how a working Stellar application integrates private payment flows."
 ---
 
-{/* TODO: Add the Stellar integration overview. */}
+This page describes a verified application pattern for the Stellar preset. It
+shows how one application assembles the SDK capabilities into user flows.
+
+<Info>
+  Treat this as an implementation example, not a complete SDK specification or
+  a list of requirements for every integration.
+</Info>
+
+## Implemented flow
+
+<Steps>
+  <Step title="Connect a wallet">
+    The user connects a Stellar wallet. The application uses the connected
+    public account for wallet authorization and public payment destinations.
+  </Step>
+
+  <Step title="Check private-address registration">
+    The application looks up the connected account in the private-address
+    registry. It enables private payment actions only after the registration is
+    active. An unregistered user can create and register a private address.
+  </Step>
+
+  <Step title="Deposit funds">
+    The user selects an asset and amount. The application moves value from the
+    connected public balance to the user's private address.
+  </Step>
+
+  <Step title="Send a private transfer">
+    The sender enters the recipient's public Stellar address. The application
+    resolves a registered recipient to a private address. If the recipient is
+    not registered, it creates a pending claim that the recipient can claim
+    later.
+  </Step>
+
+  <Step title="Withdraw funds">
+    The user selects private funds and a public Stellar destination. The
+    application checks that the destination can receive the selected asset
+    before submitting the withdrawal.
+  </Step>
+
+  <Step title="Present the result">
+    The application stores transaction records, refreshes balances, and shows
+    operation history and pending claims.
+  </Step>
+</Steps>
+
+## Operation map
+
+| User action | Source | Destination | Application behavior |
+| --- | --- | --- | --- |
+| Deposit | Public balance | User's private address | Prepares and submits a deposit |
+| Send to registered recipient | Private balance | Recipient's private address | Resolves the public recipient through the registry |
+| Send to unregistered recipient | Private balance | Pending claim | Creates an onboarding and claim flow |
+| Withdraw | Private balance | Public Stellar address | Checks asset receivability and submits a withdrawal |
+
+## Application responsibilities
+
+The example application owns:
+
+- wallet connection and confirmation screens;
+- private-address registration status;
+- asset and amount selection;
+- transaction progress and error presentation;
+- local state, balance refresh, and transaction history;
+- pending-claim discovery and claim actions.
+
+The SDK remains responsible for its public operation lifecycle and Stellar
+transaction preparation. See the SDK docs for the supported integration
+surface.
+
+<Columns cols={2}>
+  <Card
+    title="Install the Stellar preset"
+    icon="download"
+    href="/products/privacy-layer/sdk/application-development/install"
+  >
+    Add the public SDK packages used by a Stellar application.
+  </Card>
+
+  <Card
+    title="Operation how-tos"
+    icon="book-open"
+    href="/products/privacy-layer/sdk/application-development/how-to/deposit"
+  >
+    Follow the deposit, transfer, and withdrawal examples.
+  </Card>
+</Columns>
+
+{/* TODO: Add approved deployment and production data-source guidance. */}
