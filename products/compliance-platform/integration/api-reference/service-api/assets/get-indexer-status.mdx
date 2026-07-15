@@ -1,0 +1,13 @@
+---
+title: "Get indexer status"
+description: "Inspect mint registration and the latest indexed transaction signals."
+openapi: "/openapi/compliance-platform-service.json GET /v1/assets/{id}/indexer-status"
+playground: "none"
+---
+
+`registered` indicates whether Arcane connected the Asset to an indexed
+contract. `indexedCount` is the number of indexed audit records currently
+available for that Asset.
+
+When records exist, the response can include the latest slot, block time,
+transaction signature, and indexing timestamp.

@@ -1,0 +1,88 @@
+---
+title: "Solana"
+description: "Connect a Solana confidential-token mint to the Compliance Platform."
+---
+
+The Solana Service API flow connects a Token-2022 confidential mint to the
+Compliance Platform. Your backend creates an Arcane confidential Asset,
+configures and deploys the mint, then submits the mint address for indexing.
+
+## What Arcane provides
+
+Creating an Asset returns `auditorElGamalPubkey`, the per-organization auditor
+ElGamal public key used by the current Solana integration.
+
+```json
+{
+  "id": "casset_01J4Z6QK6S7V9H1N3C8M2P5R0T",
+  "name": "Confidential USDC",
+  "symbol": "cUSDC",
+  "decimals": 6,
+  "auditorElGamalPubkey": "4t2WRR2tGEGdZQeVhG9rP9RAG9DR4PkoMypM9W1pqXua",
+  "auditorKeyProvider": "arcane-derived-v1",
+  "mintAddress": null,
+  "status": "pending"
+}
+```
+
+The value is public configuration. The API does not return the corresponding
+private key.
+
+<Info>
+  Token-2022 Confidential Transfer protects confidential amounts and balances.
+  The mint, token-account addresses, account owners, and transaction graph
+  remain public on Solana.
+</Info>
+
+## Integration algorithm
+
+<Steps>
+  <Step title="Create the Arcane Asset">
+    Call `POST /v1/assets` with `name`, `symbol`, and `decimals`. Store the
+    returned Asset ID and `auditorElGamalPubkey`.
+  </Step>
+
+  <Step title="Deploy the confidential mint">
+    Configure the mint through your Solana deployment path. Your wallet or
+    custody provider signs and submits the transactions. Arcane does not sign
+    or submit them.
+  </Step>
+
+  <Step title="Bind the mint">
+    Call `PATCH /v1/assets/{id}/mint` with `mintAddress`. You can also include
+    `deploymentSignature` and `deploymentStatus`. Arcane records the supplied
+    deployment values and sets the Asset to `active`.
+  </Step>
+
+  <Step title="Confirm indexer registration">
+    Call `GET /v1/assets/{id}/indexer-status`. Check `registered` before you
+    rely on indexed records. Use `indexedCount` and the latest transaction
+    fields to inspect progress.
+  </Step>
+</Steps>
+
+```json
+{
+  "mintAddress": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+  "deploymentSignature": "5R3x9WwAZ2rGf7FREBSvBv6a8Fh7Y2pX9zF5oP6rdv3C4w2E7Va1nCyJ9sL2m8KQ3yN4h5t6u7i8o9pQ1r2s3t4",
+  "deploymentStatus": "confirmed"
+}
+```
+
+<Columns cols={2}>
+  <Card
+    title="Create a confidential asset"
+    icon="plus"
+    href="/products/compliance-platform/integration/api-reference/service-api/assets/create"
+  >
+    Create the Arcane Asset and retrieve its auditor public key.
+  </Card>
+
+  <Card
+    title="Bind a deployed mint"
+    icon="link"
+    href="/products/compliance-platform/integration/api-reference/service-api/assets/bind-mint"
+  >
+    Record the deployed mint and connect it to indexing.
+  </Card>
+</Columns>

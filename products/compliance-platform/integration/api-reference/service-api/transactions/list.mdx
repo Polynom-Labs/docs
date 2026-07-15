@@ -1,0 +1,12 @@
+---
+title: "List asset transactions"
+description: "Return indexed transactions for a confidential Asset."
+openapi: "/openapi/compliance-platform-service.json GET /v1/assets/{id}/transactions"
+playground: "none"
+---
+
+Use this method to synchronize indexed transaction records with your backend.
+The response contains public transaction data and confidential ciphertexts. It
+does not contain disclosed plaintext values.
+
+When `nextCursor` is not `null`, pass it as the next request's `cursor` value.

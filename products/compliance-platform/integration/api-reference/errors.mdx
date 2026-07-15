@@ -1,0 +1,27 @@
+---
+title: "Errors"
+description: "Handle current Compliance Platform API errors."
+---
+
+The current API returns NestJS HTTP error objects.
+
+```json
+{
+  "message": "mintAddress is required",
+  "error": "Bad Request",
+  "statusCode": 400
+}
+```
+
+| Status | Meaning |
+| --- | --- |
+| `400 Bad Request` | A required field is missing or invalid. |
+| `401 Unauthorized` | The bearer token or API key is missing, invalid, expired, or revoked. |
+| `403 Forbidden` | The user is authenticated but lacks the required Arcane permission or resource access. |
+| `404 Not Found` | The requested resource does not exist in the credential's organization or access boundary. |
+| `502 Bad Gateway` | An identity or API-key provider request failed. |
+
+The OAuth endpoints use the standard `error` and optional
+`error_description` fields for OAuth protocol errors.
+
+{/* TODO: Document stable machine-readable error codes after the backend adopts an approved error envelope. */}

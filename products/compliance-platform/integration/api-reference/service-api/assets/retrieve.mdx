@@ -1,0 +1,11 @@
+---
+title: "Retrieve a confidential asset"
+description: "Return an Asset owned by the API key's organization."
+openapi: "/openapi/compliance-platform-service.json GET /v1/assets/{id}"
+playground: "none"
+---
+
+Use this method to recover the Asset configuration or inspect its current mint
+binding and lifecycle status.
+
+An Asset outside the API key's organization returns `404 Not Found`.

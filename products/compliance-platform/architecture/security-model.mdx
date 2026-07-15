@@ -1,0 +1,71 @@
+---
+title: "Security model"
+description: "Review the Compliance Platform security properties, boundaries, and shared responsibilities."
+---
+
+The Compliance Platform separates customer-controlled transaction authority,
+encrypted Arcane infrastructure, and trusted cryptographic execution. This
+model limits where disclosure keys and confidential plaintext can exist.
+
+## Security properties
+
+When you integrate according to this architecture:
+
+- Arcane does not initiate confidential transactions or hold your
+  transaction-signing authority;
+- Arcane's API, indexer, encrypted data store, and application services do not
+  store plaintext disclosure keys;
+- Arcane can index and persist encrypted records without decrypting them;
+- protected key use and plaintext processing occur only inside the Trusted
+  Compute Module for an authorized operation;
+- Arcane returns only the approved disclosure scope and does not persist that
+  plaintext during normal operation; and
+- Arcane protects historical disclosure keys under the same controls as active
+  keys while they remain required.
+
+## Trust boundaries
+
+| Boundary | Data it can handle | Data excluded from it |
+| --- | --- | --- |
+| **Customer transaction application** | Transaction instructions, signing authority, and the public configuration required by the privacy stack | Arcane disclosure private keys |
+| **Blockchain or privacy stack** | Network state, ciphertexts, public identifiers, and validity proofs defined by the protocol | Arcane organization permissions and case policy |
+| **Ordinary Arcane infrastructure** | Encrypted records, metadata, identities, authorization inputs, and approved results | Plaintext disclosure keys and unapproved confidential data |
+| **Trusted Compute Module** | Scoped encrypted records, protected key operations, and temporary plaintext required for an approved operation | Customer transaction-signing authority and unrelated records |
+| **Key-management provider** | Protected disclosure key material and the policy inputs required to authorize its use | Customer business logic and disclosure decisions |
+
+The logical Arcane infrastructure shown in the architecture diagrams is not a
+single trust boundary. The Trusted Compute Module and key-management provider
+form separate protected boundaries inside the overall system.
+
+## Shared responsibility
+
+| Arcane is responsible for | You are responsible for | The privacy stack is responsible for |
+| --- | --- | --- |
+| Generating and protecting disclosure key material | Securing your administrative and API credentials | Defining the network-specific ciphertext and proof model |
+| Isolating protected operations inside trusted compute | Controlling transaction-signing authority | Executing and validating confidential transactions |
+| Authenticating API requests and enforcing platform permissions | Configuring organization roles, permissions, and disclosure policy | Publishing the encrypted state or events required by the integration |
+| Indexing and storing supported records in encrypted form | Approving access according to your legal and business requirements | Defining any public metadata and privacy limitations |
+| Returning only the authorized disclosure result | Integrating the Arcane public configuration correctly | Enforcing the on-chain protocol rules |
+| Recording security-sensitive operation metadata | Deciding how an approved result may be used and retained | Maintaining network availability and consensus |
+
+Arcane provides controlled-disclosure infrastructure. It does not make legal,
+regulatory, or business decisions for you. You define the policy and approval
+model. Arcane enforces the resulting platform permissions and disclosure scope.
+
+<Columns cols={2}>
+  <Card
+    title="Review trusted compute"
+    icon="shield-check"
+    href="/products/compliance-platform/architecture/trusted-compute"
+  >
+    Understand where protected key use and plaintext processing occur.
+  </Card>
+
+  <Card
+    title="Configure user access"
+    icon="users-round"
+    href="/products/compliance-platform/user-guide/organisation-management/user-management"
+  >
+    Manage organization membership and application-scoped permissions.
+  </Card>
+</Columns>

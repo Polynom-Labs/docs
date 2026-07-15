@@ -1,0 +1,45 @@
+---
+title: "Network guides"
+sidebarTitle: "Overview"
+description: "Review how supported privacy technologies connect to the Compliance Platform."
+---
+
+The Compliance Platform works with compatible confidential applications and
+assets on Solana, Stellar, and Fhenix.
+
+| Network | Compatible privacy technology | Current integration documentation |
+| --- | --- | --- |
+| **Solana** | Arcane Privacy Layer and Token-2022 Confidential Transfer | Service API Asset flow for the Solana SDP integration |
+| **Stellar** | Arcane Privacy Layer | Compatibility overview |
+| **Fhenix** | Fhenix confidential tokens using FHE | Compatibility overview |
+
+The current Service API contract is specific to the Solana confidential-token
+flow. It should not be copied into Stellar or Fhenix documentation until the
+request fields, network identifiers, and ingestion behavior for those
+integrations are verified.
+
+<Columns cols={3}>
+  <Card
+    title="Solana"
+    icon="network"
+    href="/products/compliance-platform/integration/networks/solana"
+  >
+    Integrate a Token-2022 confidential mint with the Service API.
+  </Card>
+
+  <Card
+    title="Stellar"
+    icon="star"
+    href="/products/compliance-platform/integration/networks/stellar"
+  >
+    Review compatibility with the Arcane Privacy Layer on Stellar.
+  </Card>
+
+  <Card
+    title="Fhenix"
+    icon="blocks"
+    href="/products/compliance-platform/integration/networks/fhenix"
+  >
+    Review compatibility with Fhenix confidential tokens.
+  </Card>
+</Columns>

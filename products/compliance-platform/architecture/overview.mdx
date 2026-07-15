@@ -1,6 +1,96 @@
 ---
 title: "Architecture"
-description: "Review the high-level architecture of the Arcane Compliance Platform."
+description: "Understand how the Compliance Platform separates transaction execution, encrypted indexing, authorization, and protected disclosure."
 ---
 
-{/* TODO: Document the Compliance Platform architecture. */}
+The Compliance Platform separates confidential transaction execution from
+encrypted observation and authorized disclosure. Your application submits
+transactions directly to a supported blockchain or privacy stack. Arcane does
+not construct, sign, or submit those transactions.
+
+Arcane observes encrypted activity, stores encrypted records, and enables
+approved disclosure through its UI and APIs. Sensitive cryptographic operations
+run inside the Trusted Compute Module.
+
+<Info>
+  Arcane manages disclosure capability. You retain transaction-signing
+  authority and control when your application initiates an on-chain action.
+</Info>
+
+<Frame caption="High-level Compliance Platform architecture">
+  <img
+    src="/images/diagrams/compliance-platform-architecture.png"
+    alt="Architecture showing confidential transactions flowing to the blockchain, encrypted events entering Arcane, and authorized disclosure using trusted compute and managed keys."
+  />
+</Frame>
+
+## Security properties
+
+The architecture follows five primary security properties.
+
+| Property | Architectural effect |
+| --- | --- |
+| **Protected key use** | Plaintext disclosure keys are not exposed to users, APIs, ordinary services, databases, or logs. |
+| **Encrypted by default** | Arcane indexes and stores confidential records in encrypted form. |
+| **Verifiable execution** | Approved cryptographic code runs in an attested, isolated environment. |
+| **Controlled disclosure** | Arcane evaluates identity, organization permissions, and disclosure scope before a protected operation runs. |
+| **Cryptographic integrity** | The architecture protects key material, cryptographic operations, and protected data against unauthorized modification throughout their lifecycle. |
+
+## System components
+
+| Component | Responsibility | Security boundary |
+| --- | --- | --- |
+| **Transaction application** | Constructs and submits confidential transactions directly to the blockchain. | You control the application and its signing authority. |
+| **Blockchain or privacy stack** | Executes confidential transactions and publishes encrypted state or events. | Its protocol defines the ciphertexts, proofs, and network-specific key roles. |
+| **Arcane Indexer** | Observes supported networks and extracts encrypted records and related metadata. | It does not decrypt records or access disclosure key material. |
+| **Encrypted data store** | Persists encrypted payloads, audit records, and the metadata required to locate them. | Arcane treats it as an untrusted storage layer. It contains neither disclosure keys nor confidential plaintext. |
+| **Arcane authorization layer** | Authenticates the requester and evaluates organization roles, permissions, and disclosure scope. | Only an authorized request can reach trusted execution. |
+| **Trusted Compute Module** | Receives scoped encrypted records and performs the approved cryptographic operation. | Plaintext processing is isolated from ordinary Arcane infrastructure. |
+| **Key-management provider** | Protects disclosure key material and restricts its use. | Protected key access is available only to an approved trusted workload. |
+
+## Two independent paths
+
+The transaction path and disclosure path remain separate.
+
+- In the **transaction path**, your application interacts with the blockchain.
+  Arcane observes the resulting encrypted records.
+- In the **disclosure path**, an authorized user or system asks Arcane to reveal
+  an approved scope. Arcane performs the protected operation and returns only
+  that result.
+
+This separation keeps Arcane outside the transaction-signing path while still
+supporting governed access to confidential evidence.
+
+<Columns cols={2}>
+  <Card
+    title="Follow the data flows"
+    icon="route"
+    href="/products/compliance-platform/architecture/data-flows"
+  >
+    Trace encrypted indexing and authorized disclosure from end to end.
+  </Card>
+
+  <Card
+    title="Understand trusted compute"
+    icon="shield-check"
+    href="/products/compliance-platform/architecture/trusted-compute"
+  >
+    Review the isolated execution boundary for protected operations.
+  </Card>
+
+  <Card
+    title="Review key management"
+    icon="key-round"
+    href="/products/compliance-platform/architecture/key-management"
+  >
+    Learn how Arcane scopes, protects, and uses disclosure keys.
+  </Card>
+
+  <Card
+    title="Review the security model"
+    icon="lock-keyhole"
+    href="/products/compliance-platform/architecture/security-model"
+  >
+    Understand the guarantees and shared responsibilities.
+  </Card>
+</Columns>

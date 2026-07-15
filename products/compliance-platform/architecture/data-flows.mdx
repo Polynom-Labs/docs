@@ -1,0 +1,116 @@
+---
+title: "Data flows"
+description: "Trace encrypted transaction indexing and authorized disclosure through the Compliance Platform."
+---
+
+The Compliance Platform uses separate flows for transaction activity and
+disclosure. Arcane observes encrypted on-chain records after a transaction. It
+does not route the transaction through its backend.
+
+This page describes technical data movement. For the case and approval
+workflow, see [How the Compliance Platform works](/products/compliance-platform/how-it-works).
+
+## On-chain transaction and indexing flow
+
+<Frame caption="On-chain transaction flow">
+  <img
+    src="/images/diagrams/on-chain-transaction-flow.png"
+    alt="On-chain transaction flow from an application to confidential blockchain transfers, then through the Arcane Indexer to the encrypted data store."
+  />
+</Frame>
+
+<Steps>
+  <Step title="Your application submits the transaction">
+    Your wallet, protocol, or application constructs, signs, and submits the
+    confidential transaction directly to the blockchain.
+  </Step>
+
+  <Step title="The privacy stack executes it">
+    The supported blockchain or privacy stack validates the transaction and
+    produces encrypted state, events, or audit records.
+  </Step>
+
+  <Step title="Arcane indexes encrypted evidence">
+    The Arcane Indexer observes supported records and extracts encrypted
+    payloads with the metadata needed to locate and interpret them.
+  </Step>
+
+  <Step title="Arcane stores the encrypted records">
+    The encrypted data store persists the records without receiving disclosure
+    key material or confidential plaintext.
+  </Step>
+</Steps>
+
+## Authorization and protected-key-access flow
+
+<Frame caption="Disclosure authorization and protected-key-access flow">
+  <img
+    src="/images/diagrams/disclosure-flow.png"
+    alt="Disclosure request flow from an Arcane UI or API through authentication and authorization to trusted compute and managed key custody."
+  />
+</Frame>
+
+A user, customer backend, compliance system, or Arcane interface can start a
+disclosure request. Arcane authenticates the requester and evaluates the request
+against organization permissions and disclosure policy. Only an approved
+request reaches the Trusted Compute Module.
+
+The diagram shows the authorization and protected-key-access path. The complete
+operation also loads encrypted records, returns the approved result, clears
+sensitive memory, and records an audit event.
+
+## Authorized disclosure sequence
+
+<Frame caption="Authorized disclosure sequence">
+  <img
+    src="/images/diagrams/authorized-disclosure-sequence.png"
+    alt="Authorized disclosure sequence: authenticate and authorize, load encrypted records, perform protected decryption in trusted compute, return scoped data, and record an audit event."
+  />
+</Frame>
+
+The complete disclosure algorithm is:
+
+<Steps>
+  <Step title="Submit the request">
+    An authorized user or system requests disclosure through the Arcane UI or
+    API. The request identifies the protected data and requested scope.
+  </Step>
+
+  <Step title="Authenticate and authorize">
+    Arcane authenticates the requester. It then evaluates organization roles,
+    permissions, policy, and the approved disclosure scope.
+  </Step>
+
+  <Step title="Load encrypted records">
+    Arcane loads only the relevant ciphertext from the encrypted data store. It
+    forwards the authorized operation and scoped encrypted records to the
+    Trusted Compute Module.
+  </Step>
+
+  <Step title="Obtain protected key access">
+    The key-management provider permits the approved trusted workload to use the
+    required disclosure key for this operation. The requester and ordinary
+    Arcane services do not receive the key.
+  </Step>
+
+  <Step title="Perform the protected operation">
+    Approved code parses the network-specific ciphertext and performs the
+    required decryption or reconstruction inside the trusted environment.
+  </Step>
+
+  <Step title="Return the approved result">
+    Arcane returns only the fields allowed by the authorization decision. It
+    does not persist the returned plaintext during normal operation.
+  </Step>
+
+  <Step title="Clear and record">
+    The Trusted Compute Module clears sensitive intermediate values after the
+    operation. Arcane records metadata about the disclosure for auditability.
+  </Step>
+</Steps>
+
+<Info>
+  A user, User API client, customer backend, or ordinary Arcane service never
+  receives a disclosure private key. The authorized requester receives only the
+  approved disclosure result.
+</Info>

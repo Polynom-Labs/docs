@@ -1,0 +1,72 @@
+---
+title: "Authentication"
+description: "Obtain a user access token for the Compliance Platform User API."
+---
+
+External applications use OAuth 2.0 Authorization Code with PKCE to obtain a
+User API access token. Arcane handles WorkOS sign-in and organization selection.
+
+Arcane provides your client ID, registered redirect URIs, authorization server
+location, and User API location during onboarding. These values are available
+upon request.
+
+## OAuth methods
+
+| Method | Purpose |
+| --- | --- |
+| `GET /.well-known/openid-configuration` | Read the authorization server metadata and endpoint locations. |
+| `GET /oauth/authorize` | Sign in the user, select an organization, and issue an authorization code. |
+| `POST /oauth/token` | Exchange a code and PKCE verifier for tokens, or use a refresh token to renew access. |
+| `POST /oauth/revoke` | Revoke a refresh token when the user disconnects Arcane. |
+
+## Authorization request
+
+Redirect the user to the authorization endpoint with:
+
+| Parameter | Value |
+| --- | --- |
+| `response_type` | `code` |
+| `client_id` | The client ID Arcane provided. |
+| `redirect_uri` | An exact registered redirect URI. |
+| `scope` | Include `openid`. Add `profile`, `email`, or `offline_access` when needed. |
+| `code_challenge` | The PKCE challenge for this authorization attempt. |
+| `code_challenge_method` | `S256` |
+| `state` | A one-time value that your application verifies on return. |
+
+Arcane redirects to the registered URI with `code` and `state` after the user
+signs in and selects an organization.
+
+## Token request
+
+Send an `application/x-www-form-urlencoded` request to the token endpoint.
+
+```text
+grant_type=authorization_code
+client_id=<client-id>
+code=<authorization-code>
+redirect_uri=<registered-redirect-uri>
+code_verifier=<pkce-verifier>
+```
+
+The response contains `access_token`, `token_type`, and `expires_in`. It also
+contains `refresh_token` when you requested `offline_access`.
+
+To renew access, call the same token endpoint with
+`grant_type=refresh_token`, `client_id`, and `refresh_token`.
+
+## Call the User API
+
+Send the access token as a bearer token. The token selects the user and
+organization. You cannot override either value in a User API request.
+
+```http
+GET /auth/me HTTP/1.1
+Authorization: Bearer <access-token>
+```
+
+OAuth authenticates the calling user. Arcane permissions still determine
+which methods and resources that user can access.
+
+For the security rationale behind PKCE, redirect validation, audience
+restriction, and refresh-token rotation, read the [OAuth 2.0 Security Best
+Current Practice](https://www.rfc-editor.org/rfc/rfc9700.html).

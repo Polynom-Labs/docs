@@ -1,0 +1,39 @@
+---
+title: "Transaction API"
+sidebarTitle: "Overview"
+description: "Retrieve indexed transactions for a confidential Asset."
+---
+
+Use the Transaction API after you bind a mint and Arcane begins indexing it.
+Each transaction belongs to an Asset owned by the organization selected by
+your API key.
+
+Transaction responses contain:
+
+- the Solana transaction signature and indexed event type;
+- public accounts, timing, and other public network data;
+- the confidential ciphertexts recorded for the transaction.
+
+The Transaction API does not disclose confidential plaintext. To request
+approved values such as a transaction amount, use the
+[Disclosure API](/products/compliance-platform/integration/api-reference/service-api/disclosures/overview).
+
+## List filters
+
+Use these optional query parameters when you list an Asset's transactions:
+
+| Parameter | Purpose |
+| --- | --- |
+| `cursor` | Continue from the previous response's `nextCursor`. |
+| `limit` | Return between 1 and 200 transactions. The default is 50. |
+| `type` | Filter by indexed event type. |
+| `account` | Filter by an associated Solana account. |
+| `from` | Include transactions indexed at or after this ISO 8601 time. |
+| `to` | Include transactions indexed before or at this ISO 8601 time. |
+
+## Methods
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/v1/assets/{id}/transactions` | [List an Asset's indexed transactions](/products/compliance-platform/integration/api-reference/service-api/transactions/list). |
+| `GET` | `/v1/transactions/{transactionId}` | [Retrieve one indexed transaction](/products/compliance-platform/integration/api-reference/service-api/transactions/retrieve). |

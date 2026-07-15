@@ -1,0 +1,898 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Arcane Compliance Platform Service API",
+    "version": "1.0.0",
+    "description": "Organization API-key methods for provisioning Solana confidential assets, reading indexed transactions, and requesting scoped disclosure."
+  },
+  "tags": [
+    {
+      "name": "Assets",
+      "description": "Provision and connect Solana confidential-token assets."
+    },
+    {
+      "name": "Transactions",
+      "description": "Read indexed transaction records for a confidential asset."
+    },
+    {
+      "name": "Disclosures",
+      "description": "Request and retrieve authorized confidential transaction data."
+    }
+  ],
+  "security": [
+    {
+      "serviceApiKey": []
+    }
+  ],
+  "paths": {
+    "/v1/assets": {
+      "post": {
+        "operationId": "createConfidentialAsset",
+        "summary": "Create a confidential asset",
+        "description": "Creates an organization-owned confidential Asset and returns the organization's auditor ElGamal public key.",
+        "tags": ["Assets"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConfidentialAssetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Confidential Asset created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfidentialAsset"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/assets/{id}": {
+      "get": {
+        "operationId": "getConfidentialAsset",
+        "summary": "Retrieve a confidential asset",
+        "description": "Returns an Asset owned by the organization selected by the API key.",
+        "tags": ["Assets"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssetId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Confidential Asset returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfidentialAsset"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/v1/assets/{id}/mint": {
+      "patch": {
+        "operationId": "bindConfidentialAssetMint",
+        "summary": "Bind a deployed mint",
+        "description": "Records the deployed Solana mint and activates the Asset. Arcane then attempts to register the mint for indexing.",
+        "tags": ["Assets"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssetId"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BindMintRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Mint recorded and Asset activated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfidentialAsset"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/v1/assets/{id}/indexer-status": {
+      "get": {
+        "operationId": "getConfidentialAssetIndexerStatus",
+        "summary": "Get indexer status",
+        "description": "Returns whether the mint is registered and the latest indexed transaction signals available for the Asset.",
+        "tags": ["Assets"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssetId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indexer status returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetIndexerStatus"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/v1/assets/{id}/transactions": {
+      "get": {
+        "operationId": "listConfidentialAssetTransactions",
+        "summary": "List asset transactions",
+        "description": "Returns indexed transactions for an Asset. Confidential fields remain encrypted unless their values are public on the network.",
+        "tags": ["Transactions"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AssetId"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/Limit"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "Return transactions with this indexed event type.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "account",
+            "in": "query",
+            "required": false,
+            "description": "Return transactions associated with this Solana account.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "Return transactions indexed at or after this time.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "Return transactions indexed before or at this time.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indexed transactions returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransactionList"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/v1/transactions/{transactionId}": {
+      "get": {
+        "operationId": "getConfidentialTransaction",
+        "summary": "Retrieve a transaction",
+        "description": "Returns one indexed transaction owned by the API key's organization.",
+        "tags": ["Transactions"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TransactionId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indexed transaction returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Transaction"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/TransactionNotFound"
+          }
+        }
+      }
+    },
+    "/v1/disclosures": {
+      "post": {
+        "operationId": "createDisclosure",
+        "summary": "Request a disclosure",
+        "description": "Requests access to a defined set of confidential transaction fields. The API key can request disclosure but cannot approve its own request.",
+        "tags": ["Disclosures"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDisclosureRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Disclosure request created. Pre-authorized requests can return an available result immediately.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Disclosure"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/v1/disclosures/{disclosureId}": {
+      "get": {
+        "operationId": "getDisclosure",
+        "summary": "Retrieve a disclosure",
+        "description": "Returns the current disclosure status and its result when authorized and available.",
+        "tags": ["Disclosures"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/DisclosureId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Disclosure returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Disclosure"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/DisclosureNotFound"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "serviceApiKey": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Organization API key created through the User API."
+      }
+    },
+    "parameters": {
+      "AssetId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "Arcane confidential Asset ID.",
+        "schema": {
+          "type": "string"
+        },
+        "example": "casset_01J4Z6QK6S7V9H1N3C8M2P5R0T"
+      },
+      "TransactionId": {
+        "name": "transactionId",
+        "in": "path",
+        "required": true,
+        "description": "Arcane transaction record ID or Solana transaction signature.",
+        "schema": {
+          "type": "string"
+        },
+        "example": "5R3x9WwAZ2rGf7FREBSvBv6a8Fh7Y2pX9zF5oP6rdv3C4w2E7Va1nCyJ9sL2m8KQ3yN4h5t6u7i8o9pQ1r2s3t4"
+      },
+      "DisclosureId": {
+        "name": "disclosureId",
+        "in": "path",
+        "required": true,
+        "description": "Arcane disclosure request ID.",
+        "schema": {
+          "type": "string"
+        },
+        "example": "disclosure_01K0A5Q6M7R8S9T0V1W2X3Y4Z5"
+      },
+      "Cursor": {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "Cursor returned by the previous page.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Limit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Maximum number of records to return.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200,
+          "default": 50
+        }
+      }
+    },
+    "schemas": {
+      "CreateConfidentialAssetRequest": {
+        "type": "object",
+        "required": ["name", "symbol", "decimals"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Display name.",
+            "example": "Confidential USDC"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Ticker symbol.",
+            "example": "cUSDC"
+          },
+          "decimals": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Mint decimals.",
+            "example": 6
+          },
+          "workspaceId": {
+            "type": "string",
+            "description": "Optional SDP workspace ID."
+          },
+          "creatorAuthority": {
+            "type": "string",
+            "description": "Optional Solana authority that creates or controls the mint."
+          },
+          "disclosurePolicyId": {
+            "type": "string",
+            "description": "Optional disclosure policy identifier supplied by the integrating service."
+          },
+          "confidentialMintBurnEnabled": {
+            "type": "boolean",
+            "default": false,
+            "description": "Whether confidential mint and burn support is enabled."
+          }
+        }
+      },
+      "BindMintRequest": {
+        "type": "object",
+        "required": ["mintAddress"],
+        "properties": {
+          "mintAddress": {
+            "type": "string",
+            "description": "Deployed Token-2022 confidential mint address."
+          },
+          "deploymentSignature": {
+            "type": "string",
+            "description": "Optional Solana deployment transaction signature."
+          },
+          "deploymentStatus": {
+            "type": "string",
+            "description": "Optional deployment status reported by SDP. Defaults to confirmed."
+          }
+        }
+      },
+      "ConfidentialAsset": {
+        "type": "object",
+        "required": [
+          "id",
+          "workspaceId",
+          "name",
+          "symbol",
+          "decimals",
+          "creatorAuthority",
+          "auditorElGamalPubkey",
+          "auditorKeyProvider",
+          "mintAddress",
+          "deploymentSignature",
+          "deploymentStatus",
+          "disclosurePolicyId",
+          "confidentialMintBurnEnabled",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": ["string", "null"]
+          },
+          "name": {
+            "type": "string"
+          },
+          "symbol": {
+            "type": "string"
+          },
+          "decimals": {
+            "type": "integer"
+          },
+          "creatorAuthority": {
+            "type": ["string", "null"]
+          },
+          "auditorElGamalPubkey": {
+            "type": "string",
+            "description": "Per-organization auditor ElGamal public key."
+          },
+          "auditorKeyProvider": {
+            "type": "string"
+          },
+          "mintAddress": {
+            "type": ["string", "null"]
+          },
+          "deploymentSignature": {
+            "type": ["string", "null"]
+          },
+          "deploymentStatus": {
+            "type": ["string", "null"]
+          },
+          "disclosurePolicyId": {
+            "type": ["string", "null"]
+          },
+          "confidentialMintBurnEnabled": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "active", "error", "disabled"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AssetIndexerStatus": {
+        "type": "object",
+        "required": ["assetId", "mintAddress", "registered", "status", "indexedCount"],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "mintAddress": {
+            "type": ["string", "null"]
+          },
+          "registered": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "active", "error", "disabled"]
+          },
+          "indexedCount": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "latestSlot": {
+            "type": ["integer", "null"]
+          },
+          "latestBlockTime": {
+            "type": ["integer", "null"]
+          },
+          "latestSignature": {
+            "type": ["string", "null"]
+          },
+          "lastIndexedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "required": [
+          "id",
+          "assetId",
+          "network",
+          "networkTransactionId",
+          "type",
+          "slot",
+          "blockTime",
+          "signer",
+          "publicData",
+          "ciphertexts",
+          "indexedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Arcane transaction record ID."
+          },
+          "assetId": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string",
+            "enum": ["solana"]
+          },
+          "networkTransactionId": {
+            "type": "string",
+            "description": "Solana transaction signature."
+          },
+          "type": {
+            "type": "string",
+            "description": "Indexed confidential-token event type."
+          },
+          "slot": {
+            "type": ["integer", "null"]
+          },
+          "blockTime": {
+            "type": ["integer", "null"],
+            "description": "Solana block time as Unix seconds."
+          },
+          "signer": {
+            "type": ["string", "null"]
+          },
+          "sourceAccount": {
+            "type": ["string", "null"]
+          },
+          "destinationAccount": {
+            "type": ["string", "null"]
+          },
+          "publicData": {
+            "type": "object",
+            "description": "Sanitized public fields indexed from the transaction.",
+            "additionalProperties": true
+          },
+          "ciphertexts": {
+            "type": "object",
+            "description": "Indexed confidential ciphertext fields. Plaintext confidential values are not returned by this resource.",
+            "additionalProperties": {
+              "type": ["string", "null"]
+            }
+          },
+          "indexedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "TransactionList": {
+        "type": "object",
+        "required": ["assetId", "transactions", "nextCursor"],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          },
+          "nextCursor": {
+            "type": ["string", "null"],
+            "description": "Cursor for the next page. Null when no more records are available."
+          }
+        }
+      },
+      "DisclosureScope": {
+        "type": "object",
+        "description": "Limits the records and confidential fields included in a disclosure.",
+        "properties": {
+          "transactionIds": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "description": "Specific Arcane transaction IDs or Solana transaction signatures."
+          },
+          "account": {
+            "type": "string",
+            "description": "Include transactions associated with this Solana account."
+          },
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fields": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            },
+            "description": "Confidential fields requested from the selected records.",
+            "example": ["amount"]
+          }
+        },
+        "anyOf": [
+          {
+            "required": ["transactionIds"]
+          },
+          {
+            "required": ["account"]
+          }
+        ],
+        "required": ["fields"]
+      },
+      "CreateDisclosureRequest": {
+        "type": "object",
+        "required": ["assetId", "purpose", "scope"],
+        "properties": {
+          "assetId": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Business or compliance reason for requesting access."
+          },
+          "scope": {
+            "$ref": "#/components/schemas/DisclosureScope"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["json", "csv"],
+            "default": "json"
+          },
+          "externalReference": {
+            "type": "string",
+            "description": "Optional identifier from the integrating service."
+          }
+        }
+      },
+      "DisclosureResult": {
+        "type": "object",
+        "required": ["format", "generatedAt", "receiptId"],
+        "properties": {
+          "format": {
+            "type": "string",
+            "enum": ["json", "csv"]
+          },
+          "records": {
+            "type": "array",
+            "description": "Disclosed records when the requested format is JSON.",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "content": {
+            "type": "string",
+            "description": "CSV content when the requested format is CSV."
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "receiptId": {
+            "type": "string",
+            "description": "Audit receipt for the authorized disclosure operation."
+          }
+        }
+      },
+      "Disclosure": {
+        "type": "object",
+        "required": [
+          "id",
+          "assetId",
+          "purpose",
+          "scope",
+          "format",
+          "status",
+          "externalReference",
+          "requestedAt",
+          "resolvedAt",
+          "result"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "assetId": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/DisclosureScope"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["json", "csv"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "available", "rejected"]
+          },
+          "externalReference": {
+            "type": ["string", "null"]
+          },
+          "requestedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolvedAt": {
+            "type": ["string", "null"],
+            "format": "date-time"
+          },
+          "result": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/DisclosureResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["statusCode", "message", "error"],
+        "properties": {
+          "statusCode": {
+            "type": "integer"
+          },
+          "message": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "The request is invalid.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "The API key is missing, invalid, or revoked.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "The Asset does not exist in the API key's organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "TransactionNotFound": {
+        "description": "The transaction does not exist in the API key's organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      },
+      "DisclosureNotFound": {
+        "description": "The disclosure does not exist in the API key's organization.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    }
+  }
+}

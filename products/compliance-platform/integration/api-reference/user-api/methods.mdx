@@ -1,0 +1,146 @@
+---
+title: "User API methods"
+description: "Review the complete set of user-authorized Compliance Platform methods."
+---
+
+Send a user access token with every business request.
+
+```http
+Authorization: Bearer <access-token>
+```
+
+The token selects one user and one organization. Arcane also checks the
+permission shown below and any applicable Application, external-auditor, or
+Case access boundary.
+
+## User context
+
+| Method | Path | Description | Arcane permission |
+| --- | --- | --- | --- |
+| `GET` | `/auth/me` | Return the current user, organization, permission buckets, and access context. | Authenticated user |
+
+## Applications
+
+An Application is the product or compliance boundary used by the current
+Compliance Platform implementation. These methods use the Application's
+numeric ID. Application-scoped Case and report methods use its `foreignId`
+route segment instead.
+
+| Method | Path | Description | Arcane permission |
+| --- | --- | --- | --- |
+| `GET` | `/api/applications` | List Applications in the current organization. | `applications:read` |
+| `POST` | `/api/applications` | Register an Application for the current organization. | `applications:create` |
+| `GET` | `/api/applications/{applicationId}` | Retrieve an Application. | `applications:read` |
+| `PATCH` | `/api/applications/{applicationId}` | Update Application metadata. | `applications:create` |
+| `DELETE` | `/api/applications/{applicationId}` | Revoke an Application with a soft delete. | `applications:create` |
+
+## Asset catalog, contracts, and audits
+
+These User API resources support the current Compliance Platform interface.
+They are separate from the Service API's confidential Asset resource.
+
+| Method | Path | Description | Arcane permission |
+| --- | --- | --- | --- |
+| `GET` | `/api/assets` | List configured asset catalog entries. | Authenticated user |
+| `GET` | `/api/contracts` | List token and pool contracts, with onboarding filters. | Authenticated user |
+| `POST` | `/api/contracts` | Register a token or pool contract and make the caller its administrator. | Authenticated user |
+| `GET` | `/api/audit/contract/{contractId}` | List indexed audit events for a contract. | `reports:view_transactions` |
+
+## Organisation and team management
+
+| Method | Path | Description | Arcane permission |
+| --- | --- | --- | --- |
+| `GET` | `/api/admin/org` | Return the current WorkOS organization. | `admins:manage_application_administrators` |
+| `GET` | `/api/admin/team/organizations-by-email` | List the signed-in user's organization memberships and role labels. | Authenticated user |
+| `GET` | `/api/admin/team/analytics` | Return team analytics for the current organization. | `admins:manage_application_administrators` |
+| `GET` | `/api/admin/team/members` | List organization members. | `admins:manage_application_administrators` |
+| `GET` | `/api/admin/team/members/filter-options` | List Application and status filters for the member table. | `admins:manage_application_administrators` |
+| `POST` | `/api/admin/team/invite/member` | Invite a member with optional Application permissions and access expiry. | `admins:manage_application_administrators` |
+| `POST` | `/api/admin/team/invite/external-auditor` | Invite an external auditor with time-limited access. | `admins:manage_application_administrators` |
+| `PATCH` | `/api/admin/team/members/{id}/suspend` | Suspend a member. | `admins:manage_application_administrators` |
+| `PATCH` | `/api/admin/team/members/{id}/reactivate` | Reactivate a member. | `admins:manage_application_administrators` |
+| `PATCH` | `/api/admin/team/members/{id}/extend-access` | Extend an external auditor's access. | `admins:manage_application_administrators` |
+| `GET` | `/api/admin/team/members/{id}/access-assignments` | List organization and Application permission assignments. | `admins:manage_application_administrators` |
+| `PATCH` | `/api/admin/team/members/{id}/permissions` | Update a member's permissions. | `admins:manage_application_administrators` |
+
+## Case requests and Cases
+
+Use `foreignId` to select the Application. Creating a Case creates a pending
+request. Approval creates the Case when the approval requirement is satisfied.
+
+| Method | Path | Description | Arcane permission |
+| --- | --- | --- | --- |
+| `GET` | `/api/applications/{foreignId}/disclosure-registry` | List disclosure requests for an Application. | `cases:approve_creation` |
+| `POST` | `/api/applications/{foreignId}/case-requests/{id}/approve` | Approve a Case request and create the Case when approvals are complete. | `cases:approve_creation` |
+| `POST` | `/api/applications/{foreignId}/case-requests/{id}/close` | Reject and close a pending Case request. | `cases:approve_creation` |
+| `GET` | `/api/applications/{foreignId}/cases/worklist-summary` | Return active, pending, and closed Case counts for the user's worklist. | `reports:view_transactions` |
+| `GET` | `/api/applications/{foreignId}/cases/assignable-auditors` | List auditors eligible for a new Case. | `cases:create` |
+| `GET` | `/api/applications/{foreignId}/cases` | List approved Cases and pending requests visible to the user. | `reports:view_transactions` |
+| `GET` | `/api/applications/{foreignId}/cases/approved` | List approved Cases for an Application administrator. | `cases:approve_creation` |
+| `POST` | `/api/applications/{foreignId}/cases` | Create a Case request. | `cases:create` |
+| `GET` | `/api/applications/{foreignId}/cases/{id}` | Retrieve a Case. | `reports:view_transactions` |
+| `GET` | `/api/applications/{foreignId}/cases/{id}/transactions` | List interpreted transactions in the Case boundary. | `reports:view_transactions` |
+| `GET` | `/api/applications/{foreignId}/cases/{id}/analytics` | Return transaction count and volume analytics for a Case. | `reports:view_transactions` |
+| `GET` | `/api/applications/{foreignId}/cases/{id}/auditors` | List active and removed auditor assignments. | `reports:view_transactions` |
+| `GET` | `/api/applications/{foreignId}/cases/{id}/auditors/assignable` | List auditors eligible to be added to the Case. | `cases:edit` |
+| `POST` | `/api/applications/{foreignId}/cases/{id}/auditors` | Add or restore an auditor assignment. | `cases:edit` |
+| `DELETE` | `/api/applications/{foreignId}/cases/{id}/auditors/{assignmentId}` | Soft-remove an auditor assignment. | `cases:edit` |
+| `POST` | `/api/applications/{foreignId}/cases/requests/{id}/withdraw` | Withdraw a pending Case request. | `cases:withdraw_pending_request` |
+
+## Reports
+
+Report downloads return CSV content. Listing and downloading use separate
+permissions.
+
+| Method | Path | Description | Arcane permission |
+| --- | --- | --- | --- |
+| `GET` | `/api/reports` | List reports for the current organization. | `reports:list` |
+| `GET` | `/api/reports/{reportId}/download` | Download an organization-scoped report. | `reports:download` |
+| `GET` | `/api/applications/{foreignId}/reports` | List reports for an Application. | `reports:list` |
+| `GET` | `/api/applications/{foreignId}/reports/{reportId}/download` | Download an Application-scoped report. | `reports:download` |
+| `POST` | `/api/applications/{foreignId}/case-reports` | Generate a transaction-summary CSV report for a Case. | `reports:create` |
+| `POST` | `/api/auditors-log/reports` | Generate an organization activity-log report. | `reports:create` |
+| `POST` | `/api/applications/{foreignId}/auditors-log/reports` | Generate an Application activity-log report. | `reports:create` |
+| `POST` | `/api/applications/{foreignId}/cases/{caseId}/auditors-log/reports` | Generate a Case activity-log report. | `reports:create` |
+
+## Activity log
+
+| Method | Path | Description | Arcane permission |
+| --- | --- | --- | --- |
+| `GET` | `/api/auditors-log` | List organization activity-log entries. | `logs:view_activity` |
+| `GET` | `/api/auditors-log/export.csv` | Export organization activity as CSV. | `logs:view_activity` |
+| `GET` | `/api/applications/{foreignId}/auditors-log` | List Application activity-log entries. | `logs:view_activity` |
+| `GET` | `/api/applications/{foreignId}/auditors-log/export.csv` | Export Application activity as CSV. | `logs:view_activity` |
+| `GET` | `/api/applications/{foreignId}/cases/{caseId}/auditors-log` | List Case activity-log entries. | `reports:view_transactions` |
+| `GET` | `/api/applications/{foreignId}/cases/{caseId}/auditors-log/export.csv` | Export Case activity as CSV. | `reports:view_transactions` |
+
+## Service API key administration
+
+These are User API methods. They create and revoke credentials that your
+backend then uses with the Service API.
+
+| Method | Path | Description | Arcane permission |
+| --- | --- | --- | --- |
+| `GET` | `/api/api-keys` | List API-key metadata without returning secrets. | `api_keys:manage` |
+| `POST` | `/api/api-keys` | Create an organization API key and return its secret once. | `api_keys:manage` |
+| `DELETE` | `/api/api-keys/{id}` | Revoke an organization API key. | `api_keys:manage` |
+
+## Arcane platform sign-in routes
+
+The Arcane interface uses the following WorkOS-backed routes. External
+applications should use the OAuth contract in [Authentication](/products/compliance-platform/integration/api-reference/user-api/authentication)
+instead of coupling to these interface-specific flows.
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `POST` | `/auth/oauth/google/start` | Start the Arcane interface's Google sign-in flow. |
+| `POST` | `/auth/oauth/google/complete` | Complete Google sign-in with an authorization code. |
+| `POST` | `/auth/oauth/google/redirect-complete` | Complete the hosted redirect sign-in flow. |
+| `POST` | `/auth/workos/organization-selection` | Complete sign-in after selecting a WorkOS organization. |
+| `POST` | `/auth/workos/logout` | Revoke the current WorkOS session. |
+| `POST` | `/auth/magic/send` | Send a WorkOS Magic Auth code. |
+| `POST` | `/auth/magic/verify` | Verify a WorkOS Magic Auth code. |
+| `POST` | `/auth/reta/google/start` | Start the Reta-specific Google sign-in flow. |
+| `POST` | `/auth/reta/google/complete` | Complete the Reta-specific Google sign-in flow. |
+
+{/* TODO: Add per-method request and response schema pages from the generated backend OpenAPI document after external OAuth client onboarding is approved. */}

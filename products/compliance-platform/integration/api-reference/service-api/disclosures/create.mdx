@@ -1,0 +1,21 @@
+---
+title: "Request a disclosure"
+description: "Request scoped access to confidential transaction fields."
+openapi: "/openapi/compliance-platform-service.json POST /v1/disclosures"
+playground: "none"
+---
+
+Select transactions directly with `scope.transactionIds`, or select an
+account and optional time range with `scope.account`, `scope.from`, and
+`scope.to`.
+
+The response returns one of these statuses:
+
+| Status | Meaning |
+| --- | --- |
+| `pending` | The request requires an authorization decision. |
+| `available` | Arcane authorized the request and returned the scoped result. |
+| `rejected` | Arcane did not authorize the requested disclosure. |
+
+When the response is `pending`, store the returned Disclosure `id` and use the
+retrieve method to read the decision.

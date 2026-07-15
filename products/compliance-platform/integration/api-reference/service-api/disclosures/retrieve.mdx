@@ -1,0 +1,13 @@
+---
+title: "Retrieve a disclosure"
+description: "Return a disclosure's status and authorized result."
+openapi: "/openapi/compliance-platform-service.json GET /v1/disclosures/{disclosureId}"
+playground: "none"
+---
+
+The `result` is `null` while the Disclosure is `pending` or when it is
+`rejected`.
+
+When the status is `available`, the result contains the approved data in the
+requested `json` or `csv` format. It also contains the disclosure operation's
+`receiptId`.

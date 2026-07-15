@@ -1,0 +1,58 @@
+---
+title: "API reference"
+sidebarTitle: "Overview"
+description: "Choose the Arcane User API or Service API for your integration."
+---
+
+Arcane exposes two separate API surfaces for the Compliance Platform. Choose
+the API by the actor represented by each request.
+
+| | User API | Service API |
+| --- | --- | --- |
+| **Actor** | A signed-in user | Your backend service |
+| **Credential** | User access token | Organization API key |
+| **Use it for** | The same user-driven workflows available in the Compliance Platform interface | Asset provisioning, indexed transaction retrieval, and scoped disclosure |
+| **Primary paths** | `/auth/...` and `/api/...` | `/v1/assets...`, `/v1/transactions...`, and `/v1/disclosures...` |
+| **Authorization boundary** | The user's organization, permissions, Application access, and Case access | The organization selected by the API key |
+
+<Info>
+  The APIs do not share an Application or Asset contract. Applications, Cases,
+  team management, and API-key administration belong to the User API. The
+  Service API has its own Asset, Transaction, and Disclosure contracts for the
+  Solana integration.
+</Info>
+
+## User API
+
+Use the User API when your integration acts for a person. Arcane authenticates
+the user through WorkOS and applies the same permission checks used by the
+Compliance Platform interface.
+
+<Card
+  title="Explore the User API"
+  icon="user-round"
+  href="/products/compliance-platform/integration/api-reference/user-api/overview"
+>
+  Review OAuth authentication and every user-authorized method.
+</Card>
+
+## Service API
+
+Use the Service API from a trusted backend when you integrate a Solana
+confidential-token deployment. It creates the Arcane Asset, returns the
+organization's auditor public key, records the deployed mint, retrieves
+indexed transactions, and requests scoped disclosure.
+
+<Card
+  title="Explore the Service API"
+  icon="server-cog"
+  href="/products/compliance-platform/integration/api-reference/service-api/overview"
+>
+  Review API-key authentication and the Asset, Transaction, and Disclosure
+  methods.
+</Card>
+
+<Warning>
+  Do not replace a user access token with an API key. The credentials represent
+  different actors and are accepted by different route sets.
+</Warning>

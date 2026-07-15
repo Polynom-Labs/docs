@@ -1,0 +1,51 @@
+---
+title: "Disclosure API"
+sidebarTitle: "Overview"
+description: "Request authorized access to scoped confidential transaction data."
+---
+
+Use the Disclosure API when your backend needs confidential values from
+indexed transactions. A disclosure limits access to one Asset, a defined set
+of records, requested fields, and a stated purpose.
+
+Your API key authenticates the request. It does not authorize decryption by
+itself. Arcane evaluates the requested scope against the Asset's disclosure
+configuration.
+
+A pre-authorized request can return `status: "available"` immediately. A
+request that requires approval returns `status: "pending"`. Retrieve the
+Disclosure again after the approval decision.
+
+```text
+pending -> available
+pending -> rejected
+```
+
+An available Disclosure returns only the approved fields. Its result includes
+a `receiptId` that identifies the recorded disclosure operation.
+
+## Define the scope
+
+Every request includes:
+
+| Field | Purpose |
+| --- | --- |
+| `assetId` | Select the confidential Asset. |
+| `purpose` | Explain the business or compliance reason for access. |
+| `scope.transactionIds` or `scope.account` | Select the transaction records. |
+| `scope.from` and `scope.to` | Optionally restrict an account scope by time. |
+| `scope.fields` | Select the confidential fields to disclose. |
+| `format` | Return the result as `json` or `csv`. The default is `json`. |
+| `externalReference` | Optionally attach an identifier from your system. |
+
+## Methods
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/v1/disclosures` | [Request a scoped disclosure](/products/compliance-platform/integration/api-reference/service-api/disclosures/create). |
+| `GET` | `/v1/disclosures/{disclosureId}` | [Retrieve its status and authorized result](/products/compliance-platform/integration/api-reference/service-api/disclosures/retrieve). |
+
+<Info>
+  Send the requested scope and purpose. Do not send an approval decision. An
+  integrating service cannot approve its own disclosure request.
+</Info>

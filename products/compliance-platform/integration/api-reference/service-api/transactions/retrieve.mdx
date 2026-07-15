@@ -1,0 +1,12 @@
+---
+title: "Retrieve a transaction"
+description: "Return one indexed transaction from your organization."
+openapi: "/openapi/compliance-platform-service.json GET /v1/transactions/{transactionId}"
+playground: "none"
+---
+
+Identify the transaction by its Arcane transaction record ID or Solana
+transaction signature.
+
+The method returns `404 Not Found` when the transaction is not associated with
+an Asset owned by the API key's organization.

@@ -1,0 +1,82 @@
+---
+title: "Trusted compute"
+description: "Understand the isolated execution boundary for authorized cryptographic operations."
+---
+
+The Trusted Compute Module is Arcane's minimal security-critical component. It
+processes authorized disclosure operations over encrypted records without
+exposing protected key material or intermediate plaintext to ordinary Arcane
+infrastructure.
+
+<Info>
+  The module does not initiate on-chain transactions, manage your business
+  logic, or persist decrypted data.
+</Info>
+
+## Execution boundary
+
+| Inside the trusted environment | Outside the trusted environment |
+| --- | --- |
+| Disclosure request validation | Customer applications and wallets |
+| Encrypted record parsing | Arcane API and application services |
+| Network-specific decryption logic | Arcane Indexer |
+| ElGamal decryption, when required | Encrypted data store |
+| Amount reconstruction, when required | Logs, queues, and analytics systems |
+| Scoped result generation | User interfaces and customer backends |
+| Sensitive memory cleanup | Transaction-signing infrastructure |
+
+Systems outside the boundary may handle encrypted records, metadata, and an
+approved disclosure result. They do not receive plaintext disclosure keys.
+
+## Current execution environment
+
+Arcane currently runs the Trusted Compute Module on the SCRT Labs confidential
+computing stack. It provides hardware-backed workload isolation and remote
+attestation for off-chain execution.
+
+The public Arcane API remains independent of this execution provider. The
+security boundary requires isolated execution, workload identity, attestation,
+and controlled key access.
+
+## Attestation and workload identity
+
+Attestation provides evidence about the environment and code that request a
+protected operation. Arcane uses it to restrict protected key use to an approved
+Trusted Compute Module workload.
+
+The decision evaluates:
+
+- the confidential computing environment;
+- the measured software image or workload identity;
+- the approved Trusted Compute Module version; and
+- whether protected key use is restricted to that approved code.
+
+Attestation identifies the workload. Arcane still authenticates and authorizes
+the requester before the workload can perform a disclosure operation.
+
+## Interaction with key custody
+
+Turnkey is Arcane's current key-management provider. During an authorized
+operation, the Trusted Compute Module receives access to a protected key
+operation or transient access to the required key material. It performs the
+cryptographic operation inside the trusted environment and clears sensitive
+memory after execution.
+
+"Transient access" does not mean that Arcane exports the disclosure key. It
+means that approved, attested code can use the protected key only for the
+authorized operation.
+
+## Security boundary
+
+The Trusted Compute Module separates encrypted infrastructure from plaintext
+processing. The architecture keeps disclosure keys and intermediate plaintext
+outside the Arcane API, indexer, encrypted data store, and ordinary application
+services.
+
+<Card
+  title="Trace an authorized disclosure"
+  icon="route"
+  href="/products/compliance-platform/architecture/data-flows#authorized-disclosure-sequence"
+>
+  Follow the request from authentication through protected execution and audit.
+</Card>

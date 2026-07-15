@@ -9,9 +9,9 @@ in scope, which fields may be disclosed, and which auditors may review the
 approved evidence.
 
 <Info>
-  Creating a case starts an approval request. It does not provide immediate
-  access to private evidence. The case opens only after an authorized
-  application administrator approves the request.
+  Arcane evaluates the applicable authorization policy when you submit the
+  request. An approval-gated request remains pending. A request that matches a
+  preauthorization can open immediately without bypassing policy.
 </Info>
 
 ## Before you begin
@@ -35,9 +35,9 @@ organization, have access to the current application, and hold the
 | **Basis** | Select **Internal Investigation**, **External Audit**, or **Regulator Request**. |
 | **Reason** | State the investigative purpose, the evidence required, and why the proposed boundary is sufficient. |
 | **Review period** | Set the first and last dates of the historical transaction activity to be reviewed. |
-| **Access duration** | Set how long assigned auditors may access the case after approval. The duration begins when the approved case is created. |
+| **Access duration** | Set how long assigned auditors may access the Case after authorization. The duration begins when the Case is created. |
 | **Assigned auditors** | Select one or more eligible auditors from the current application. Only assigned auditors can access the approved case. |
-| **Disclosure scope** | Select the elevated identifiers or address fields required for the review. Unselected sensitive fields remain hidden. |
+| **Disclosure scope** | Select every confidential value, identifier, or address field required for the review. Unselected sensitive fields remain hidden. |
 | **Application scope** | The current application supplies the default contract boundary for the case. |
 
 The **Review period** and **Access duration** serve different purposes. The
@@ -71,8 +71,8 @@ case is approved.
 
   <Step title="Set the access duration">
     Define the temporary access period required for the review. Access begins
-    only after the request receives the required approval and ends when the
-    configured duration expires.
+    when the authorization policy creates the Case and ends when the configured
+    duration expires.
   </Step>
 
   <Step title="Assign auditors">
@@ -81,8 +81,9 @@ case is approved.
   </Step>
 
   <Step title="Select the disclosure scope">
-    Start with the standard masked view and enable only the additional fields
-    required for the stated purpose.
+    Start with evidence metadata and enable only the confidential fields
+    required for the stated purpose. Amounts remain hidden unless you select
+    them.
   </Step>
 
   <Step title="Review and submit">
@@ -94,13 +95,14 @@ case is approved.
 
 ## Disclosure scope
 
-The approved case always includes the transaction information required for a
-scoped review, such as date, operation type, amount, asset, chain, and contract
-context. Sensitive identifiers remain hidden unless they are explicitly
-included in the request.
+The approved case always includes non-secret evidence metadata such as date,
+operation type, asset, chain, and contract context. Confidential values and
+sensitive identifiers remain hidden unless the request explicitly includes
+them.
 
-| Option | Effect after approval |
+| Option | Effect in the active Case |
 | --- | --- |
+| **Amounts** | Reveals confidential amounts for in-scope records. |
 | **Full transaction hashes** | Reveals complete transaction identifiers for in-scope records. |
 | **Full counterparty addresses** | Reveals sender information for in-scope records when that information is available. |
 | **Withdrawal destination details** | Reveals recipient or withdrawal-destination information when that information is available. |
@@ -115,16 +117,16 @@ included in the request.
 
 | State | What it means |
 | --- | --- |
-| `Pending` | The request is waiting for an application administrator with `cases:approve_creation` to review it. No case evidence is available yet. |
-| `Active` | The required approval has been recorded, the case has been created, and assigned auditors can review the approved evidence until access expires. |
+| `Pending` | The request is waiting for the distinct approvals required by its stored policy snapshot. No case evidence is available yet. |
+| `Active` | The approval threshold was met or a preauthorization matched. The case exists, and assigned auditors can review approved evidence until access expires. |
 | `Closed` | The request was rejected or withdrawn before it created an accessible case. |
 | `Expired` | The approved case reached the end of its access duration. Transaction and analytics access is blocked. |
 
 The requester can withdraw a pending request if it is no longer required. An
-application administrator can approve the request or close it with a decision
-reason. Approval creates a stable case identifier, applies the approved
-application and contract scope, and activates the recorded auditor
-assignments.
+authorized approver can approve or reject it with a decision reason. When the
+stored authorization policy is satisfied, Arcane creates a stable case ID,
+applies the approved application and Asset scope, and activates the recorded
+auditor assignments.
 
 All request creation, approval, rejection, withdrawal, and auditor-assignment
 changes are recorded in the activity history.

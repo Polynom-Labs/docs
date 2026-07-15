@@ -1,0 +1,88 @@
+---
+title: "Key retention and destruction"
+description: "Understand how Arcane retains, disables, and permanently destroys cryptographic keys."
+---
+
+Arcane retains a cryptographic key for as long as data protected by that key
+may need to be decrypted. This policy applies to active keys, historical keys,
+and protected recovery material under Arcane's control.
+
+For key generation, custody, storage, access, and use, read [Key
+management](/products/compliance-platform/architecture/key-management).
+
+<Warning>
+  Permanent key destruction is irreversible. Data that depends on a destroyed
+  key becomes permanently unreadable.
+</Warning>
+
+## Retention and rotation
+
+Rotating a key normally changes which key protects future data. It does not
+destroy the previous key. Arcane can retain a rotated key when authorized
+historical disclosure remains necessary.
+
+Arcane retains each key with its:
+
+- customer or Application;
+- cryptographic role;
+- protected scope;
+- environment; and
+- effective period.
+
+Rotation, offboarding, service termination, or decommissioning does not by
+itself authorize key destruction.
+
+## When destruction is allowed
+
+Arcane can permanently destroy a key only after confirming that no valid
+historical decryption scope remains. Contractual, legal, regulatory, audit,
+investigation, dispute, incident-response, and retention requirements must
+also allow destruction.
+
+The responsible customer, Application owner, or authorized data owner must
+approve the request and acknowledge that the affected data will become
+permanently unreadable. Arcane must also approve the request internally.
+
+## Destruction process
+
+<Steps>
+  <Step title="Disable the key">
+    Arcane disables the key and marks it as pending destruction for the
+    applicable waiting period.
+  </Step>
+
+  <Step title="Allow cancellation">
+    An authorized party can cancel the request during the waiting period.
+  </Step>
+
+  <Step title="Destroy protected material">
+    After the waiting period, Arcane destroys the key through the applicable
+    key provider or trusted execution environment. Arcane also removes or
+    expires recoverable copies, sealed material, backups, replicas, and key
+    shares under its control.
+  </Step>
+
+  <Step title="Confirm completion">
+    Destruction is complete when Arcane and its provider can no longer use,
+    recover, or reconstruct the key through supported operations or recovery
+    procedures.
+  </Step>
+</Steps>
+
+Arcane records any provider purge delay or residual retention that applies.
+It can retain non-secret metadata such as the public key, key ID, role, scope,
+effective period, approvals, and destruction evidence.
+
+## Audit records
+
+Arcane records key rotation, retention, disablement, pending destruction,
+cancellation, and permanent destruction. Each record identifies the key and
+role, customer or Application, scope, reason, approvers, execution time,
+provider or environment, and result.
+
+Audit records never include private key material or information that could
+reconstruct a key.
+
+Arcane reviews this policy at least annually and after material changes to its
+architecture, providers, trusted execution environment, or cryptographic
+systems.

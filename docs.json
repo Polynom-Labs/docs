@@ -28,7 +28,11 @@
             "group": "Architecture",
             "root": "products/compliance-platform/architecture/overview",
             "pages": [
-              "products/compliance-platform/architecture/key-management"
+              "products/compliance-platform/architecture/data-flows",
+              "products/compliance-platform/architecture/trusted-compute",
+              "products/compliance-platform/architecture/key-management",
+              "products/compliance-platform/architecture/key-retention-and-destruction",
+              "products/compliance-platform/architecture/security-model"
             ]
           },
           {
@@ -47,33 +51,67 @@
           },
           {
             "group": "Integration",
+            "root": "products/compliance-platform/integration/overview",
             "pages": [
-              "products/compliance-platform/integration/overview",
-              "products/compliance-platform/integration/frontend-reference",
               {
-                "group": "Solana",
+                "group": "API reference",
+                "root": "products/compliance-platform/integration/api-reference/overview",
                 "pages": [
-                  "products/compliance-platform/integration/solana/integration-overview",
-                  "products/compliance-platform/integration/solana/reference"
+                  {
+                    "group": "User API",
+                    "root": "products/compliance-platform/integration/api-reference/user-api/overview",
+                    "pages": [
+                      "products/compliance-platform/integration/api-reference/user-api/authentication",
+                      "products/compliance-platform/integration/api-reference/user-api/methods"
+                    ]
+                  },
+                  {
+                    "group": "Service API",
+                    "root": "products/compliance-platform/integration/api-reference/service-api/overview",
+                    "pages": [
+                      "products/compliance-platform/integration/api-reference/service-api/authentication",
+                      {
+                        "group": "Assets",
+                        "root": "products/compliance-platform/integration/api-reference/service-api/assets/overview",
+                        "pages": [
+                          "products/compliance-platform/integration/api-reference/service-api/assets/create",
+                          "products/compliance-platform/integration/api-reference/service-api/assets/retrieve",
+                          "products/compliance-platform/integration/api-reference/service-api/assets/bind-mint",
+                          "products/compliance-platform/integration/api-reference/service-api/assets/get-indexer-status"
+                        ]
+                      },
+                      {
+                        "group": "Transactions",
+                        "root": "products/compliance-platform/integration/api-reference/service-api/transactions/overview",
+                        "pages": [
+                          "products/compliance-platform/integration/api-reference/service-api/transactions/list",
+                          "products/compliance-platform/integration/api-reference/service-api/transactions/retrieve"
+                        ]
+                      },
+                      {
+                        "group": "Disclosures",
+                        "root": "products/compliance-platform/integration/api-reference/service-api/disclosures/overview",
+                        "pages": [
+                          "products/compliance-platform/integration/api-reference/service-api/disclosures/create",
+                          "products/compliance-platform/integration/api-reference/service-api/disclosures/retrieve"
+                        ]
+                      }
+                    ]
+                  },
+                  "products/compliance-platform/integration/api-reference/errors"
                 ]
               },
               {
-                "group": "Stellar",
+                "group": "Network guides",
+                "root": "products/compliance-platform/integration/networks/overview",
                 "pages": [
-                  "products/compliance-platform/integration/stellar/integration-overview",
-                  "products/compliance-platform/integration/stellar/reference"
-                ]
-              },
-              {
-                "group": "Fhenix",
-                "pages": [
-                  "products/compliance-platform/integration/fhenix/integration-overview",
-                  "products/compliance-platform/integration/fhenix/reference"
+                  "products/compliance-platform/integration/networks/solana",
+                  "products/compliance-platform/integration/networks/stellar",
+                  "products/compliance-platform/integration/networks/fhenix"
                 ]
               }
             ]
-          },
-          "products/compliance-platform/troubleshooting"
+          }
         ]
       },
       {
@@ -117,6 +155,68 @@
     "eyebrows": "breadcrumbs"
   },
   "interaction": {
-    "drilldown": false
-  }
+    "drilldown": true
+  },
+  "redirects": [
+    {
+      "source": "/products/compliance-platform/integration/frontend-reference",
+      "destination": "/products/compliance-platform/integration/api-reference/user-api/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/client-api-reference",
+      "destination": "/products/compliance-platform/integration/api-reference/user-api/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/solana/integration-overview",
+      "destination": "/products/compliance-platform/integration/networks/solana"
+    },
+    {
+      "source": "/products/compliance-platform/integration/solana/reference",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/stellar/integration-overview",
+      "destination": "/products/compliance-platform/integration/networks/stellar"
+    },
+    {
+      "source": "/products/compliance-platform/integration/stellar/reference",
+      "destination": "/products/compliance-platform/integration/networks/stellar"
+    },
+    {
+      "source": "/products/compliance-platform/integration/fhenix/integration-overview",
+      "destination": "/products/compliance-platform/integration/networks/fhenix"
+    },
+    {
+      "source": "/products/compliance-platform/integration/fhenix/reference",
+      "destination": "/products/compliance-platform/integration/networks/fhenix"
+    },
+    {
+      "source": "/products/compliance-platform/troubleshooting",
+      "destination": "/support/troubleshooting"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/assets/audit-keys",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/assets/disclosure-keys",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/assets/:path*",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/service-api/entities",
+      "destination": "/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/service-api/applications/:path*",
+      "destination": "/products/compliance-platform/integration/api-reference/user-api/methods"
+    },
+    {
+      "source": "/products/compliance-platform/integration/api-reference/user-api/capabilities",
+      "destination": "/products/compliance-platform/integration/api-reference/user-api/methods"
+    }
+  ]
 }

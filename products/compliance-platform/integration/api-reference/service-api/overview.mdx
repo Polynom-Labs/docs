@@ -1,0 +1,102 @@
+---
+title: "Service API"
+sidebarTitle: "Overview"
+description: "Provision confidential Assets, retrieve indexed transactions, and request scoped disclosure."
+---
+
+The Service API is the backend-to-backend integration used by the Solana SDP
+flow. It exposes Assets, Transactions, and Disclosures under `/v1`.
+
+Use it to:
+
+- create an Arcane confidential Asset;
+- obtain the organization's auditor ElGamal public key;
+- record the deployed Solana mint;
+- check whether the mint is registered and inspect indexer progress;
+- retrieve indexed transactions;
+- request authorized access to scoped confidential fields.
+
+The Service API does not expose Applications, users, Cases, team management,
+or API-key administration. Those resources belong to the
+[User API](/products/compliance-platform/integration/api-reference/user-api/overview).
+
+## Base URL
+
+Arcane provides the Service API base URL during integration onboarding. It is
+available upon request.
+
+## Methods
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/v1/assets` | Create a confidential Asset and return its auditor public key. |
+| `GET` | `/v1/assets/{id}` | Retrieve an Asset owned by the API key's organization. |
+| `PATCH` | `/v1/assets/{id}/mint` | Record the deployed Solana mint and activate the Asset. |
+| `GET` | `/v1/assets/{id}/indexer-status` | Read mint-registration and indexer status. |
+| `GET` | `/v1/assets/{id}/transactions` | List indexed transactions for an Asset. |
+| `GET` | `/v1/transactions/{transactionId}` | Retrieve one indexed transaction. |
+| `POST` | `/v1/disclosures` | Request scoped access to confidential transaction fields. |
+| `GET` | `/v1/disclosures/{disclosureId}` | Retrieve disclosure status and its authorized result. |
+
+## Integration sequence
+
+```mermaid
+sequenceDiagram
+    participant Backend as Your backend
+    participant Arcane as Arcane Service API
+    participant Solana as Solana
+
+    Backend->>Arcane: POST /v1/assets
+    Arcane-->>Backend: Asset + auditorElGamalPubkey
+    Backend->>Solana: Configure and deploy confidential mint
+    Solana-->>Backend: Mint address and transaction signature
+    Backend->>Arcane: PATCH /v1/assets/{id}/mint
+    Arcane-->>Backend: Active Asset
+    Backend->>Arcane: GET /v1/assets/{id}/indexer-status
+    Arcane-->>Backend: Registration and indexing status
+    Backend->>Arcane: GET /v1/assets/{id}/transactions
+    Arcane-->>Backend: Public data + confidential ciphertexts
+    Backend->>Arcane: POST /v1/disclosures
+    Arcane-->>Backend: Available result or pending request
+    Backend->>Arcane: GET /v1/disclosures/{disclosureId}
+    Arcane-->>Backend: Current status + authorized result
+```
+
+The mint-binding method records the values supplied by your backend and then
+attempts to register the mint for indexing. Use the indexer-status method to
+confirm registration. A successful binding response does not by itself mean
+that an indexed transaction is already available.
+
+<Columns cols={2}>
+  <Card
+    title="Authentication"
+    icon="key-round"
+    href="/products/compliance-platform/integration/api-reference/service-api/authentication"
+  >
+    Create and use an organization API key.
+  </Card>
+
+  <Card
+    title="Asset API"
+    icon="boxes"
+    href="/products/compliance-platform/integration/api-reference/service-api/assets/overview"
+  >
+    Review the request fields, lifecycle, and four Asset methods.
+  </Card>
+
+  <Card
+    title="Transaction API"
+    icon="list-tree"
+    href="/products/compliance-platform/integration/api-reference/service-api/transactions/overview"
+  >
+    Retrieve indexed public data and confidential ciphertexts.
+  </Card>
+
+  <Card
+    title="Disclosure API"
+    icon="scan-eye"
+    href="/products/compliance-platform/integration/api-reference/service-api/disclosures/overview"
+  >
+    Request and retrieve authorized confidential values.
+  </Card>
+</Columns>

@@ -1,0 +1,12 @@
+---
+title: "Create a confidential asset"
+description: "Create an Asset and obtain the organization's auditor public key."
+openapi: "/openapi/compliance-platform-service.json POST /v1/assets"
+playground: "none"
+---
+
+Store the returned Asset `id` and `auditorElGamalPubkey`. Configure the
+deployed confidential mint with that public key, then bind the mint to the
+Asset.
+
+The response returns `status: "pending"` until you bind a mint.

@@ -1,0 +1,69 @@
+---
+title: "User API"
+sidebarTitle: "Overview"
+description: "Perform Compliance Platform actions on behalf of an authenticated user."
+---
+
+Use the User API when your integration acts for a signed-in person. It exposes
+the operations used by the Compliance Platform interface, including
+Applications, team access, Cases, reports, activity logs, and Service API key
+administration.
+
+Arcane authenticates users through WorkOS. Each access token identifies one
+user and one organization. The API then applies the user's current Arcane
+permissions and resource-access rules.
+
+<Columns cols={2}>
+  <Card
+    title="Authentication"
+    icon="key-round"
+    href="/products/compliance-platform/integration/api-reference/user-api/authentication"
+  >
+    Connect an external application with a lightweight OAuth flow.
+  </Card>
+
+  <Card
+    title="User API methods"
+    icon="list-checks"
+    href="/products/compliance-platform/integration/api-reference/user-api/methods"
+  >
+    Review every User API method and the Arcane permission it uses.
+  </Card>
+</Columns>
+
+## When to use the User API
+
+Use this API when you:
+
+- build a custom interface for compliance operators;
+- add an Arcane workflow to an existing product;
+- manage Applications or team access for a user;
+- create, approve, or review Cases;
+- generate reports or inspect activity;
+- create or revoke Service API keys.
+
+## Path model
+
+The current User API uses `/auth/...` for user context and `/api/...` for
+business operations. Application-scoped operations use the Application's
+`foreignId` route segment.
+
+```http
+GET /auth/me
+GET /api/applications
+GET /api/applications/{foreignId}/cases
+```
+
+## Use the Service API for Solana provisioning
+
+The User API does not expose the Service API's confidential-asset provisioning
+contract. Use an organization API key when your backend needs to create an
+Arcane confidential Asset, bind its Solana mint, or inspect its indexer status.
+
+<Card
+  title="Service API"
+  icon="server-cog"
+  href="/products/compliance-platform/integration/api-reference/service-api/overview"
+>
+  Integrate a Solana confidential-token deployment from your backend.
+</Card>

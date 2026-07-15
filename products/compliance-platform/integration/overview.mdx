@@ -1,7 +1,114 @@
 ---
-title: "Overview"
-description: "Review Compliance Platform integration use cases and supported technologies."
+title: "Integration overview"
+sidebarTitle: "Overview"
+description: "Connect confidential applications and confidential assets to the Arcane Compliance Platform."
 ---
 
-{/* TODO: Describe the tasks that integrations can solve. */}
-{/* TODO: List the currently supported technologies and blockchains. */}
+Connect confidential assets and confidential applications to the Arcane
+Compliance Platform. After integration, your team can operate them through the
+Arcane interface or through the User API. The Solana SDP integration also uses
+a focused Service API for confidential-asset provisioning and indexing.
+
+This section documents the **Compliance Platform** only. The **Privacy Layer**
+is a separate Arcane product with its own integration documentation and API
+surface.
+
+## Integrate assets or applications
+
+The Compliance Platform supports two integration paths. You can use either
+path independently or combine them in one product.
+
+| Integration | Use it for | Main actions |
+| --- | --- | --- |
+| **Confidential asset** | Issue a stablecoin, tokenized real-world asset, or another confidential asset. | Connect the asset to Arcane so authorized operators can use Compliance Platform workflows. The Solana SDP flow can provision an Asset and register its mint through the Service API. |
+| **Confidential application** | Operate a private payroll product, payment gateway, transfer application, treasury product, or another confidential financial workflow. | Register the application, associate its confidential activity, configure access, and manage cases, risk incidents, reports, and activity records. |
+
+## Choose compatible privacy technology
+
+You can use the Compliance Platform when your confidential application and
+assets use a compatible privacy technology stack. Current compatible stacks
+include:
+
+- the Arcane Privacy Layer on Stellar and Solana. Both network integrations use
+  zero-knowledge (ZK) proofs;
+- Solana confidential tokens built with Token-2022 Confidential Transfer;
+- Fhenix confidential tokens built with fully homomorphic encryption (FHE).
+
+The privacy technology protects transaction execution and confidential asset
+data. The Compliance Platform adds organization access, policy, review,
+controlled disclosure, reporting, and activity evidence around that protected
+activity.
+
+Compatibility depends on the privacy technology stack, not the product
+category. Any confidential financial product can connect when it uses a
+compatible stack.
+
+<Info>
+  If you provide privacy technology and want to integrate it with Arcane,
+  contact [max@arcane.finance](mailto:max@arcane.finance).
+</Info>
+
+## Operate through Arcane
+
+Once connected, you can work with confidential assets and applications through
+the Compliance Platform interface. The interface gives authorized users access
+to organization setup, applications and assets, team permissions, cases,
+disclosure workflows, risk incidents, reports, and activity records.
+
+Arcane also exposes two API surfaces:
+
+| API | Use it for | Authentication | Authorization |
+| --- | --- | --- | --- |
+| **User API** | Build a custom interface or another user-driven workflow with documented, user-authorized Compliance Platform actions. | User access token | The signed-in user's organization membership, permissions, assignments, and approved data scope. |
+| **Service API** | Provision a confidential Asset, bind its Solana mint, and read indexer status from a trusted backend. | Organization API key | The organization selected by the key. |
+
+## Choose an API
+
+<Columns cols={2}>
+  <Card
+    title="User API"
+    icon="user-round"
+    href="/products/compliance-platform/integration/api-reference/user-api/overview"
+  >
+    Perform actions on behalf of an authenticated user and apply that user's
+    permissions and access boundaries.
+  </Card>
+
+  <Card
+    title="Service API"
+    icon="server-cog"
+    href="/products/compliance-platform/integration/api-reference/service-api/overview"
+  >
+    Use an organization API key for the Solana confidential-asset integration.
+  </Card>
+</Columns>
+
+## Choose a network
+
+<Columns cols={3}>
+  <Card
+    title="Solana"
+    icon="network"
+    href="/products/compliance-platform/integration/networks/solana"
+  >
+    Connect the Arcane Privacy Layer or Solana confidential tokens.
+  </Card>
+
+  <Card
+    title="Stellar"
+    icon="star"
+    href="/products/compliance-platform/integration/networks/stellar"
+  >
+    Connect the Arcane Privacy Layer on Stellar.
+  </Card>
+
+  <Card
+    title="Fhenix"
+    icon="blocks"
+    href="/products/compliance-platform/integration/networks/fhenix"
+  >
+    Connect Fhenix confidential tokens built with FHE.
+  </Card>
+</Columns>
+
+{/* TODO: Add verified Stellar and Fhenix contracts when their source material is approved. */}

@@ -1,0 +1,15 @@
+---
+title: "Bind a deployed mint"
+description: "Record a Solana mint and activate the confidential Asset."
+openapi: "/openapi/compliance-platform-service.json PATCH /v1/assets/{id}/mint"
+playground: "none"
+---
+
+Call this method after your backend deploys the Token-2022 confidential mint.
+Provide `mintAddress`. You can also provide the deployment transaction
+signature and the status reported by your deployment service.
+
+Arcane records the supplied values, sets the Asset to `active`, and attempts to
+register the mint for indexing. Use [Get indexer
+status](/products/compliance-platform/integration/api-reference/service-api/assets/get-indexer-status)
+to confirm registration.

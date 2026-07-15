@@ -1,6 +1,154 @@
 ---
 title: "Key management"
-description: "Understand key management in the Arcane Compliance Platform."
+description: "Understand how Arcane scopes, protects, and uses disclosure key material."
 ---
 
-{/* TODO: Document the key management model. */}
+Arcane's key-management boundary covers keys used for controlled disclosure of
+confidential records. These keys do not authorize transfers or other on-chain
+actions.
+
+Your integration receives public key material when a supported privacy stack
+requires it for asset or application configuration. Arcane never returns the
+corresponding private disclosure key through its UI or APIs.
+
+<Info>
+  API credentials authenticate your requests. They are separate from
+  disclosure keys. You retain transaction-signing keys and transaction
+  authority.
+</Info>
+
+## Scope and isolation
+
+Arcane isolates a disclosure key by its cryptographic role and protected data
+domain. The exact domain depends on the network integration. It can be an asset,
+mint, application, or another network-defined boundary.
+
+Arcane follows these principles:
+
+- each disclosure key has one defined role;
+- a key is scoped to one protected data domain;
+- Arcane does not reuse keys across customers; and
+- Arcane does not reuse keys across unrelated assets, mints, or applications.
+
+Network integrations define their own key roles, ciphertext formats, and
+decryption logic. The general custody and execution boundary remains the same.
+
+## Key lifecycle
+
+<Steps>
+  <Step title="Generate the key material">
+    Arcane generates disclosure key material inside a secure cryptographic
+    boundary. The exact algorithm follows the network or privacy-stack profile.
+  </Step>
+
+  <Step title="Return public configuration">
+    Arcane returns only the public material that you need to configure an asset,
+    application, contract, or program. It does not export the private key in
+    plaintext.
+  </Step>
+
+  <Step title="Protect the private key">
+    Turnkey currently provides key custody and access control. Arcane does not
+    persist plaintext disclosure keys in its backend, database, logs, queues, or
+    application memory.
+  </Step>
+
+  <Step title="Authorize key use">
+    Arcane authenticates the requester and evaluates the requested disclosure
+    scope. Only an authorized operation can reach trusted execution.
+  </Step>
+
+  <Step title="Use the key inside trusted compute">
+    The Trusted Compute Module obtains protected access for the operation,
+    processes the scoped encrypted records, and returns only the approved
+    disclosure result.
+  </Step>
+
+  <Step title="Clear sensitive values and record the event">
+    The module clears protected intermediate values after execution. Arcane
+    records operation metadata without writing the disclosed plaintext to its
+    audit trail.
+  </Step>
+</Steps>
+
+## Key custody
+
+Turnkey is the current key-management provider. The Trusted Compute Module is
+the only Arcane workload that can perform an approved operation with protected
+disclosure key material.
+
+If a network uses a key type that the custody provider cannot operate directly,
+the Trusted Compute Module performs the required network-specific cryptography
+inside its isolated environment. The same non-export and authorization rules
+still apply.
+
+## Auditability
+
+Arcane records security-sensitive lifecycle and use events, including:
+
+- key generation;
+- public key registration or configuration;
+- disclosure request creation;
+- the authorization decision;
+- execution of the protected operation;
+- delivery of the disclosure result;
+- rotation; and
+- disablement or deletion.
+
+The activity metadata identifies who requested access, what scope Arcane
+approved, which key role the operation used, and when it occurred. It does not
+store disclosure keys or confidential plaintext.
+
+## Network-specific key roles
+
+Each network and privacy-technology integration defines the disclosure roles
+that its cryptography requires. Arcane creates a separate key for each role. It
+does not reuse one role's key for another purpose.
+
+For a Solana Token-2022 confidential Asset, Arcane supports three per-mint
+ElGamal roles:
+
+| Role | Solana public-key field | Authorized disclosure |
+| --- | --- | --- |
+| **Auditor** | `auditor_elgamal_pubkey` | Confidential transfer amounts for the mint |
+| **Fee withheld authority** | `withdraw_withheld_authority_elgamal_pubkey` | Confidential withheld-fee amounts for the mint and fee configuration |
+| **Supply** | `supply_elgamal_pubkey` | Confidential supply-related data for the mint |
+
+The Asset API returns the public value for each role as deployment
+configuration. The corresponding private keys remain inside Arcane's protected
+key-management boundary.
+
+## Rotation and historical records
+
+Rotation behavior follows the network and privacy-technology integration. Some
+privacy technologies bind existing ciphertext to the key that was active when
+the record was created. In that case, a new key applies only to future records
+and Arcane must protect the historical key for as long as historical disclosure
+remains required.
+
+<Columns cols={3}>
+  <Card
+    title="Solana key configuration"
+    icon="blocks"
+    href="/products/compliance-platform/integration/networks/solana"
+  >
+    Configure the three role-specific public keys on a Solana mint.
+  </Card>
+
+  <Card
+    title="User API authentication"
+    icon="key-round"
+    href="/products/compliance-platform/integration/api-reference/user-api/authentication"
+  >
+    Learn how API authentication remains separate from disclosure key custody.
+  </Card>
+
+  <Card
+    title="Key retention and destruction"
+    icon="shield-check"
+    href="/products/compliance-platform/architecture/key-retention-and-destruction"
+  >
+    Understand how Arcane retains historical keys and controls permanent
+    destruction.
+  </Card>
+</Columns>

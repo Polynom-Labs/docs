@@ -1,0 +1,48 @@
+---
+title: "Asset API"
+sidebarTitle: "Overview"
+description: "Provision a Solana confidential Asset and connect its deployed mint."
+---
+
+A Service API Asset represents one Solana confidential-token mint owned by the
+organization selected by the API key.
+
+## Lifecycle
+
+Creating an Asset returns `status: "pending"` and the organization's auditor
+ElGamal public key. After your backend deploys the mint, bind its address. The
+binding response returns `status: "active"`.
+
+```text
+pending -> active
+```
+
+The API returns the auditor public key in `auditorElGamalPubkey`. It never
+returns the corresponding private key.
+
+## Create request
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `name` | Yes | Display name for the confidential Asset. |
+| `symbol` | Yes | Ticker symbol. |
+| `decimals` | Yes | Non-negative integer used by the Solana mint. |
+| `workspaceId` | No | SDP workspace identifier. |
+| `creatorAuthority` | No | Solana authority that creates or controls the mint. |
+| `disclosurePolicyId` | No | Disclosure policy identifier supplied by the integrating service. |
+| `confidentialMintBurnEnabled` | No | Whether confidential mint and burn support is enabled. Defaults to `false`. |
+
+## Methods
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `POST` | `/v1/assets` | [Create a confidential Asset](/products/compliance-platform/integration/api-reference/service-api/assets/create). |
+| `GET` | `/v1/assets/{id}` | [Retrieve a confidential Asset](/products/compliance-platform/integration/api-reference/service-api/assets/retrieve). |
+| `PATCH` | `/v1/assets/{id}/mint` | [Bind the deployed mint](/products/compliance-platform/integration/api-reference/service-api/assets/bind-mint). |
+| `GET` | `/v1/assets/{id}/indexer-status` | [Get indexer status](/products/compliance-platform/integration/api-reference/service-api/assets/get-indexer-status). |
+
+<Info>
+  This API does not deploy the mint, sign a Solana transaction, mint tokens, or
+  return private key material. Your application or custody provider performs
+  those actions.
+</Info>
