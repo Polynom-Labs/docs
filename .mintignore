@@ -9,13 +9,6 @@ drafts/
 *.draft.mdx
 .cursor
 
-# Build and deployment files
-.app-build/
-.do/
+# Repository files
 .gitignore
-.heroku/
-dist/
 node_modules/
-package-lock.json
-package.json
-scripts/
