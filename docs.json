@@ -222,6 +222,7 @@
               {
                 "group": "Integration",
                 "pages": [
+                  "products/privacy-layer/sdk/integration/getting-access",
                   "products/privacy-layer/sdk/integration/integration-paths",
                   "products/privacy-layer/sdk/integration/quick-start",
                   "products/privacy-layer/sdk/integration/state-integration",
