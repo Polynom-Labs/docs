@@ -85,6 +85,10 @@
     "light": "/logo/arcane-light.svg",
     "dark": "/logo/arcane-dark.svg"
   },
+  "favicon": {
+    "light": "/logo/favicon-light.svg",
+    "dark": "/logo/favicon-dark.svg"
+  },
   "colors": {
     "primary": "#0065F4",
     "light": "#3B82F6",
