@@ -79,6 +79,14 @@
     {
       "source": "/products/privacy-layer/integration/solana/troubleshooting",
       "destination": "/products/privacy-layer/integration/solana/integration-overview"
+    },
+    {
+      "source": "/products/privacy-layer/sdk/integration/quick-start-frontend",
+      "destination": "/products/privacy-layer/sdk/integration/quick-start"
+    },
+    {
+      "source": "/products/privacy-layer/sdk/integration/quick-start-backend",
+      "destination": "/products/privacy-layer/sdk/integration/quick-start"
     }
   ],
   "logo": {
@@ -253,6 +261,20 @@
             "pages": [
               "products/privacy-layer/integration/stellar/integration-overview",
               "products/privacy-layer/integration/solana/integration-overview"
+            ]
+          }
+        ]
+      },
+      {
+        "group": "Custom KYT providers",
+        "pages": [
+          "products/custom-kyt-providers/overview",
+          {
+            "group": "API reference",
+            "root": "products/custom-kyt-providers/api-reference/overview",
+            "pages": [
+              "products/custom-kyt-providers/api-reference/metadata",
+              "products/custom-kyt-providers/api-reference/check"
             ]
           }
         ]
