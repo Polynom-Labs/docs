@@ -1,0 +1,41 @@
+---
+title: Relayer
+description: Submit private transactions without making the note owner the public submitting account.
+---
+
+The Relayer submits a prepared transaction and pays its network fee. It separates the account visible as the submitter from the private owner of the notes being spent.
+
+## Submission without ownership
+
+The client constructs the transaction and its proof. The relayer receives the submission package, not the private witness or spending scalar.
+
+It cannot redirect outputs, change withdrawal amounts, or replace protected transaction records without invalidating the checks that bind those values. Relay access is not custody of the user's private notes.
+
+## When Relay is used
+
+| Operation in the integration examples | Submission |
+| --- | --- |
+| Deposit | Direct submission by the funding wallet or server account |
+| Transfer with a private sender | Relay |
+| Transfer to an unregistered recipient | Relay |
+| Withdrawal with a private sender | Relay |
+| Claim of an escrow transfer | Direct submission by the claimant |
+
+A relayed withdrawal still has a public destination, asset, and amount. Relay hides neither that public movement nor the fact that a pool transaction occurred.
+
+## Visibility and availability
+
+The relayer sees the public submission data and can observe client connection metadata and timing. It does not receive application audit-decryption keys as part of submission.
+
+A relayer can delay or refuse service. It cannot turn that refusal into ownership of the notes. Submission availability still matters: clients need a supported submission path and the required authorization to complete a payment.
+
+Do not treat a timeout as proof of failure. Preserve the transaction identifier and check its status before preparing another spend.
+
+## Application integration
+
+The application prepares the operation, submits through the configured Relay integration, tracks the outcome, and reconciles its private records after settlement.
+
+Use the [Relayer API](/products/privacy-layer/api-reference/relayer) and the [frontend](/products/privacy-layer/sdk/application-development/setup) or [backend](/products/privacy-layer/sdk/integration/backend) example for implementation details.
+
+{/* TODO: Verify deployed submitter binding and replacement-authorization behavior before prescribing relayer failover or passage reuse. */}
+{/* Source: engineering paper sections 2, 4.5, and 7. Operation routes follow current integration examples. */}

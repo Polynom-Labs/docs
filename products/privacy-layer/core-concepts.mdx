@@ -1,0 +1,71 @@
+---
+title: Core concepts
+description: Understand how notes represent private value and how applications share pool state.
+---
+
+A private balance is a collection of unspent notes. Each note represents an amount of an asset controlled by a private address. Spending consumes whole notes and creates new ones for the recipient and, when needed, change.
+
+The pool does not maintain a public balance for each private address. Your application calculates a balance from the private records it can recover and spend.
+
+## Notes and ownership
+
+A note binds its value, asset, application domain, and ownership material. Its public commitment hides those fields while allowing the protocol to verify that they have not changed.
+
+Ownership is tied to a private-address key, not to the Stellar account that submits the transaction. This allows a relayer to submit on behalf of the owner without acquiring the ability to spend the note.
+
+A payment that spends a note larger than the requested amount creates a recipient output and a change output. The input note cannot be spent again.
+
+## Public state
+
+| Element | Purpose |
+| --- | --- |
+| Note commitment | Binds the private note fields without publishing them |
+| State leaf | Binds the note commitment to the recipient-encryption material |
+| Merkle tree and root | Represent the set of recorded outputs; the proof establishes membership without revealing the input leaf |
+| Nullifier hash | Marks a note as spent without identifying its original leaf |
+| Encrypted recipient record | Lets the recipient recover and validate its note |
+| Encrypted audit record | Supports authorized compliance evaluation of the same transaction data |
+
+Membership and double-spend prevention are different checks. A proof establishes that an input belongs to the stated tree. Settlement checks that the root is accepted and that the input's nullifier has not already been consumed.
+
+## Shared pools and application domains
+
+Within a shared pool, participating applications use common commitment state, nullifiers, and asset custody. Application separation is represented inside notes rather than by a separate pool for every application.
+
+An application domain identifies the policy and audit context for a note. Its identifier is bound into the note commitment. It is not simply a routing label that an application can change after the note is created.
+
+| Shared within the pool | Scoped to the application |
+| --- | --- |
+| Commitment tree and accepted roots | Application identity bound into notes |
+| Nullifier set | Audit-key configuration |
+| Asset custody and settlement rules | Policy and authorized audit access |
+
+Sharing pool state does not give one application access to another application's audit keys. Nor does an application ID give the application ownership of its users' notes.
+
+{/* TODO: Confirm deployed cross-application transfer support before adding a cross-domain transaction flow or promising aggregation of multiple application policies. */}
+
+## Conservation of value
+
+For each asset, the value entering a transaction must equal the value leaving it:
+
+```text
+private inputs + public deposit = private outputs + public withdrawal
+```
+
+The rule applies separately to each asset. One asset cannot cover a shortfall in another. Change remains in a new private output.
+
+Deposits add value to pool custody. Private transfers change note ownership without a public asset movement. Withdrawals release value from custody to a public destination.
+
+## Recovering private state
+
+Recipients use their private-address keys to read encrypted output records. They validate the recovered data against the recorded state leaf before accepting a note.
+
+An indexer can help locate candidate records, but its response is not proof of ownership or transaction validity. Missing records can prevent an application from displaying or spending funds even when settlement is correct.
+
+Protect spending secrets and preserve recoverable private records. An empty local balance does not prove that an existing account has no funds.
+
+## Continue
+
+Read [Transaction lifecycle](/products/privacy-layer/transactions) for the checks that turn these records into a settled payment.
+
+{/* Source: Arcane Privacy Layer engineering paper, sections 2–3 and 6. */}

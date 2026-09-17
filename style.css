@@ -1,0 +1,18 @@
+/* Compact navigation cards, scoped to the two landing pages. */
+.arcane-launchpad .card {
+  border-radius: 5px;
+  box-shadow: none;
+}
+
+.arcane-launchpad [data-component-part="card-title"] {
+  color: #0065f4;
+}
+
+.arcane-launchpad [data-component-part="card-content"] {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.dark .arcane-launchpad [data-component-part="card-title"] {
+  color: #60a5fa;
+}

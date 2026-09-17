@@ -1,0 +1,58 @@
+---
+title: Compliance integration
+description: How private transactions connect to policy authorization and controlled disclosure.
+---
+
+Privacy Layer and Compliance Platform connect through encrypted audit records and transaction authorization. The proof establishes a valid private transition; compliance determines whether that transition is permitted under the applicable policy.
+
+## Audit records tied to the transaction
+
+The transaction constructs encrypted audit records from the same private data used for its commitments and proof. These records support policy evaluation without publishing their plaintext to the blockchain.
+
+Audit records are associated with the application and protected within its audit-key scope.
+
+## KYT authorization
+
+KYT (Know Your Transaction) evaluates a prepared transaction against the checks configured for the application before settlement. An approved transaction receives a signed, time-limited authorization called a passage.
+
+### From preparation to settlement
+
+1. Your application prepares a transaction using the SDK.
+2. The compliance service evaluates the transaction under the application's configured checks, including applicable restrictions and address screening.
+3. If approved, the transaction receives a passage. If rejected, it cannot proceed through settlement.
+4. At settlement, the smart contracts require a valid passage alongside the transaction proof. The passage expires and can be used only once.
+
+The pool also verifies the transaction proof and state transition. An approved KYT response alone does not prove that settlement will succeed.
+
+### Authorization boundaries
+
+A passage is transaction authorization, not ownership of notes and not a permanent approval of an account. The ability to withhold authorization can prevent a payment from proceeding, but does not grant the authorizer the ability to spend or redirect its inputs.
+
+Compliance availability is therefore part of transaction availability. A valid proof cannot compel an unavailable or refusing policy service to approve settlement.
+
+## Controlled disclosure
+
+Later investigation or audit is a separate workflow. An approved request defines the records, purpose, recipient, and fields that may be released.
+
+In the paper's model, selective disclosure is policy-mediated filtering after authorized decryption within the protected boundary. It is not cryptographic field-level selective disclosure. The recipient learns the released information and may retain it; disclosure does not grant ongoing access or reveal decoding keys.
+
+## Where the boundary lies
+
+| Privacy Layer | Compliance Platform |
+| --- | --- |
+| Constructs proof-bound audit records | Authenticates and interprets authorized audit data |
+| Binds application context into private state | Applies application policy and governs audit access |
+| Requires transaction authorization at settlement | Provides the policy decision and required authorization |
+| Publishes protected transaction evidence | Controls later disclosure of approved information |
+
+For custody, protected execution, rotation, and retention, continue in Compliance Platform:
+
+- [Architecture and responsibilities](/products/compliance-platform/architecture/overview)
+- [Data flows](/products/compliance-platform/architecture/data-flows)
+- [Key management](/products/compliance-platform/architecture/key-management)
+- [Key retention and destruction](/products/compliance-platform/architecture/key-retention-and-destruction)
+- [Security model](/products/compliance-platform/architecture/security-model)
+
+For transaction-screening integration, see the [KYT API](/products/privacy-layer/api-reference/kyt).
+
+{/* KYT source review: 2026-09-17. Backend and Storage: staging acd70eb8; contracts: development 47a0eb40; SDK: main 942f226e; Transfer backend: main 5f69ad80; Relayer: main 6441cf71. Deployment versions require separate confirmation. Disclosure model: engineering paper sections 5 and 7. */}

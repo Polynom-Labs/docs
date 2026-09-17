@@ -87,13 +87,32 @@
     {
       "source": "/products/privacy-layer/sdk/integration/quick-start-backend",
       "destination": "/products/privacy-layer/sdk/integration/quick-start"
+    },
+    {
+      "source": "/products/privacy-layer/sdk/application-development/install",
+      "destination": "/products/privacy-layer/sdk/application-development/setup"
+    },
+    {
+      "source": "/products/privacy-layer/architecture/zk-pool-model",
+      "destination": "/products/privacy-layer/core-concepts"
+    },
+    {
+      "source": "/products/privacy-layer/architecture/transaction-lifecycle",
+      "destination": "/products/privacy-layer/transactions"
+    },
+    {
+      "source": "/products/privacy-layer/architecture/overview",
+      "destination": "/products/privacy-layer/about"
+    },
+    {
+      "source": "/products/privacy-layer/how-it-works",
+      "destination": "/products/privacy-layer/transactions"
     }
   ],
   "logo": {
     "light": "/logo/arcane-light.svg",
     "dark": "/logo/arcane-dark.svg"
   },
-  "favicon": "/logo/favicon.svg",
   "colors": {
     "primary": "#0065F4",
     "light": "#3B82F6",
@@ -103,43 +122,87 @@
     "library": "lucide"
   },
   "navigation": {
-    "pages": [
-      "start-here",
-      "what-is-arcane",
+    "tabs": [
       {
-        "group": "Compliance Platform",
-        "pages": [
-          "products/compliance-platform/overview",
-          "products/compliance-platform/how-it-works",
+        "tab": "Products",
+        "groups": [
           {
-            "group": "Architecture",
-            "root": "products/compliance-platform/architecture/overview",
+            "group": "Introduction",
             "pages": [
-              "products/compliance-platform/architecture/data-flows",
-              "products/compliance-platform/architecture/trusted-compute",
-              "products/compliance-platform/architecture/key-management",
-              "products/compliance-platform/architecture/key-retention-and-destruction",
-              "products/compliance-platform/architecture/security-model"
+              "start-here",
+              "what-is-arcane"
             ]
           },
           {
-            "group": "User guide",
+            "group": "Compliance Platform",
             "pages": [
-              "products/compliance-platform/user-guide/start-and-setup",
+              "products/compliance-platform/overview",
+              "products/compliance-platform/how-it-works",
               {
-                "group": "Organisation management",
+                "group": "Architecture",
+                "root": "products/compliance-platform/architecture/overview",
                 "pages": [
-                  "products/compliance-platform/user-guide/organisation-management/application-management",
-                  "products/compliance-platform/user-guide/organisation-management/user-management"
+                  "products/compliance-platform/architecture/data-flows",
+                  "products/compliance-platform/architecture/trusted-compute",
+                  "products/compliance-platform/architecture/key-management",
+                  "products/compliance-platform/architecture/key-retention-and-destruction",
+                  "products/compliance-platform/architecture/security-model"
                 ]
               },
-              "products/compliance-platform/user-guide/how-to-create-case"
+              {
+                "group": "User guide",
+                "pages": [
+                  "products/compliance-platform/user-guide/start-and-setup",
+                  {
+                    "group": "Organisation management",
+                    "pages": [
+                      "products/compliance-platform/user-guide/organisation-management/application-management",
+                      "products/compliance-platform/user-guide/organisation-management/user-management"
+                    ]
+                  },
+                  "products/compliance-platform/user-guide/how-to-create-case"
+                ]
+              }
             ]
           },
           {
-            "group": "Integration",
-            "root": "products/compliance-platform/integration/overview",
+            "group": "Privacy Layer",
             "pages": [
+              "products/privacy-layer/about",
+              "products/privacy-layer/core-concepts",
+              "products/privacy-layer/transactions",
+              {
+                "group": "Protocol components",
+                "pages": [
+                  "products/privacy-layer/protocol-components/pool-contracts",
+                  "products/privacy-layer/protocol-components/zero-knowledge-proofs",
+                  "products/privacy-layer/protocol-components/relayer",
+                  "products/privacy-layer/protocol-components/compliance-integration"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "support/contact-us"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Developer resources",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": [
+              "developer-resources"
+            ]
+          },
+          {
+            "group": "Compliance Platform",
+            "pages": [
+              "products/compliance-platform/integration/overview",
               {
                 "group": "API reference",
                 "root": "products/compliance-platform/integration/api-reference/overview",
@@ -198,26 +261,34 @@
                 ]
               }
             ]
-          }
-        ]
-      },
-      {
-        "group": "Privacy Layer",
-        "pages": [
-          "products/privacy-layer/about",
-          "products/privacy-layer/how-it-works",
-          {
-            "group": "Architecture",
-            "root": "products/privacy-layer/architecture/overview",
-            "pages": [
-              "products/privacy-layer/architecture/zk-pool-model"
-            ]
           },
           {
-            "group": "SDK",
-            "root": "products/privacy-layer/sdk/overview/introduction",
+            "group": "Privacy Layer",
             "pages": [
-              "products/privacy-layer/sdk/overview/packages",
+              "products/privacy-layer/sdk/overview/introduction",
+              {
+                "group": "Get started",
+                "pages": [
+                  "products/privacy-layer/sdk/integration/getting-access",
+                  "products/privacy-layer/sdk/application-development/setup",
+                  "products/privacy-layer/sdk/integration/backend",
+                  "products/privacy-layer/sdk/integration/quick-start"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "products/privacy-layer/sdk/application-development/how-to/deposit",
+                  {
+                    "group": "Send a private transfer",
+                    "root": "products/privacy-layer/sdk/application-development/how-to/transfer-registered-recipient",
+                    "pages": [
+                      "products/privacy-layer/sdk/application-development/how-to/transfer-unregistered-recipient"
+                    ]
+                  },
+                  "products/privacy-layer/sdk/application-development/how-to/withdraw"
+                ]
+              },
               {
                 "group": "Concepts",
                 "pages": [
@@ -229,61 +300,43 @@
                 ]
               },
               {
-                "group": "Integration",
+                "group": "Reference",
                 "pages": [
-                  "products/privacy-layer/sdk/integration/getting-access",
-                  "products/privacy-layer/sdk/integration/integration-paths",
-                  "products/privacy-layer/sdk/integration/quick-start",
-                  "products/privacy-layer/sdk/integration/state-integration",
-                  "products/privacy-layer/sdk/integration/data-sources"
-                ]
-              },
-              {
-                "group": "Stellar application development",
-                "root": "products/privacy-layer/sdk/application-development/install",
-                "pages": [
-                  "products/privacy-layer/sdk/application-development/setup",
                   {
-                    "group": "How to",
+                    "group": "SDK reference",
+                    "root": "products/privacy-layer/sdk/overview/packages",
                     "pages": [
-                      "products/privacy-layer/sdk/application-development/how-to/deposit",
-                      "products/privacy-layer/sdk/application-development/how-to/withdraw",
-                      "products/privacy-layer/sdk/application-development/how-to/transfer-registered-recipient",
-                      "products/privacy-layer/sdk/application-development/how-to/transfer-unregistered-recipient"
+                      "products/privacy-layer/sdk/integration/integration-paths",
+                      "products/privacy-layer/sdk/integration/state-integration",
+                      "products/privacy-layer/sdk/integration/data-sources"
                     ]
-                  }
+                  },
+                  "products/privacy-layer/api-reference/relayer",
+                  "products/privacy-layer/api-reference/kyt"
                 ]
               }
             ]
           },
           {
-            "group": "Application examples",
+            "group": "Custom KYT providers",
             "pages": [
-              "products/privacy-layer/integration/stellar/integration-overview",
-              "products/privacy-layer/integration/solana/integration-overview"
+              "products/custom-kyt-providers/overview",
+              {
+                "group": "API reference",
+                "root": "products/custom-kyt-providers/api-reference/overview",
+                "pages": [
+                  "products/custom-kyt-providers/api-reference/metadata",
+                  "products/custom-kyt-providers/api-reference/check"
+                ]
+              }
             ]
-          }
-        ]
-      },
-      {
-        "group": "Custom KYT providers",
-        "pages": [
-          "products/custom-kyt-providers/overview",
+          },
           {
-            "group": "API reference",
-            "root": "products/custom-kyt-providers/api-reference/overview",
+            "group": "Support",
             "pages": [
-              "products/custom-kyt-providers/api-reference/metadata",
-              "products/custom-kyt-providers/api-reference/check"
+              "support/troubleshooting"
             ]
           }
-        ]
-      },
-      {
-        "group": "Support",
-        "pages": [
-          "support/troubleshooting",
-          "support/contact-us"
         ]
       }
     ]
@@ -292,6 +345,7 @@
     "eyebrows": "breadcrumbs"
   },
   "interaction": {
-    "drilldown": true
-  }
+    "drilldown": false
+  },
+  "favicon": "/logo/favicon.svg"
 }

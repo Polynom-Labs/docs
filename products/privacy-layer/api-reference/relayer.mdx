@@ -1,0 +1,87 @@
+---
+title: Relayer API
+description: Submit prepared private transactions, track their status, and retry eligible failures.
+---
+
+Use the Relayer API to submit an SDK-prepared transaction package for execution on Stellar. Submission is asynchronous: acceptance creates a relay request, not a confirmed blockchain transaction.
+
+Use the service base URL supplied for your environment. The routes below belong to the Privacy Layer Transfer API, not the Compliance Platform Service API.
+
+{/* TODO: Confirm published environment URLs and gateway authentication requirements. The checked Transfer Backend controllers and app bootstrap do not declare an application API-key or bearer guard. Do not infer unrestricted public access from that fact. */}
+
+## Methods
+
+| Method | Path | Result |
+| --- | --- | --- |
+| POST | `/api/relay-requests` | Accept a transaction package; HTTP 202 |
+| GET | `/api/relay-requests/{relayRequestId}` | Read request status; HTTP 200 |
+| POST | `/api/relay-requests/{relayRequestId}/attempts` | Retry an eligible request; HTTP 200 |
+
+## Submit a transaction package
+
+Send JSON with `Content-Type: application/json`. Build the package from the prepared SDK operation rather than constructing proof data manually.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `version` | number, required | Package version: `1`. |
+| `poolSelector` | string, required | Pool identifier supported by this environment. |
+| `proofBytes` | hex string, required | Generated proof bytes. |
+| `publicSignals` | hex string, required | Encoded public signals for the proof. |
+| `applicationIdHints` | string[], required | Application IDs in audit-slot order. Count must match the circuit configuration. |
+| `zkConfigNonce` | decimal string | Circuit configuration identifier. Send the SDK value explicitly. |
+| `keyVersionHints` | array of nonnegative integers or null | Key versions in audit-slot order. |
+| `ciphertextBytes` | hex string | Ciphertext required by circuit configurations that store it separately from public signals. |
+| `outputNoteEphemeralScalars` | string[] | Required with the separate-ciphertext configuration; one value per output. |
+| `escrowAuthorization` | string | Authorisation for the applicable escrow submission route. |
+
+The SDK and the environment's circuit configuration determine which conditional fields to include. Proof-related material can be sensitive: do not log the full request body.
+
+The response contains:
+
+| Field | Description |
+| --- | --- |
+| `relayRequestId` | Identifier to persist and use for status checks. |
+| `status` | Current request state. |
+| `createdAt` | Creation timestamp. |
+| `statusUrl` | Relative URL for the status endpoint. Resolve against the service base URL. |
+
+Submitting the same canonical payload with the same pool and nullifier identity reuses the existing request. A different payload for that identity returns `409 conflicting_payload`. Admission limits still apply to repeated submissions.
+
+## Track the result
+
+Call `GET /api/relay-requests/{relayRequestId}`. No request body is needed.
+
+| Status | Meaning |
+| --- | --- |
+| `accepted`, `validating`, `queued` | Processing has not yet reached a submitted transaction. |
+| `submitted`, `reconciling` | Submission is in progress or its outcome is being resolved. |
+| `succeeded` | The operation completed successfully. |
+| `rejected` | The package did not pass validation or policy checks. |
+| `failed` | Processing failed; inspect the reason and retry eligibility. |
+
+The response includes `relayRequestId`, `status`, `createdAt`, `updatedAt`, and `retryAllowed`. It can also include `attemptNumber`, `transactionHash`, and `publicReason`.
+
+Persist the request ID so you can resume status checks after a reload or service restart. A transaction hash alone does not indicate success.
+
+## Retry a request
+
+When `retryAllowed` is `true`, call `POST /api/relay-requests/{relayRequestId}/attempts` with no body. The response has the same shape as the status response. Eligibility is checked again when the request arrives.
+
+Do not start a replacement transaction while the existing request is `submitted` or `reconciling`. Continue checking its outcome.
+
+## Errors
+
+Admission errors use a JSON `reason` field.
+
+| HTTP status | Reasons |
+| --- | --- |
+| 400 | `invalid_package`, `unsupported_pool`, `unsupported_signal_shape` |
+| 404 | `not_found` |
+| 409 | `conflicting_payload`, `retry_not_allowed` |
+| 413 | `payload_too_large` |
+| 429 | `rate_limited` |
+| 503 | `relayer_unavailable`, `queue_at_capacity`, `low_balance` |
+
+After acceptance, operation failures appear in `status` and `publicReason`. Reasons include `invalid_proof`, `kyt_rejected`, `nullifiers_spent`, `simulation_failed`, and `transaction_failed`.
+
+See [KYT API](/products/privacy-layer/api-reference/kyt) for screening decisions and [SDK and APIs](/products/privacy-layer/sdk/integration/integration-paths) for the integration model.

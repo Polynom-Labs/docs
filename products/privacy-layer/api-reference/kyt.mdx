@@ -1,0 +1,91 @@
+---
+title: KYT API
+description: Request a screening decision and signed authorisation for a prepared private transaction.
+---
+
+KYT (Know Your Transaction) checks a prepared transaction against the configured compliance rules. An approved response supplies a signed passage authorisation for the transaction flow. A rejected response supplies a reason code.
+
+Use the Transfer API base URL supplied for your environment. The service forwards inspection to the configured compliance backend. Its upstream credentials are configured on the server; do not embed those credentials in your frontend.
+
+For direct server-to-server calls to the compliance backend, send `Authorization: Bearer <inspect-token>` when the environment requires an inspect token. This is a dedicated service credential, not a User API OAuth token or Compliance Service API key. The backend permits calls without this credential when no inspect token is configured.
+
+{/* TODO: Confirm published environment URL and client-facing gateway authentication. Do not document the Compliance Service API key as the authentication scheme for this route without implementation evidence. */}
+
+## Inspect a passage
+
+`POST /api/kyt/passages/inspect`
+
+Send JSON with `Content-Type: application/json`. Use the request generated for your SDK and environment configuration.
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `owner` | string, required | Caller Stellar address. |
+| `poolContract` | string, required | Privacy pool contract address. |
+| `kytRegistry` | string, required | KYT passage registry contract address. |
+| `proofBytes` | hex string, required | Generated proof. |
+| `publicSignalsBytes` | hex string, required | Encoded public signals. This field is named differently from Relayer's `publicSignals`. |
+| `applicationIdsPlaintext` | string[], required | Application ID hints in audit-slot order. |
+| `currentLedger` | number, required | Current ledger fetched from the configured Stellar RPC. Used to calculate authorization expiry. |
+| `zkConfigNonce` | decimal string | Circuit configuration used by the prepared transaction. |
+| `keyVersPlaintext` | (number or null)[] | Optional key-version hints in audit-slot order. Validated key versions come from Storage, not these hints. |
+| `ciphertextBytes` | hex string | Required for ciphertext-binding layouts. Preserve the SDK-generated value. |
+| `outputNoteEphemeralScalars` | string[] | Inspection-only values needed by applicable output-note binding layouts. They are not part of the on-chain transaction arguments. |
+| `nonce` | string | Decision-correlation value. |
+| `passageId` | string | Optional precomputed passage identifier, validated by the screening service. |
+
+Circuit-specific fields and array lengths must match the configured backend and circuit layout. Preserve the SDK-generated request; do not copy values from another transaction. The legacy `decryptedAuditSlots` field is ignored for audit validation, screening, and persisted key versions. You do not need to provide decrypted records yourself.
+
+## Read the decision
+
+A processed request returns HTTP 201. Inspect the body's `status`: an HTTP success response can contain a rejected screening decision.
+
+### Approved
+
+| Field | Description |
+| --- | --- |
+| `status` | `approved` |
+| `passageId`, `decisionId` | Passage and decision identifiers. |
+| `signature` | Signed authorisation, encoded as Base64. |
+| `signatureEncoding` | `base64` |
+| `expiresAtLedger` | Expiration expressed as a ledger number, not a timestamp. |
+| `kytPublicKey` | Public key identifying the authorisation signer. |
+| `authorizationHash` | Hash bound to the signed authorisation. |
+| `publicSignalHash`, `publicLegContextHash` | Hashes derived from the transaction context. |
+| `onboardingHash` | Compatibility field; the current implementation returns a zero hash. |
+| `withdrawAddress` | Withdrawal address derived from the transaction context. |
+
+Pass the authorisation through the transaction flow for which it was issued. Approval does not itself submit or confirm a blockchain transaction.
+
+The registry consumes the passage once at settlement. It accepts either the inline signed authorization or a passage registered on-chain in advance. Use `expiresAtLedger` from the response; the registry rejects expired authorizations and enforces its maximum lifetime.
+
+### Rejected
+
+| Field | Description |
+| --- | --- |
+| `status` | `rejected` |
+| `reasonCode` | Machine-readable rejection reason. |
+| `decisionId` | Decision identifier. |
+| `passageId` | Passage identifier, when available. |
+
+Stop the submission flow when the decision is rejected. Retain the decision identifier for support rather than logging proof-related request contents.
+
+## Request failures
+
+- Invalid request data can return HTTP 400.
+- Missing or incorrect inspect credentials return HTTP 401 when token authentication is enabled.
+- The Transfer API preserves non-success HTTP statuses returned by its upstream screening service.
+- Failure to reach that service returns HTTP 502.
+
+Treat a missing decision or a request failure as an unresolved check, not as approval.
+
+See [KYT authorization](/products/privacy-layer/protocol-components/compliance-integration#kyt-authorization) for the authorization flow and its boundaries.
+
+## Read passage metadata
+
+The compliance backend also exposes `GET /api/kyt/passages/{passageId}` for indexer enrichment. A known passage returns HTTP 200 with `passage_id`, `status`, `application_ids`, `slot_app_ids`, and `slot_key_vers`; an unknown passage returns HTTP 404. Slot arrays preserve audit-slot order and can contain null values.
+
+This is not a transaction-status endpoint and does not return decrypted audit records. The Transfer API proxy does not expose this GET route.
+
+{/* Source review: 2026-09-17, compliance backend staging acd70eb8, Transfer backend main 5f69ad80, SDK main 942f226e, contracts development 47a0eb40. TODO: Confirm deployed version set and indexer-route access controls. */}
+
+See [Relayer API](/products/privacy-layer/api-reference/relayer) for submission and [Disclosure policy](/products/privacy-layer/sdk/concepts/disclosure-policy) for transaction visibility settings.

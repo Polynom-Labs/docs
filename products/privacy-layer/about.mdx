@@ -1,187 +1,62 @@
 ---
-title: "Privacy Layer"
-sidebarTitle: "Overview"
-description: "Confidential transaction infrastructure for payments and financial activity inside client products."
+title: Privacy Layer
+sidebarTitle: Overview
+description: Private balances and transactions with verifiable settlement and compliance authorization.
 ---
 
-The Arcane Privacy Layer enables a client application to execute confidential
-on-chain transactions without transferring ownership of the client product,
-ledger, or customer relationship to Arcane.
+Arcane Privacy Layer lets you deposit funds, send private transfers, and withdraw to public addresses. Your application uses the Arcane Privacy SDK to construct transactions while the blockchain verifies their validity without reading private balances.
 
-It adds private balances, protected transfers, and controlled movement between
-public and private transaction state to an existing financial product. The
-client continues to own the customer experience, business rules, accounting,
-and operational records.
+Your application keeps control of its interface, accounts, business rules, and records. Privacy Layer supplies the private transaction protocol; Compliance Platform supplies the protected policy and disclosure workflows.
 
-<Info>
-  The Privacy Layer protects the transaction path. The separate Compliance
-  Platform governs authorized review and disclosure when private evidence must
-  be examined.
-</Info>
+## System at a glance
 
-## Why the Privacy Layer exists
+This protocol section describes the Stellar architecture.
 
-Public blockchains provide verifiable settlement, but they can also expose
-balances, payment amounts, counterparties, and patterns of financial activity.
-This creates an unacceptable information boundary for many payment, treasury,
-payroll, and digital-asset products.
+```mermaid
+flowchart TD
+  Client["Application and SDK"] --> Proof["Private transaction and proof"]
+  Proof --> Auth["Compliance authorization"]
+  Auth --> Submission["Wallet or Relayer"]
+  Submission --> Pool["Pool contracts"]
+  Pool --> Records["Encrypted output records"]
+  Records --> Recipient["Recipient discovery and private state"]
+```
 
-Clients need transaction confidentiality without losing the ability to:
+Settlement combines three independent requirements: a valid private state transition, the required compliance approval, and an authorized execution context. A proof does not grant policy approval. A compliance decision does not grant ownership. A relayer does not gain the right to redirect funds.
 
-- reconcile product and blockchain state;
-- investigate failed or disputed operations;
-- support authorized compliance and audit workflows;
-- retain control of customer records and accounting;
-- move value between public and private environments when required.
+## Explore the protocol
 
-The Privacy Layer provides the private execution infrastructure for this
-operating model.
-
-## Core capabilities
-
-<Columns cols={2}>
-  <Card title="Private balances and transfers" icon="lock-keyhole">
-    Maintain shielded value and execute protected transfers without exposing
-    private transaction details as ordinary public payment records.
+<CardGroup cols={2}>
+  <Card title="Core concepts" href="/products/privacy-layer/core-concepts">
+    Understand notes, private addresses, commitments, and application domains.
   </Card>
-
-  <Card title="Public and private movement" icon="arrow-right-left">
-    Shield value into private state, transfer it within the Privacy Layer, and
-    withdraw it to a public blockchain address when required.
+  <Card title="Transactions" href="/products/privacy-layer/transactions">
+    Follow deposits, transfers, and withdrawals through settlement.
   </Card>
-
-  <Card title="Integration infrastructure" icon="blocks">
-    Use the network-specific Arcane SDK and the supporting services required by
-    the configured deployment.
+  <Card title="Pool contracts" href="/products/privacy-layer/protocol-components/pool-contracts">
+    See how the pool verifies transactions and updates state atomically.
   </Card>
-
-  <Card title="Reconciliation evidence" icon="file-clock">
-    Preserve transaction signatures, confirmation state, private-state scan
-    progress, and operation history for client operations and support.
+  <Card title="Zero-knowledge proofs" href="/products/privacy-layer/protocol-components/zero-knowledge-proofs">
+    Understand what the proof establishes and the cryptographic assumptions.
   </Card>
-</Columns>
-
-## Product model
-
-The Privacy Layer is integrated into a client-controlled financial product.
-End users interact with the client's interface. The client integration uses
-the Arcane SDK and deployment services to prepare and execute private
-transactions.
-
-| Layer | Primary responsibility |
-| --- | --- |
-| **Client interface** | Customer experience, authenticated product actions, balances, and transaction status. |
-| **Client application and storage** | Business rules, wallet scope, product records, private-state material required by the integration, and reconciliation. |
-| **Arcane Privacy Layer** | Network-specific SDK, proof and transaction construction, plus the indexing, delivery, or relaying services used by the deployment. |
-| **Blockchain network** | Transaction settlement, confirmation, and public network state. |
-
-<Note>
-  The client product remains the system of record. Reconcile a submitted
-  private transaction with chain confirmation, the required private-state
-  update, and the client ledger before treating the product action as complete.
-</Note>
-
-## Privacy and visibility
-
-The Privacy Layer separates confidential transaction data from the public
-settlement layer. Private balances and protected operations use private state
-and cryptographic proofs, while the blockchain verifies and settles the
-result.
-
-Privacy does not remove every public signal. Funding and withdrawal operations
-that interact with public blockchain addresses remain part of public network
-state. Clients must also protect integration keys, wallet mappings, product
-references, logs, and other metadata that could reveal sensitive context.
-
-When an approved compliance, audit, support, or investigation workflow needs
-private evidence, the Compliance Platform provides a separate, scoped review
-path. The Privacy Layer does not make private transaction data generally
-visible to platform users.
-
-## Who the product is for
-
-<Columns cols={2}>
-  <Card title="Product and engineering teams" icon="settings-2">
-    Add private transaction capabilities to wallets, payment products, and
-    client applications.
+  <Card title="Relayer" href="/products/privacy-layer/protocol-components/relayer">
+    Separate transaction submission from private ownership.
   </Card>
-
-  <Card title="Treasury and payment operations" icon="building-2">
-    Operate protected payment, payout, and treasury flows while retaining
-    reconciliation records.
+  <Card title="Compliance integration" href="/products/privacy-layer/protocol-components/compliance-integration">
+    Connect private transactions to policy authorization and controlled disclosure.
   </Card>
+</CardGroup>
 
-  <Card title="Support and investigation teams" icon="life-buoy">
-    Trace product status and transaction evidence without using private data as
-    a general operational analytics feed.
-  </Card>
+## Privacy boundaries
 
-  <Card title="Compliance and audit teams" icon="shield-check">
-    Use the separate governed review path when specific private evidence is
-    required for an authorized purpose.
-  </Card>
-</Columns>
+Private transfers protect note contents and ownership links from public observers. Deposits still expose the funding account, asset, and amount. Withdrawals expose the public destination, asset, and amount.
 
-## Common use cases
+Relaying does not hide client connections from the relayer or remove timing and network metadata. Authorized compliance infrastructure can access the audit data required for its purpose. The protocol does not provide unconditional anonymity.
 
-The Privacy Layer can support financial workflows such as:
+## Build with Arcane
 
-- wallet and stablecoin payments;
-- payroll, contributor payments, and partner payouts;
-- treasury and corporate payment operations;
-- private funding and withdrawal flows;
-- protected digital-asset transfers;
-- financial actions embedded in client applications.
+Start with [SDK setup](/products/privacy-layer/sdk/integration/getting-access), then follow the [frontend](/products/privacy-layer/sdk/application-development/setup) or [backend](/products/privacy-layer/sdk/integration/backend) example.
 
-## Product boundary
+For the separate Solana integration path, see [Solana integration](/products/privacy-layer/integration/solana/integration-overview). Do not apply Stellar contract or cryptographic details to another network.
 
-The Privacy Layer provides transaction privacy infrastructure. It does not
-replace the client's:
-
-- interface, authentication, or customer accounts;
-- business logic, product approvals, or accounting rules;
-- database, ledger, or transaction history;
-- key-management and application security controls;
-- operational monitoring, reconciliation, or support procedures;
-- legal, compliance, or risk-management responsibilities.
-
-<Info>
-  Stellar and Solana use separate network-specific integration paths. Select
-  the path that matches the client's configured network and deployment.
-</Info>
-
-## Next steps
-
-<Columns cols={2}>
-  <Card
-    title="How it works"
-    icon="workflow"
-    href="/products/privacy-layer/how-it-works"
-  >
-    Follow the private transaction path and understand system responsibilities.
-  </Card>
-
-  <Card
-    title="Stellar operation lifecycle"
-    icon="star"
-    href="/products/privacy-layer/sdk/concepts/operation-lifecycle"
-  >
-    Prepare and execute errors, retry, and persisted SDK state.
-  </Card>
-
-  <Card
-    title="Solana application example"
-    icon="network"
-    href="/products/privacy-layer/integration/solana/integration-overview"
-  >
-    Solana application example. A network runbook is not published yet.
-  </Card>
-
-  <Card
-    title="Compliance Platform"
-    icon="scan-eye"
-    href="/products/compliance-platform/overview"
-  >
-    Understand the governed review and disclosure path for private evidence.
-  </Card>
-</Columns>
+{/* Source: engineering paper sections 1–2 and 7. */}

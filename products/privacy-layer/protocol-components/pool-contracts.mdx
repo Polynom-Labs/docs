@@ -1,0 +1,46 @@
+---
+title: Pool contracts
+description: How public pool state verifies private transactions and settles asset movement.
+---
+
+The pool contracts are the settlement boundary for private transactions. They keep public commitments and asset custody while verifying transitions whose note contents remain private.
+
+## State held by the pool
+
+| State | Purpose |
+| --- | --- |
+| State leaves and Merkle roots | Commit to private outputs and establish the roots accepted for spending |
+| Consumed nullifier hashes | Prevent the same note from being spent twice |
+| Asset custody | Hold deposited assets and fund public withdrawals |
+| Verifier configuration | Identify the proof relation used to validate a transaction |
+
+Application domains are bound inside notes. Participating applications can share pool state without sharing audit keys or policy definitions. See [Core concepts](/products/privacy-layer/core-concepts).
+
+## Settlement checks
+
+The pool checks the submitted transaction against both its proof and current state:
+
+1. The proof is valid for the selected verifier and public statement.
+2. The selected state root is accepted.
+3. The input nullifiers have not already been consumed.
+4. The required compliance authorization is valid.
+5. Public asset movement has the required authority and custody.
+
+A proof can remain cryptographically valid while its transaction can no longer settle. For example, a competing payment may have consumed one of its inputs.
+
+## Atomic effects
+
+A successful settlement consumes input nullifiers, appends output state leaves, performs any public asset movement, and publishes encrypted transaction records in one ledger operation. If a check or effect fails, the transaction's state changes are not committed.
+
+Deposits require authority to debit the public funding account. Withdrawals release the specified asset and amount to the public destination. Internal transfers update private state without a public token transfer.
+
+## Contract and governance boundaries
+
+The pool does not interpret decrypted note or audit contents. Proof verification and compliance authorization provide different checks over the transaction.
+
+Correct settlement also depends on Stellar consensus, Soroban authorization and atomic execution, supported asset contracts, and the configured verifier. A malicious asset contract or incorrect verifier is not repaired by the privacy proof.
+
+Verifier changes affect the rules under which existing notes can be spent. See [Zero-knowledge proofs](/products/privacy-layer/protocol-components/zero-knowledge-proofs) for the setup and verification boundary.
+
+{/* TODO: Verify deployed authorization-state fields, policy epochs, passage revocation, transition replay protection, and verifier upgrade controls before publishing their concrete guarantees. */}
+{/* Source: engineering paper sections 2, 4.4, 6.5, and 7. */}

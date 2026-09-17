@@ -1,0 +1,54 @@
+---
+title: Zero-knowledge proofs
+description: What a private transaction proves and what remains a settlement or operational check.
+---
+
+A zero-knowledge proof lets the pool verify a private state transition without receiving its private witness. The witness includes the input notes, ownership material, membership paths, and data used to construct the outputs.
+
+## What the proof establishes
+
+| Property | Meaning |
+| --- | --- |
+| Ownership | The prover knows the spending material for the consumed notes |
+| Membership | The consumed notes belong to the selected state root |
+| Nullifier derivation | Published nullifier hashes correspond to the consumed notes |
+| Output construction | New commitments bind the intended note fields and recipient material |
+| Conservation | Inputs and deposits equal outputs and withdrawals for each asset |
+| Record consistency | Encrypted recipient and audit records correspond to the same private transaction data |
+
+The proof binds these properties together. A client cannot present one amount for value conservation and an unrelated amount in the audit record while satisfying the specified relation.
+
+## What the proof does not establish
+
+The proof does not decide whether its root is still accepted, whether another transaction has spent its inputs, whether a public account authorized funding, or whether policy permits settlement. [Pool contracts](/products/privacy-layer/protocol-components/pool-contracts) and [compliance authorization](/products/privacy-layer/protocol-components/compliance-integration) provide those checks.
+
+## Cryptographic construction
+
+The engineering design assigns a distinct role to each mechanism:
+
+| Mechanism | Role |
+| --- | --- |
+| Groth16 over BN254 | Proof of the private state transition |
+| Poseidon | Commitments, nullifier hashing, and Merkle hashing |
+| BabyJubJub | Private-address ownership and recipient/audit key agreement |
+| MiMC7-based field encryption and keyed tags | Recipient and audit record protection |
+| SHA-256 and Ed25519 | Transaction authorization binding and signatures |
+
+Recipient records and audit records serve different readers and use separate key roles. Neither an encrypted record nor its decryption key substitutes for the owner's spending witness.
+
+The field-encryption construction is protocol-specific. Proof consistency establishes that records were constructed according to the relation; it is not, by itself, a proof of encryption security. The construction is not presented as standardized ECIES or AEAD.
+
+## Validation and randomness
+
+Security depends on canonical field and scalar encodings, valid curve points and subgroup membership, consistent parameters, and fresh randomness. Recipients validate recovered records against their authentication data and state leaves before accepting notes.
+
+Incorrect randomness or reused encryption material can undermine confidentiality even if the surrounding transaction flow is correct.
+
+## Setup and verifier trust
+
+Groth16 relies on circuit-specific setup material. Proof soundness depends on the correct relation, verification key, and setup assumptions. Verification of the wrong relation can invalidate ownership or conservation guarantees.
+
+The engineering paper specifies verifiable setup artifacts and controlled verifier changes. Artifact publication and operational governance must be verified separately; the use of Groth16 alone does not establish that a setup ceremony or independent security audit has been completed.
+
+{/* TODO: Link verified setup transcripts, artifact digests, test vectors, and audit reports when approved for publication. Confirm deployed primitive versions and verifier governance before adding parameter-level claims. */}
+{/* Source: engineering paper sections 4.2, 6, and 7. */}
